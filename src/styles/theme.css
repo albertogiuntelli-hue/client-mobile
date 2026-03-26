@@ -1,0 +1,148 @@
+/* ===========================
+   TEMA GENERALE
+=========================== */
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    background: #f5f5f5;
+}
+
+/* ===========================
+   NAVBAR
+=========================== */
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #ffffff;
+    padding: 10px 15px;
+    border-bottom: 1px solid #ddd;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.navbar-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    color: black;
+}
+
+/* LOGO — dimensioni corrette OVUNQUE */
+nav.navbar img.logo-img {
+    width: 28px !important;
+    height: 28px !important;
+    object-fit: contain !important;
+}
+
+.navbar-title {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.navbar-links {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+.cart-info {
+    display: flex;
+    flex-direction: column;
+    text-align: right;
+}
+
+.cart-count,
+.cart-total {
+    font-size: 14px;
+}
+
+/* Hamburger */
+.hamburger {
+    display: none;
+    flex-direction: column;
+    gap: 4px;
+    cursor: pointer;
+}
+
+.hamburger div {
+    width: 22px;
+    height: 3px;
+    background: black;
+}
+
+/* ===========================
+   MOBILE MENU
+=========================== */
+
+.mobile-menu {
+    display: none;
+    flex-direction: column;
+    background: white;
+    padding: 15px;
+    border-top: 1px solid #ddd;
+}
+
+.mobile-menu.open {
+    display: flex;
+}
+
+/* ===========================
+   CHECKOUT
+=========================== */
+
+.checkout-container {
+    padding: 15px;
+    overflow-y: auto;
+    max-height: 100vh;
+}
+
+.checkout-form-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.checkout-form-row input {
+    flex: 1;
+}
+
+.checkout-btn {
+    width: 100%;
+    padding: 15px;
+    background: #28a745;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 18px;
+    margin-top: 20px;
+    cursor: pointer;
+}
+
+/* ===========================
+   RESPONSIVE MOBILE
+=========================== */
+
+@media (max-width: 768px) {
+    .navbar-links {
+        display: none;
+    }
+
+    .hamburger {
+        display: flex;
+    }
+
+    nav.navbar img.logo-img {
+        width: 32px !important;
+        height: 32px !important;
+    }
+
+    .checkout-form-row {
+        flex-direction: column;
+    }
+}

@@ -1,0 +1,131 @@
+/* ============================
+   NAVBAR MODERNA VERDE ELEGANTE
+============================ */
+
+:root {
+    --verde: #6BCB77;
+    --verde-scuro: #4E9F3D;
+    --verde-chiaro: #E8F8EF;
+    --grafite: #2E2E2E;
+    --grigio-chiaro: #F5F5F5;
+}
+
+/* NAVBAR */
+.navbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 20px;
+    background: var(--verde);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
+}
+
+/* LOGO + TITOLO */
+.navbar-logo {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+}
+
+.navbar-logo img {
+    height: 42px;
+    margin-right: 10px;
+    border-radius: 8px;
+}
+
+.navbar-title {
+    color: white;
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+/* LINK DESKTOP */
+.navbar-links {
+    display: flex;
+    gap: 22px;
+}
+
+.navbar-links a {
+    color: white;
+    font-weight: 600;
+    text-decoration: none;
+    font-size: 16px;
+    transition: 0.2s;
+}
+
+.navbar-links a:hover {
+    color: var(--verde-chiaro);
+}
+
+/* CARRELLO */
+.cart-link {
+    position: relative;
+    color: white;
+    font-weight: 700;
+    text-decoration: none;
+    font-size: 18px;
+}
+
+/* BADGE CARRELLO */
+.cart-badge {
+    position: absolute;
+    top: -8px;
+    right: -12px;
+    background: var(--verde-scuro);
+    color: white;
+    padding: 3px 7px;
+    border-radius: 50%;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+/* HAMBURGER (MOBILE) */
+.hamburger {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    cursor: pointer;
+}
+
+.hamburger div {
+    width: 28px;
+    height: 3px;
+    background: white;
+    border-radius: 3px;
+    transition: 0.3s;
+}
+
+/* MENU MOBILE */
+.mobile-menu {
+    display: none;
+    flex-direction: column;
+    background: var(--verde);
+    padding: 15px;
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
+}
+
+.mobile-menu a {
+    color: white;
+    padding: 12px 0;
+    font-size: 18px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+    .navbar-links {
+        display: none;
+    }
+
+    .hamburger {
+        display: flex;
+    }
+
+    .mobile-menu.open {
+        display: flex;
+    }
+}
