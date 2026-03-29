@@ -1,52 +1,38 @@
 import React, { useEffect, useState } from "react";
 import api from "../api/axios";
 import { useCart } from "../context/CartContext";
-import "../styles/theme.css";
 import "../styles/productlist.css";
 
-export default function ProductList() {
-    const [products, setProducts] = useState([]);
-    const [search, setSearch] = useState("");
+export default function Promo() {
+    const [promo, setPromo] = useState([]);
     const { addToCart } = useCart();
 
     useEffect(() => {
-        const fetchProducts = async () => {
+        const fetchPromo = async () => {
             try {
-                const res = await api.get("/products");
+                const res = await api.get("/promo");
 
                 const valid = res.data.filter(
                     (p) => p.nome && p.nome.trim() !== ""
                 );
 
-                setProducts(valid);
+                setPromo(valid);
             } catch (error) {
-                console.error("Errore caricamento prodotti:", error);
+                console.error("Errore caricamento promo:", error);
             }
         };
 
-        fetchProducts();
+        fetchPromo();
     }, []);
-
-    const filtered = products.filter((p) =>
-        p.nome.toLowerCase().includes(search.toLowerCase())
-    );
 
     return (
         <div className="products-container">
-            <h1 className="page-title">Prodotti</h1>
+            <h1 className="page-title">Offerte Speciali</h1>
 
-            <input
-                type="text"
-                placeholder="Cerca prodotto..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="search-input"
-            />
-
-            {filtered.length === 0 && <p>Nessun prodotto trovato</p>}
+            {promo.length === 0 && <p>Nessuna promo disponibile</p>}
 
             <div className="product-grid">
-                {filtered.map((p) => {
+                {promo.map((p) => {
                     const prezzoFinale =
                         p.prezzoSco > 0 ? p.prezzoSco : p.prezzo;
 

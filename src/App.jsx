@@ -6,6 +6,7 @@ import ProductList from "./pages/ProductList";
 import ProductPage from "./pages/ProductPage";
 import Carrello from "./pages/Carrello";
 import Checkout from "./pages/Checkout";
+import Promo from "./pages/Promo";
 
 // COMPONENTI
 import Navbar from "./components/Navbar";
@@ -19,6 +20,7 @@ export default function App() {
         <Route path="/" element={<Home />} />
         <Route path="/prodotti" element={<ProductList />} />
         <Route path="/prodotto/:id" element={<ProductPage />} />
+        <Route path="/promo" element={<Promo />} />
         <Route path="/carrello" element={<Carrello />} />
         <Route path="/checkout" element={<Checkout />} />
       </Routes>
