@@ -10,7 +10,7 @@ export default function Promo() {
     useEffect(() => {
         const fetchPromo = async () => {
             try {
-                const res = await api.get("/promo");
+                const res = await api.get("/api/promo");
 
                 const valid = res.data.filter(
                     (p) => p.nome && p.nome.trim() !== ""

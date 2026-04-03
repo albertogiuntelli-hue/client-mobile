@@ -12,7 +12,7 @@ export default function ProductList() {
     useEffect(() => {
         const fetchProducts = async () => {
             try {
-                const res = await api.get("/products");
+                const res = await api.get("/api/products");
 
                 const valid = res.data.filter(
                     (p) => p.nome && p.nome.trim() !== ""

@@ -1,5 +1,3 @@
-// client/src/admin/AdminDashboard.jsx
-
 export default function AdminDashboard() {
     return (
         <div style={{ padding: "20px" }}>
