@@ -45,7 +45,30 @@ export default function Checkout() {
             `*Totale:* €${total.toFixed(2)}\n\n` +
             `*Note:* ${cliente.note || "Nessuna"}`;
 
-        // Salvataggio ordine nel backend
+        // 🔵 1) CONTROLLO SE L’UTENTE ESISTE GIÀ
+        let existingUser = null;
+        try {
+            existingUser = await api.get(`/api/users/${cliente.telefono}`);
+        } catch (err) {
+            existingUser = null; // se 404 → utente nuovo
+        }
+
+        // 🔵 2) SE NON ESISTE → LO REGISTRO
+        if (!existingUser || !existingUser.data) {
+            try {
+                await api.post("/api/users", {
+                    nome: cliente.nome,
+                    cognome: cliente.cognome,
+                    indirizzo: cliente.indirizzo,
+                    telefono: cliente.telefono,
+                    note: cliente.note || "",
+                });
+            } catch (err) {
+                console.error("Errore registrazione utente:", err);
+            }
+        }
+
+        // 🔵 3) SALVATAGGIO ORDINE
         try {
             await api.post("/api/orders", {
                 cliente: {
@@ -70,7 +93,7 @@ export default function Checkout() {
             alert("Ordine non salvato in dashboard. Riprova più tardi.");
         }
 
-        // Apertura WhatsApp con numero fisso
+        // 🔵 4) APERTURA WHATSAPP CON NUMERO FISSO
         const encoded = encodeURIComponent(messaggioWhatsApp);
         window.open(`https://wa.me/393356039828?text=${encoded}`, "_blank");
 
