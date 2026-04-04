@@ -25,36 +25,17 @@ export default function Checkout() {
             return;
         }
 
-        // Riepilogo prodotti per WhatsApp
-        const righeProdotti = items
-            .map((item) => {
-                const prezzoUnitario = item.prezzoSco > 0 ? item.prezzoSco : item.prezzo;
-                return `${item.nome} x${item.quantity} - €${(
-                    prezzoUnitario * item.quantity
-                ).toFixed(2)}`;
-            })
-            .join("\n");
-
-        const messaggioWhatsApp =
-            `*Nuovo ordine PlusMarket Giuntelli*\n\n` +
-            `*Cliente:*\n` +
-            `${cliente.nome} ${cliente.cognome}\n` +
-            `${cliente.indirizzo}\n` +
-            `Tel: ${cliente.telefono}\n\n` +
-            `*Prodotti:*\n${righeProdotti}\n\n` +
-            `*Totale:* €${total.toFixed(2)}\n\n` +
-            `*Note:* ${cliente.note || "Nessuna"}`;
-
         // 🔵 1) CONTROLLO SE L’UTENTE ESISTE GIÀ
         let existingUser = null;
         try {
-            existingUser = await api.get(`/api/users/${cliente.telefono}`);
+            const res = await api.get(`/api/users/${cliente.telefono}`);
+            existingUser = res.data;
         } catch (err) {
             existingUser = null; // se 404 → utente nuovo
         }
 
         // 🔵 2) SE NON ESISTE → LO REGISTRO
-        if (!existingUser || !existingUser.data) {
+        if (!existingUser) {
             try {
                 await api.post("/api/users", {
                     nome: cliente.nome,
@@ -93,11 +74,32 @@ export default function Checkout() {
             alert("Ordine non salvato in dashboard. Riprova più tardi.");
         }
 
-        // 🔵 4) APERTURA WHATSAPP CON NUMERO FISSO
+        // 🔵 4) APERTURA WHATSAPP
+        const righeProdotti = items
+            .map((item) => {
+                const prezzoUnitario = item.prezzoSco > 0 ? item.prezzoSco : item.prezzo;
+                return `${item.nome} x${item.quantity} - €${(
+                    prezzoUnitario * item.quantity
+                ).toFixed(2)}`;
+            })
+            .join("\n");
+
+        const messaggioWhatsApp =
+            `*Nuovo ordine PlusMarket Giuntelli*\n\n` +
+            `*Cliente:*\n` +
+            `${cliente.nome} ${cliente.cognome}\n` +
+            `${cliente.indirizzo}\n` +
+            `Tel: ${cliente.telefono}\n\n` +
+            `*Prodotti:*\n${righeProdotti}\n\n` +
+            `*Totale:* €${total.toFixed(2)}\n\n` +
+            `*Note:* ${cliente.note || "Nessuna"}`;
+
         const encoded = encodeURIComponent(messaggioWhatsApp);
         window.open(`https://wa.me/393356039828?text=${encoded}`, "_blank");
 
+        // 🔵 5) SVUOTA CARRELLO E TORNA ALLA HOME
         clearCart();
+        window.location.href = "/";
     };
 
     return (

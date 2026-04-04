@@ -10,15 +10,14 @@ const ProductPage = () => {
     const [loading, setLoading] = useState(true);
     const { addToCart } = useCart();
 
+    // 🔵 quantità in etti (solo per prodotti a peso)
+    const [etti, setEtti] = useState(1);
+
     useEffect(() => {
         const fetchProduct = async () => {
             try {
-                // 🔥 Prende TUTTI i prodotti
                 const res = await api.get("/products");
-
-                // 🔥 Cerca quello con il codice giusto
                 const found = res.data.find((p) => p.codice === codice);
-
                 setProduct(found || null);
                 setLoading(false);
             } catch (error) {
@@ -30,34 +29,31 @@ const ProductPage = () => {
         fetchProduct();
     }, [codice]);
 
-    if (loading) {
-        return <p className="loading">Caricamento prodotto...</p>;
-    }
+    if (loading) return <p className="loading">Caricamento prodotto...</p>;
+    if (!product) return <p className="error">Prodotto non trovato.</p>;
 
-    if (!product) {
-        return <p className="error">Prodotto non trovato.</p>;
-    }
+    // 🔵 Aggiunta al carrello con gestione ETTO → KG
+    const handleAdd = () => {
+        if (product.a_peso) {
+            const kg = etti * 0.1; // conversione
+            addToCart(product, kg);
+        } else {
+            addToCart(product, 1);
+        }
+    };
 
     return (
         <div className="product-page">
 
-            {/* Immagine */}
             <img
                 src={product.immagine}
                 alt={product.nome}
                 className="product-page-image"
             />
 
-            {/* Nome */}
             <h1 className="product-page-title">{product.nome}</h1>
-
-            {/* Codice */}
             <p className="product-page-code">Codice: {product.codice}</p>
 
-            {/* Descrizione */}
-            <p className="product-page-desc">{product.descrizione}</p>
-
-            {/* Prezzo */}
             <p className="product-page-price">
                 {product.prezzoSco > 0 ? (
                     <>
@@ -69,25 +65,22 @@ const ProductPage = () => {
                 )}
             </p>
 
-            {/* Categoria */}
-            {product.categoria && (
-                <p className="product-page-cat">
-                    Categoria: {product.categoria}
-                </p>
+            {/* 🔵 SE IL PRODOTTO È A PESO → INPUT ETTO */}
+            {product.a_peso && (
+                <div className="etti-box">
+                    <label>Quanti etti vuoi?</label>
+                    <input
+                        type="number"
+                        min="1"
+                        max="50"
+                        value={etti}
+                        onChange={(e) => setEtti(parseInt(e.target.value) || 1)}
+                        className="etti-input"
+                    />
+                </div>
             )}
 
-            {/* Disponibilità */}
-            {"disponibile" in product && (
-                <p className="product-page-stock">
-                    Disponibile: {product.disponibile ? "Sì" : "No"}
-                </p>
-            )}
-
-            {/* Pulsante carrello */}
-            <button
-                className="btn-add big"
-                onClick={() => addToCart(product)}
-            >
+            <button className="btn-add big" onClick={handleAdd}>
                 Aggiungi al carrello
             </button>
         </div>

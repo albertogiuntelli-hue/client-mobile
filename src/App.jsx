@@ -1,29 +1,27 @@
-import { Routes, Route } from "react-router-dom";
-
-// PAGINE
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
-import ProductList from "./pages/ProductList";
 import ProductPage from "./pages/ProductPage";
-import Carrello from "./pages/Carrello";
+import CartPage from "./pages/CartPage";
 import Checkout from "./pages/Checkout";
-import Promo from "./pages/Promo";
+import InstallBanner from "./components/InstallBanner";
 
-// COMPONENTI
-import Navbar from "./components/Navbar";
-
-export default function App() {
+function App() {
   return (
     <>
-      <Navbar />
+      {/* 🔥 Banner PWA */}
+      <InstallBanner />
 
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/prodotti" element={<ProductList />} />
-        <Route path="/prodotto/:id" element={<ProductPage />} />
-        <Route path="/promo" element={<Promo />} />
-        <Route path="/carrello" element={<Carrello />} />
-        <Route path="/checkout" element={<Checkout />} />
-      </Routes>
+      {/* 🔥 Router principale */}
+      <Router>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/product/:codice" element={<ProductPage />} />
+          <Route path="/cart" element={<CartPage />} />
+          <Route path="/checkout" element={<Checkout />} />
+        </Routes>
+      </Router>
     </>
   );
 }
+
+export default App;
