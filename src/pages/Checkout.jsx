@@ -25,19 +25,18 @@ export default function Checkout() {
             return;
         }
 
-        // Riepilogo prodotti
+        // Riepilogo prodotti per WhatsApp
         const righeProdotti = items
             .map((item) => {
-                const prezzoUnitario =
-                    item.prezzoSco > 0 ? item.prezzoSco : item.prezzo;
+                const prezzoUnitario = item.prezzoSco > 0 ? item.prezzoSco : item.prezzo;
                 return `${item.nome} x${item.quantity} - €${(
                     prezzoUnitario * item.quantity
                 ).toFixed(2)}`;
             })
             .join("\n");
 
-        // Messaggio WhatsApp
-        const messaggioWhatsApp = `*Nuovo ordine PlusMarket Giuntelli*\n\n` +
+        const messaggioWhatsApp =
+            `*Nuovo ordine PlusMarket Giuntelli*\n\n` +
             `*Cliente:*\n` +
             `${cliente.nome} ${cliente.cognome}\n` +
             `${cliente.indirizzo}\n` +
@@ -60,20 +59,20 @@ export default function Checkout() {
                     codice: item.codice,
                     nome: item.nome,
                     quantita: item.quantity,
+                    quantity: item.quantity,
                     prezzo: item.prezzo,
-                    prezzoSco: item.prezzoSco,
+                    prezzoSco: item.prezzoSco || 0,
                 })),
                 totale: total,
             });
         } catch (err) {
             console.error("Errore salvataggio ordine:", err);
             alert("Ordine non salvato in dashboard. Riprova più tardi.");
-            // comunque proseguiamo con WhatsApp
         }
 
-        // Apertura WhatsApp
+        // Apertura WhatsApp con numero fisso
         const encoded = encodeURIComponent(messaggioWhatsApp);
-        window.open(`https://wa.me/?text=${encoded}`, "_blank");
+        window.open(`https://wa.me/393356039828?text=${encoded}`, "_blank");
 
         clearCart();
     };
@@ -82,24 +81,18 @@ export default function Checkout() {
         <div className="checkout-container">
             <h1 className="checkout-title">Riepilogo Ordine</h1>
 
-            {/* RIEPILOGO PRODOTTI */}
             <div className="checkout-list">
                 {items.map((item) => {
-                    const prezzoUnitario =
-                        item.prezzoSco > 0 ? item.prezzoSco : item.prezzo;
+                    const prezzoUnitario = item.prezzoSco > 0 ? item.prezzoSco : item.prezzo;
                     const totaleRiga = prezzoUnitario * item.quantity;
 
                     return (
                         <div key={item.codice} className="checkout-item">
                             <div>
                                 <div className="checkout-name">{item.nome}</div>
-                                <div className="checkout-qty">
-                                    x{item.quantity}
-                                </div>
+                                <div className="checkout-qty">x{item.quantity}</div>
                             </div>
-                            <div className="checkout-price">
-                                € {totaleRiga.toFixed(2)}
-                            </div>
+                            <div className="checkout-price">€ {totaleRiga.toFixed(2)}</div>
                         </div>
                     );
                 })}
@@ -107,7 +100,6 @@ export default function Checkout() {
 
             <h2 className="checkout-total">Totale: €{total.toFixed(2)}</h2>
 
-            {/* DATI CLIENTE */}
             <div className="checkout-form">
                 <h3>Dati cliente</h3>
 
