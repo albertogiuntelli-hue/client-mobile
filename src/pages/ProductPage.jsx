@@ -10,7 +10,6 @@ export default function ProductPage() {
     const [product, setProduct] = useState(null);
     const [loading, setLoading] = useState(true);
 
-    // Stato per quantità o peso
     const [quantity, setQuantity] = useState(1);
     const [weight, setWeight] = useState(100); // grammi
 
@@ -50,7 +49,6 @@ export default function ProductPage() {
             {isWeightProduct ? (
                 <>
                     <p>Prezzo al Kg: € {product.prezzo}</p>
-
                     <label>Seleziona grammi:</label>
                     <select
                         value={weight}
@@ -66,7 +64,6 @@ export default function ProductPage() {
             ) : (
                 <>
                     <p>Prezzo: € {product.prezzo}</p>
-
                     <label>Quantità:</label>
                     <input
                         type="number"
