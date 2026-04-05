@@ -1,90 +1,85 @@
-import React, { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import api from "../api/axios";
 import { useCart } from "../context/CartContext";
-import "../styles/theme.css";
+import api from "../api/api";
 
-const ProductPage = () => {
+export default function ProductPage() {
     const { codice } = useParams();
-    const [product, setProduct] = useState(null);
-    const [loading, setLoading] = useState(true);
     const { addToCart } = useCart();
 
-    // 🔵 quantità in etti (solo per prodotti a peso)
-    const [etti, setEtti] = useState(1);
+    const [product, setProduct] = useState(null);
+    const [loading, setLoading] = useState(true);
+
+    // Stato per quantità o peso
+    const [quantity, setQuantity] = useState(1);
+    const [weight, setWeight] = useState(100); // grammi
 
     useEffect(() => {
-        const fetchProduct = async () => {
-            try {
-                const res = await api.get("/products");
-                const found = res.data.find((p) => p.codice === codice);
-                setProduct(found || null);
-                setLoading(false);
-            } catch (error) {
-                console.error("Errore caricamento prodotto:", error);
-                setLoading(false);
-            }
-        };
-
-        fetchProduct();
+        api.get(`/prodotti/${codice}`).then((res) => {
+            setProduct(res.data);
+            setLoading(false);
+        });
     }, [codice]);
 
-    if (loading) return <p className="loading">Caricamento prodotto...</p>;
-    if (!product) return <p className="error">Prodotto non trovato.</p>;
+    if (loading) return <p>Caricamento...</p>;
+    if (!product) return <p>Prodotto non trovato</p>;
 
-    // 🔵 Aggiunta al carrello con gestione ETTO → KG
+    const isWeightProduct = product.prezzo_al_kg === true;
+
     const handleAdd = () => {
-        if (product.a_peso) {
-            const kg = etti * 0.1; // conversione
-            addToCart(product, kg);
+        if (isWeightProduct) {
+            addToCart(product, {
+                productType: "peso",
+                weight: Number(weight),
+                quantity: 0,
+            });
         } else {
-            addToCart(product, 1);
+            addToCart(product, {
+                productType: "pezzi",
+                quantity: Number(quantity),
+                weight: 0,
+            });
         }
     };
 
     return (
         <div className="product-page">
+            <h1>{product.nome}</h1>
+            <p>{product.descrizione}</p>
 
-            <img
-                src={product.immagine}
-                alt={product.nome}
-                className="product-page-image"
-            />
+            {isWeightProduct ? (
+                <>
+                    <p>Prezzo al Kg: € {product.prezzo}</p>
 
-            <h1 className="product-page-title">{product.nome}</h1>
-            <p className="product-page-code">Codice: {product.codice}</p>
+                    <label>Seleziona grammi:</label>
+                    <select
+                        value={weight}
+                        onChange={(e) => setWeight(e.target.value)}
+                    >
+                        <option value="100">100g</option>
+                        <option value="200">200g</option>
+                        <option value="300">300g</option>
+                        <option value="400">400g</option>
+                        <option value="500">500g</option>
+                    </select>
+                </>
+            ) : (
+                <>
+                    <p>Prezzo: € {product.prezzo}</p>
 
-            <p className="product-page-price">
-                {product.prezzoSco > 0 ? (
-                    <>
-                        <span className="old-price">{product.prezzo} €</span>
-                        <span className="new-price">{product.prezzoSco} €</span>
-                    </>
-                ) : (
-                    <span className="normal-price">{product.prezzo} €</span>
-                )}
-            </p>
-
-            {/* 🔵 SE IL PRODOTTO È A PESO → INPUT ETTO */}
-            {product.a_peso && (
-                <div className="etti-box">
-                    <label>Quanti etti vuoi?</label>
+                    <label>Quantità:</label>
                     <input
                         type="number"
                         min="1"
-                        max="50"
-                        value={etti}
-                        onChange={(e) => setEtti(parseInt(e.target.value) || 1)}
-                        className="etti-input"
+                        value={quantity}
+                        onChange={(e) => setQuantity(e.target.value)}
                     />
-                </div>
+                </>
             )}
 
-            <button className="btn-add big" onClick={handleAdd}>
+            <button onClick={handleAdd} className="add-btn">
                 Aggiungi al carrello
             </button>
         </div>
     );
-};
-
-export default ProductPage;
+}
