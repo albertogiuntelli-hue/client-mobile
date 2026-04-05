@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { useCart } from "../context/CartContext";
-import api from "../api/api";
+import api from "../api/axios";   // ✔️ percorso corretto
 
 export default function ProductPage() {
     const { codice } = useParams();
@@ -11,7 +11,7 @@ export default function ProductPage() {
     const [loading, setLoading] = useState(true);
 
     const [quantity, setQuantity] = useState(1);
-    const [weight, setWeight] = useState(100); // grammi
+    const [weight, setWeight] = useState(100);
 
     useEffect(() => {
         api.get(`/prodotti/${codice}`).then((res) => {
