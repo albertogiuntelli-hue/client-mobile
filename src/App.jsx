@@ -4,18 +4,20 @@ import ProductPage from "./pages/ProductPage";
 import Carrello from "./pages/Carrello.jsx";
 import Checkout from "./pages/Checkout";
 import InstallBanner from "./components/InstallBanner";
-import ProductList from "./pages/ProductList"; // ✅ AGGIUNTO
+import ProductList from "./pages/ProductList";
+import Navbar from "./components/Navbar"; // ✅ IMPORTANTE
 
 function App() {
   return (
     <>
-      {/* 🔥 Banner PWA */}
       <InstallBanner />
 
-      {/* 🔥 Router principale */}
+      {/* 🔥 Navbar sempre visibile su tutte le pagine */}
+      <Navbar />
+
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/prodotti" element={<ProductList />} /> {/* ✅ AGGIUNTO */}
+        <Route path="/prodotti" element={<ProductList />} />
         <Route path="/product/:codice" element={<ProductPage />} />
         <Route path="/cart" element={<Carrello />} />
         <Route path="/checkout" element={<Checkout />} />
