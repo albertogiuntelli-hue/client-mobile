@@ -4,6 +4,7 @@ import ProductPage from "./pages/ProductPage";
 import Carrello from "./pages/Carrello.jsx";
 import Checkout from "./pages/Checkout";
 import InstallBanner from "./components/InstallBanner";
+import ProductList from "./pages/ProductList"; // ✅ AGGIUNTO
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
       {/* 🔥 Router principale */}
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/prodotti" element={<ProductList />} /> {/* ✅ AGGIUNTO */}
         <Route path="/product/:codice" element={<ProductPage />} />
         <Route path="/cart" element={<Carrello />} />
         <Route path="/checkout" element={<Checkout />} />
