@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import api from "../api/axios";
-import "../styles/ProductList.css"; // IMPORTANTE: percorso corretto
+import "../styles/productlist.css"; // percorso corretto (minuscolo)
 
 export default function ProductList() {
     const [products, setProducts] = useState([]);
