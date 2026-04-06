@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import api from "../api/axios";
+import "../styles/ProductList.css"; // IMPORTANTE: importa il CSS corretto
 
 export default function ProductList() {
     const [products, setProducts] = useState([]);
@@ -21,22 +22,25 @@ export default function ProductList() {
     if (loading) return <p>Caricamento prodotti...</p>;
 
     return (
-        <div className="products-list">
-            {products.map((product) => (
-                <Link
-                    key={product.codice}
-                    to={`/prodotti/${product.codice}`}
-                    className="product-card"
-                >
-                    <h3>{product.nome}</h3>
+        <div className="products-container">
+            <div className="product-grid">
+                {products.map((product) => (
+                    <Link
+                        key={product.codice}
+                        to={`/prodotti/${product.codice}`}
+                        className="product-card"
+                    >
+                        <div className="product-name">{product.nome}</div>
+                        <div className="product-code">Cod: {product.codice}</div>
 
-                    {product.prezzo_al_kg === true ? (
-                        <p>€ {product.prezzo} / Kg</p>
-                    ) : (
-                        <p>€ {product.prezzo}</p>
-                    )}
-                </Link>
-            ))}
+                        {product.prezzo_al_kg === true ? (
+                            <div className="product-price">€ {product.prezzo} / Kg</div>
+                        ) : (
+                            <div className="product-price">€ {product.prezzo}</div>
+                        )}
+                    </Link>
+                ))}
+            </div>
         </div>
     );
 }
