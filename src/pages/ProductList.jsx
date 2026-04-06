@@ -7,7 +7,7 @@ export default function ProductList() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        api.get("/prodotti")
+        api.get("/api/products")
             .then((res) => {
                 setProducts(res.data);
                 setLoading(false);
