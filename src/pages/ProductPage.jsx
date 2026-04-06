@@ -1,82 +1,42 @@
-import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
-import { useCart } from "../context/CartContext";
-import api from "../api/axios";   // ✔️ percorso corretto
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import api from "../api/axios";
 
-export default function ProductPage() {
-    const { codice } = useParams();
-    const { addToCart } = useCart();
-
-    const [product, setProduct] = useState(null);
+export default function ProductsPage() {
+    const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
 
-    const [quantity, setQuantity] = useState(1);
-    const [weight, setWeight] = useState(100);
-
     useEffect(() => {
-        api.get(`/prodotti/${codice}`).then((res) => {
-            setProduct(res.data);
-            setLoading(false);
-        });
-    }, [codice]);
-
-    if (loading) return <p>Caricamento...</p>;
-    if (!product) return <p>Prodotto non trovato</p>;
-
-    const isWeightProduct = product.prezzo_al_kg === true;
-
-    const handleAdd = () => {
-        if (isWeightProduct) {
-            addToCart(product, {
-                productType: "peso",
-                weight: Number(weight),
-                quantity: 0,
+        api.get("/prodotti")
+            .then((res) => {
+                setProducts(res.data);
+                setLoading(false);
+            })
+            .catch((err) => {
+                console.error("Errore caricamento prodotti:", err);
+                setLoading(false);
             });
-        } else {
-            addToCart(product, {
-                productType: "pezzi",
-                quantity: Number(quantity),
-                weight: 0,
-            });
-        }
-    };
+    }, []);
+
+    if (loading) return <p>Caricamento prodotti...</p>;
 
     return (
-        <div className="product-page">
-            <h1>{product.nome}</h1>
-            <p>{product.descrizione}</p>
+        <div className="products-list">
+            {products.map((product) => (
+                <Link
+                    key={product.codice}
+                    to={`/prodotti/${product.codice}`}
+                    className="product-card"
+                >
+                    <h3>{product.nome}</h3>
 
-            {isWeightProduct ? (
-                <>
-                    <p>Prezzo al Kg: € {product.prezzo}</p>
-                    <label>Seleziona grammi:</label>
-                    <select
-                        value={weight}
-                        onChange={(e) => setWeight(e.target.value)}
-                    >
-                        <option value="100">100g</option>
-                        <option value="200">200g</option>
-                        <option value="300">300g</option>
-                        <option value="400">400g</option>
-                        <option value="500">500g</option>
-                    </select>
-                </>
-            ) : (
-                <>
-                    <p>Prezzo: € {product.prezzo}</p>
-                    <label>Quantità:</label>
-                    <input
-                        type="number"
-                        min="1"
-                        value={quantity}
-                        onChange={(e) => setQuantity(e.target.value)}
-                    />
-                </>
-            )}
-
-            <button onClick={handleAdd} className="add-btn">
-                Aggiungi al carrello
-            </button>
+                    {product.prezzo_al_kg === true ? (
+                        <p>€ {product.prezzo} / Kg</p>
+                    ) : (
+                        <p>€ {product.prezzo}</p>
+                    )}
+                </Link>
+            ))}
         </div>
     );
 }
