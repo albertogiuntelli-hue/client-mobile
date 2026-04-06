@@ -5,14 +5,12 @@ import Carrello from "./pages/Carrello.jsx";
 import Checkout from "./pages/Checkout";
 import InstallBanner from "./components/InstallBanner";
 import ProductList from "./pages/ProductList";
-import Navbar from "./components/Navbar"; // ✅ IMPORTANTE
+import Navbar from "./components/Navbar";
 
 function App() {
   return (
     <>
       <InstallBanner />
-
-      {/* 🔥 Navbar sempre visibile su tutte le pagine */}
       <Navbar />
 
       <Routes>

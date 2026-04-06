@@ -7,7 +7,11 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: "autoUpdate",
-      includeAssets: ["icon-192.png", "icon-512.png"],
+      includeAssets: [
+        "favicon.ico",
+        "icon-192.png",
+        "icon-512.png"
+      ],
       manifest: {
         name: "PlusMarket Giuntelli",
         short_name: "PlusMarket",
@@ -30,13 +34,4 @@ export default defineConfig({
         ]
       },
       workbox: {
-        globPatterns: ["**/*.{js,css,html,png,svg,jpg,jpeg}"],
-      }
-    })
-  ],
-  server: {
-    host: "0.0.0.0",
-    port: 5174,
-    strictPort: true
-  }
-});
+        globPatterns: ["

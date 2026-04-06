@@ -4,11 +4,14 @@
 <head>
   <meta charset="UTF-8" />
 
-  <!-- ICONA DEL SITO (PC) -->
-  <link rel="icon" href="/client.ico" />
+  <!-- ICONA DEL SITO -->
+  <link rel="icon" href="/icon-192.png" />
 
-  <!-- MANIFEST PER APP SU CELLULARE -->
+  <!-- MANIFEST PWA -->
   <link rel="manifest" href="/manifest.json" />
+
+  <!-- COLORI PWA -->
+  <meta name="theme-color" content="#00a651" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>PlusMarket</title>
@@ -16,7 +19,17 @@
 
 <body>
   <div id="root"></div>
+
   <script type="module" src="/src/main.jsx"></script>
+
+  <!-- REGISTRAZIONE SERVICE WORKER -->
+  <script>
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("/sw.js");
+      });
+    }
+  </script>
 </body>
 
 </html>

@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import api from "../api/axios";
-import "../styles/productlist.css"; // percorso corretto (minuscolo)
 
 export default function ProductList() {
     const [products, setProducts] = useState([]);
@@ -19,7 +18,10 @@ export default function ProductList() {
             });
     }, []);
 
-    if (loading) return <p>Caricamento prodotti...</p>;
+    if (loading) return <p style={{ padding: "20px" }}>Caricamento prodotti...</p>;
+
+    if (products.length === 0)
+        return <p style={{ padding: "20px" }}>Nessun prodotto disponibile.</p>;
 
     return (
         <div className="products-container">
@@ -27,17 +29,24 @@ export default function ProductList() {
                 {products.map((product) => (
                     <Link
                         key={product.codice}
-                        to={`/prodotti/${product.codice}`}
+                        to={`/product/${product.codice}`}
                         className="product-card"
                     >
+                        {product.immagine && (
+                            <img
+                                src={product.immagine}
+                                alt={product.nome}
+                                className="product-img"
+                            />
+                        )}
+
                         <div className="product-name">{product.nome}</div>
                         <div className="product-code">Cod: {product.codice}</div>
 
-                        {product.prezzo_al_kg === true ? (
-                            <div className="product-price">€ {product.prezzo} / Kg</div>
-                        ) : (
-                            <div className="product-price">€ {product.prezzo}</div>
-                        )}
+                        <div className="product-price">
+                            € {product.prezzo}
+                            {product.prezzo_al_kg === true ? " / Kg" : ""}
+                        </div>
                     </Link>
                 ))}
             </div>

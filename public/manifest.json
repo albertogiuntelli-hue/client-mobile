@@ -3,6 +3,7 @@
     "short_name": "PlusMarket",
     "description": "App ufficiale PlusMarket Giuntelli — ordina, scopri promozioni e gestisci il tuo carrello.",
     "start_url": "/",
+    "scope": "/",
     "display": "standalone",
     "background_color": "#ffffff",
     "theme_color": "#00a651",

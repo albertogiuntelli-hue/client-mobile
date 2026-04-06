@@ -11,7 +11,10 @@ export default function Carrello() {
             {items.length === 0 && <p>Il carrello è vuoto.</p>}
 
             {items.map((item) => {
-                const prezzoUnitario = item.prezzoSco > 0 ? item.prezzoSco : item.prezzo;
+                // 🔥 Prezzo corretto con sconto
+                const prezzoUnitario =
+                    item.prezzo_scontato > 0 ? item.prezzo_scontato : item.prezzo;
+
                 const totaleRiga = prezzoUnitario * item.quantity;
 
                 return (
@@ -75,52 +78,3 @@ export default function Carrello() {
                                         borderRadius: "6px",
                                         border: "1px solid red",
                                         color: "red",
-                                        marginLeft: "10px",
-                                    }}
-                                >
-                                    Rimuovi
-                                </button>
-                            </div>
-                        </div>
-
-                        {/* PREZZO */}
-                        <div style={{ textAlign: "right" }}>
-                            <p style={{ margin: 0, fontWeight: "bold" }}>
-                                € {prezzoUnitario.toFixed(2)}
-                            </p>
-                            <p style={{ margin: 0, fontSize: "14px" }}>
-                                Totale: € {totaleRiga.toFixed(2)}
-                            </p>
-                        </div>
-                    </div>
-                );
-            })}
-
-            {/* TOTALE GENERALE */}
-            {items.length > 0 && (
-                <h3 style={{ marginTop: "20px" }}>
-                    Totale Ordine: € {total.toFixed(2)}
-                </h3>
-            )}
-
-            {/* PULSANTE PER PROCEDERE */}
-            {items.length > 0 && (
-                <Link
-                    to="/checkout"
-                    style={{
-                        display: "inline-block",
-                        marginTop: "20px",
-                        padding: "10px 15px",
-                        background: "#1976d2",
-                        color: "white",
-                        borderRadius: "6px",
-                        textDecoration: "none",
-                        fontWeight: "bold",
-                    }}
-                >
-                    Procedi all’Ordine
-                </Link>
-            )}
-        </div>
-    );
-}

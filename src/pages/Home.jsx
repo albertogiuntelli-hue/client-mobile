@@ -1,8 +1,4 @@
-// client-mobile/src/pages/Home.jsx
-
-import React from "react";
 import { Link } from "react-router-dom";
-import "../styles/theme.css";
 
 export default function Home() {
     return (
@@ -14,8 +10,7 @@ export default function Home() {
             </p>
 
             <p className="home-text">
-                Sfoglia i prodotti e inizia il tuo ordine direttamente dal tuo
-                smartphone.
+                Sfoglia i prodotti e inizia il tuo ordine direttamente dal tuo smartphone.
             </p>
 
             <Link to="/prodotti" className="btn-primary">

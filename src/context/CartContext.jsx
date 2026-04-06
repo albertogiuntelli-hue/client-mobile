@@ -5,7 +5,7 @@ const CartContext = createContext();
 export function CartProvider({ children }) {
     const [items, setItems] = useState([]);
 
-    // Aggiunta al carrello con fallback sicuri
+    // Aggiunta al carrello
     const addToCart = (product, options = {}) => {
         const {
             productType = "pezzi",
@@ -77,13 +77,19 @@ export function CartProvider({ children }) {
 
     const clearCart = () => setItems([]);
 
+    // 🔥 TOTALE CORRETTO (con prezzo_scontato)
     const total = items.reduce((sum, item) => {
+        const prezzoUnitario =
+            item.prezzo_scontato > 0 ? item.prezzo_scontato : item.prezzo;
+
         if (item.productType === "pezzi") {
-            return sum + item.prezzo * item.quantity;
+            return sum + prezzoUnitario * item.quantity;
         }
+
         if (item.productType === "peso") {
-            return sum + (item.weight / 1000) * item.prezzo;
+            return sum + (item.weight / 1000) * prezzoUnitario;
         }
+
         return sum;
     }, 0);
 
@@ -104,5 +110,5 @@ export function CartProvider({ children }) {
 }
 
 export function useCart() {
-    return useContext(CartContext);
+    return useContext(CCartContext);
 }

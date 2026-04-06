@@ -63,9 +63,8 @@ export default function Checkout() {
                     codice: item.codice,
                     nome: item.nome,
                     quantita: item.quantity,
-                    quantity: item.quantity,
                     prezzo: item.prezzo,
-                    prezzoSco: item.prezzoSco || 0,
+                    prezzo_scontato: item.prezzo_scontato || 0,
                 })),
                 totale: total,
             });
@@ -77,7 +76,9 @@ export default function Checkout() {
         // 🔵 4) APERTURA WHATSAPP
         const righeProdotti = items
             .map((item) => {
-                const prezzoUnitario = item.prezzoSco > 0 ? item.prezzoSco : item.prezzo;
+                const prezzoUnitario =
+                    item.prezzo_scontato > 0 ? item.prezzo_scontato : item.prezzo;
+
                 return `${item.nome} x${item.quantity} - €${(
                     prezzoUnitario * item.quantity
                 ).toFixed(2)}`;
@@ -108,7 +109,9 @@ export default function Checkout() {
 
             <div className="checkout-list">
                 {items.map((item) => {
-                    const prezzoUnitario = item.prezzoSco > 0 ? item.prezzoSco : item.prezzo;
+                    const prezzoUnitario =
+                        item.prezzo_scontato > 0 ? item.prezzo_scontato : item.prezzo;
+
                     const totaleRiga = prezzoUnitario * item.quantity;
 
                     return (

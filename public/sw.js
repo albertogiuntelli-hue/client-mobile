@@ -1,25 +1,14 @@
-self.addEventListener("install", (event) => {
+self.addEventListener("install", () => {
     console.log("Service Worker installato");
     self.skipWaiting();
 });
 
-self.addEventListener("activate", (event) => {
+self.addEventListener("activate", () => {
     console.log("Service Worker attivo");
     return self.clients.claim();
 });
 
+// 🔥 VERSIONE PULITA: NIENTE CACHE BLOCCATE
 self.addEventListener("fetch", (event) => {
-    event.respondWith(
-        caches.match(event.request).then((cached) => {
-            return (
-                cached ||
-                fetch(event.request).then((response) => {
-                    return caches.open("plusmarket-cache").then((cache) => {
-                        cache.put(event.request, response.clone());
-                        return response;
-                    });
-                })
-            );
-        })
-    );
+    event.respondWith(fetch(event.request));
 });

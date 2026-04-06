@@ -15,6 +15,7 @@ export default function InstallBanner() {
     return (
         <div className="install-banner">
             <p>Installa l'app PlusMarket sul tuo dispositivo</p>
+
             <button
                 className="install-btn"
                 onClick={async () => {
@@ -25,7 +26,10 @@ export default function InstallBanner() {
                 Installa
             </button>
 
-            <button className="close-btn" onClick={() => setVisible(false)}>
+            <button
+                className="close-btn"
+                onClick={() => setVisible(false)}
+            >
                 Chiudi
             </button>
         </div>
