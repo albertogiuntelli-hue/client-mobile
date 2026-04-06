@@ -11,7 +11,6 @@ export default function Carrello() {
             {items.length === 0 && <p>Il carrello è vuoto.</p>}
 
             {items.map((item) => {
-                // 🔥 Prezzo corretto con sconto
                 const prezzoUnitario =
                     item.prezzo_scontato > 0 ? item.prezzo_scontato : item.prezzo;
 
@@ -78,3 +77,42 @@ export default function Carrello() {
                                         borderRadius: "6px",
                                         border: "1px solid red",
                                         color: "red",
+                                    }}
+                                >
+                                    Rimuovi
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* TOTALE RIGA */}
+                        <div style={{ minWidth: "80px", textAlign: "right" }}>
+                            € {totaleRiga.toFixed(2)}
+                        </div>
+                    </div>
+                );
+            })}
+
+            {/* TOTALE CARRELLO */}
+            {items.length > 0 && (
+                <div style={{ marginTop: "20px", textAlign: "right" }}>
+                    <h3>Totale: € {total.toFixed(2)}</h3>
+
+                    <Link
+                        to="/checkout"
+                        style={{
+                            display: "inline-block",
+                            marginTop: "10px",
+                            padding: "10px 20px",
+                            background: "#1976d2",
+                            color: "white",
+                            borderRadius: "8px",
+                            textDecoration: "none",
+                        }}
+                    >
+                        Procedi al Checkout
+                    </Link>
+                </div>
+            )}
+        </div>
+    );
+}
