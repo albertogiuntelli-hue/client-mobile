@@ -1,4 +1,5 @@
 import { useCart } from "../context/CartContext";
+import { useNavigate } from "react-router-dom";
 import "../styles/theme.css";
 
 export default function Carrello() {
@@ -11,6 +12,8 @@ export default function Carrello() {
         total,
     } = useCart();
 
+    const navigate = useNavigate();
+
     if (items.length === 0) {
         return <p className="empty-cart">Il carrello è vuoto.</p>;
     }
@@ -22,7 +25,6 @@ export default function Carrello() {
             {items.map((item) => (
                 <div key={item.codice} className="cart-item">
 
-                    {/* IMMAGINE */}
                     <img
                         src={item.immagine || "/placeholder.png"}
                         alt={item.nome}
@@ -33,7 +35,6 @@ export default function Carrello() {
                         <div className="cart-name">{item.nome}</div>
                         <div className="cart-code">Cod: {item.codice}</div>
 
-                        {/* PREZZO */}
                         <div className="cart-price">
                             Prezzo: €{" "}
                             {item.prezzo_scontato > 0
@@ -41,7 +42,6 @@ export default function Carrello() {
                                 : item.prezzo}
                         </div>
 
-                        {/* QUANTITÀ */}
                         {item.productType === "pezzi" ? (
                             <div className="cart-qty">
                                 <button
@@ -102,12 +102,15 @@ export default function Carrello() {
                 </div>
             ))}
 
-            {/* TOTALE */}
             <div className="cart-total">
                 Totale: € {total.toFixed(2)}
             </div>
 
-            <button className="btn-primary checkout-btn">
+            {/* 🔥 FIX: ROUTING FUNZIONANTE */}
+            <button
+                className="btn-primary checkout-btn"
+                onClick={() => navigate("/checkout")}
+            >
                 Procedi al checkout
             </button>
 
