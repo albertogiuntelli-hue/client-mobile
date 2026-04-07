@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
 import api from "../api/axios";
 import { useCart } from "../context/CartContext";
+import PopupPeso from "../components/PopupPeso";
 import "../styles/theme.css";
 
 export default function ProductList() {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [popupProduct, setPopupProduct] = useState(null);
+
     const { addToCart } = useCart();
 
     useEffect(() => {
@@ -21,19 +23,27 @@ export default function ProductList() {
             });
     }, []);
 
-    if (loading) return <p style={{ padding: "20px" }}>Caricamento prodotti...</p>;
+    if (loading) {
+        return <p style={{ padding: "20px" }}>Caricamento prodotti...</p>;
+    }
 
-    const addWeightedProduct = (product, grams) => {
-        const qtyKg = grams / 1000;
-        const prezzo = product.prezzo * qtyKg;
+    // 🔥 Funzione corretta per aggiungere prodotti a peso
+    const handleAddWeight = (product, grams) => {
+        if (!grams || grams <= 0) return;
 
-        addToCart({
-            ...product,
-            productType: "peso",
-            weight: grams,
-            quantity: 0,
-            prezzo: prezzo.toFixed(2),
-        });
+        addToCart(
+            {
+                ...product,
+                productType: "peso",
+                quantity: 0,
+                weight: grams,
+            },
+            {
+                productType: "peso",
+                quantity: 0,
+                weight: grams,
+            }
+        );
 
         setPopupProduct(null);
     };
@@ -73,12 +83,19 @@ export default function ProductList() {
                             <button
                                 className="btn-primary"
                                 onClick={() =>
-                                    addToCart({
-                                        ...product,
-                                        productType: "pezzi",
-                                        quantity: 1,
-                                        weight: 0,
-                                    })
+                                    addToCart(
+                                        {
+                                            ...product,
+                                            productType: "pezzi",
+                                            quantity: 1,
+                                            weight: 0,
+                                        },
+                                        {
+                                            productType: "pezzi",
+                                            quantity: 1,
+                                            weight: 0,
+                                        }
+                                    )
                                 }
                             >
                                 Aggiungi al carrello
@@ -88,46 +105,13 @@ export default function ProductList() {
                 ))}
             </div>
 
+            {/* 🔥 Popup Peso */}
             {popupProduct && (
-                <div className="popup-overlay">
-                    <div className="popup-box">
-                        <h3>{popupProduct.nome}</h3>
-                        <p>Seleziona la quantità in grammi:</p>
-
-                        <div className="popup-buttons">
-                            {[100, 200, 300].map((g) => (
-                                <button
-                                    key={g}
-                                    className="btn-secondary"
-                                    onClick={() => addWeightedProduct(popupProduct, g)}
-                                >
-                                    {g} g
-                                </button>
-                            ))}
-                        </div>
-
-                        <input
-                            type="number"
-                            placeholder="Inserisci grammi"
-                            className="popup-input"
-                            onKeyDown={(e) => {
-                                if (e.key === "Enter") {
-                                    addWeightedProduct(
-                                        popupProduct,
-                                        Number(e.target.value)
-                                    );
-                                }
-                            }}
-                        />
-
-                        <button
-                            className="btn-cancel"
-                            onClick={() => setPopupProduct(null)}
-                        >
-                            Annulla
-                        </button>
-                    </div>
-                </div>
+                <PopupPeso
+                    product={popupProduct}
+                    onConfirm={(grams) => handleAddWeight(popupProduct, grams)}
+                    onClose={() => setPopupProduct(null)}
+                />
             )}
         </div>
     );

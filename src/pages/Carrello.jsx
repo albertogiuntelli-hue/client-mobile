@@ -42,7 +42,8 @@ export default function Carrello() {
                                 : item.prezzo}
                         </div>
 
-                        {item.productType === "pezzi" ? (
+                        {/* 🔥 GESTIONE PRODOTTI A PEZZI */}
+                        {item.productType === "pezzi" && (
                             <div className="cart-qty">
                                 <button
                                     className="btn-small"
@@ -66,7 +67,10 @@ export default function Carrello() {
                                     +
                                 </button>
                             </div>
-                        ) : (
+                        )}
+
+                        {/* 🔥 GESTIONE PRODOTTI A PESO */}
+                        {item.productType === "peso" && (
                             <div className="cart-qty">
                                 <button
                                     className="btn-small"
@@ -83,7 +87,7 @@ export default function Carrello() {
                                         addToCart(item, {
                                             productType: "peso",
                                             quantity: 0,
-                                            weight: 50,
+                                            weight: 50, // aggiunge 50g
                                         })
                                     }
                                 >
@@ -106,7 +110,6 @@ export default function Carrello() {
                 Totale: € {total.toFixed(2)}
             </div>
 
-            {/* 🔥 FIX: ROUTING FUNZIONANTE */}
             <button
                 className="btn-primary checkout-btn"
                 onClick={() => navigate("/checkout")}
