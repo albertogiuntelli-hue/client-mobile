@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import api from "../api/axios";
 import { useCart } from "../context/CartContext";
 import "../styles/theme.css";
+import "../styles/product-page.css"; // 🔥 aggiunto CSS dedicato
 
 const ProductPage = () => {
     const { codice } = useParams();
@@ -37,7 +38,7 @@ const ProductPage = () => {
         <div className="product-page">
 
             <img
-                src={product.immagine || "/placeholder.png"}
+                src={product.immagine || "/logo.png"}   // 🔥 fallback corretto
                 alt={product.nome}
                 className="product-page-image"
             />
