@@ -4,180 +4,120 @@ import api from "../api/axios";
 import "../styles/theme.css";
 
 export default function Checkout() {
-    const { items, clearCart, total } = useCart();
+    const { items, total, clearCart } = useCart();
 
-    const [cliente, setCliente] = useState({
-        nome: "",
-        cognome: "",
-        indirizzo: "",
-        telefono: "",
-        note: "",
-    });
+    const [nome, setNome] = useState("");
+    const [telefono, setTelefono] = useState("");
+    const [indirizzo, setIndirizzo] = useState("");
+    const [note, setNote] = useState("");
+    const [loading, setLoading] = useState(false);
+    const [success, setSuccess] = useState(false);
 
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setCliente((prev) => ({ ...prev, [name]: value }));
-    };
-
-    const sendOrder = async () => {
-        if (!cliente.nome || !cliente.cognome || !cliente.indirizzo || !cliente.telefono) {
-            alert("Compila tutti i campi obbligatori (nome, cognome, indirizzo, telefono).");
+    const handleSubmit = async () => {
+        if (!nome || !telefono || !indirizzo) {
+            alert("Compila tutti i campi obbligatori.");
             return;
         }
 
-        // 🔵 1) CONTROLLO SE L’UTENTE ESISTE GIÀ
-        let existingUser = null;
-        try {
-            const res = await api.get(`/api/users/${cliente.telefono}`);
-            existingUser = res.data;
-        } catch (err) {
-            existingUser = null; // se 404 → utente nuovo
-        }
+        setLoading(true);
 
-        // 🔵 2) SE NON ESISTE → LO REGISTRO
-        if (!existingUser) {
-            try {
-                await api.post("/api/users", {
-                    nome: cliente.nome,
-                    cognome: cliente.cognome,
-                    indirizzo: cliente.indirizzo,
-                    telefono: cliente.telefono,
-                    note: cliente.note || "",
-                });
-            } catch (err) {
-                console.error("Errore registrazione utente:", err);
-            }
-        }
-
-        // 🔵 3) SALVATAGGIO ORDINE
         try {
             await api.post("/api/orders", {
-                cliente: {
-                    nome: cliente.nome,
-                    cognome: cliente.cognome,
-                    indirizzo: cliente.indirizzo,
-                    telefono: cliente.telefono,
-                    note: cliente.note,
-                },
-                items: items.map((item) => ({
-                    codice: item.codice,
-                    nome: item.nome,
-                    quantita: item.quantity,
-                    prezzo: item.prezzo,
-                    prezzo_scontato: item.prezzo_scontato || 0,
-                })),
-                totale: total,
+                cliente: { nome, telefono, indirizzo, note },
+                prodotti: items,
+                totale: total.toFixed(2),
             });
+
+            clearCart();
+            setSuccess(true);
         } catch (err) {
-            console.error("Errore salvataggio ordine:", err);
-            alert("Ordine non salvato in dashboard. Riprova più tardi.");
+            console.error("Errore invio ordine:", err);
+            alert("Errore durante l'invio dell'ordine.");
         }
 
-        // 🔵 4) APERTURA WHATSAPP
-        const righeProdotti = items
-            .map((item) => {
-                const prezzoUnitario =
-                    item.prezzo_scontato > 0 ? item.prezzo_scontato : item.prezzo;
-
-                return `${item.nome} x${item.quantity} - €${(
-                    prezzoUnitario * item.quantity
-                ).toFixed(2)}`;
-            })
-            .join("\n");
-
-        const messaggioWhatsApp =
-            `*Nuovo ordine PlusMarket Giuntelli*\n\n` +
-            `*Cliente:*\n` +
-            `${cliente.nome} ${cliente.cognome}\n` +
-            `${cliente.indirizzo}\n` +
-            `Tel: ${cliente.telefono}\n\n` +
-            `*Prodotti:*\n${righeProdotti}\n\n` +
-            `*Totale:* €${total.toFixed(2)}\n\n` +
-            `*Note:* ${cliente.note || "Nessuna"}`;
-
-        const encoded = encodeURIComponent(messaggioWhatsApp);
-        window.open(`https://wa.me/393356039828?text=${encoded}`, "_blank");
-
-        // 🔵 5) SVUOTA CARRELLO E TORNA ALLA HOME
-        clearCart();
-        window.location.href = "/";
+        setLoading(false);
     };
+
+    if (success) {
+        return (
+            <div className="checkout-success">
+                <h2>Ordine inviato!</h2>
+                <p>Grazie per aver ordinato da PlusMarket Giuntelli.</p>
+            </div>
+        );
+    }
 
     return (
         <div className="checkout-container">
-            <h1 className="checkout-title">Riepilogo Ordine</h1>
+            <h2>Checkout</h2>
 
-            <div className="checkout-list">
-                {items.map((item) => {
-                    const prezzoUnitario =
-                        item.prezzo_scontato > 0 ? item.prezzo_scontato : item.prezzo;
+            <div className="checkout-summary">
+                <h3>Riepilogo ordine</h3>
+                {items.map((item) => (
+                    <div key={item.codice} className="checkout-item">
+                        <span>{item.nome}</span>
+                        <span>
+                            {item.productType === "pezzi"
+                                ? `${item.quantity} pz`
+                                : `${item.weight} g`}
+                        </span>
+                        <span>
+                            €{" "}
+                            {(
+                                (item.prezzo_scontato > 0
+                                    ? item.prezzo_scontato
+                                    : item.prezzo) *
+                                (item.productType === "pezzi"
+                                    ? item.quantity
+                                    : item.weight / 1000)
+                            ).toFixed(2)}
+                        </span>
+                    </div>
+                ))}
 
-                    const totaleRiga = prezzoUnitario * item.quantity;
-
-                    return (
-                        <div key={item.codice} className="checkout-item">
-                            <div>
-                                <div className="checkout-name">{item.nome}</div>
-                                <div className="checkout-qty">x{item.quantity}</div>
-                            </div>
-                            <div className="checkout-price">€ {totaleRiga.toFixed(2)}</div>
-                        </div>
-                    );
-                })}
+                <div className="checkout-total">
+                    Totale: € {total.toFixed(2)}
+                </div>
             </div>
-
-            <h2 className="checkout-total">Totale: €{total.toFixed(2)}</h2>
 
             <div className="checkout-form">
                 <h3>Dati cliente</h3>
 
-                <div className="checkout-form-row">
-                    <input
-                        type="text"
-                        name="nome"
-                        placeholder="Nome"
-                        value={cliente.nome}
-                        onChange={handleChange}
-                    />
-                    <input
-                        type="text"
-                        name="cognome"
-                        placeholder="Cognome"
-                        value={cliente.cognome}
-                        onChange={handleChange}
-                    />
-                </div>
+                <input
+                    type="text"
+                    placeholder="Nome e cognome"
+                    value={nome}
+                    onChange={(e) => setNome(e.target.value)}
+                />
 
                 <input
                     type="text"
-                    name="indirizzo"
-                    placeholder="Indirizzo completo"
-                    value={cliente.indirizzo}
-                    onChange={handleChange}
-                    className="checkout-input-full"
+                    placeholder="Telefono"
+                    value={telefono}
+                    onChange={(e) => setTelefono(e.target.value)}
                 />
 
                 <input
-                    type="tel"
-                    name="telefono"
-                    placeholder="Numero di cellulare"
-                    value={cliente.telefono}
-                    onChange={handleChange}
-                    className="checkout-input-full"
+                    type="text"
+                    placeholder="Indirizzo"
+                    value={indirizzo}
+                    onChange={(e) => setIndirizzo(e.target.value)}
                 />
 
                 <textarea
-                    name="note"
-                    placeholder="Note aggiuntive (facoltative)"
-                    value={cliente.note}
-                    onChange={handleChange}
-                    className="checkout-note"
+                    placeholder="Note (opzionale)"
+                    value={note}
+                    onChange={(e) => setNote(e.target.value)}
                 />
-            </div>
 
-            <button className="checkout-btn" onClick={sendOrder}>
-                Invia ordine su WhatsApp
-            </button>
+                <button
+                    className="btn-primary"
+                    onClick={handleSubmit}
+                    disabled={loading}
+                >
+                    {loading ? "Invio in corso..." : "Invia ordine"}
+                </button>
+            </div>
         </div>
     );
 }

@@ -1,118 +1,121 @@
 import { useCart } from "../context/CartContext";
-import { Link } from "react-router-dom";
+import "../styles/theme.css";
 
 export default function Carrello() {
-    const { items, addToCart, decreaseQuantity, removeFromCart, total } = useCart();
+    const {
+        items,
+        addToCart,
+        decreaseQuantity,
+        removeFromCart,
+        clearCart,
+        total,
+    } = useCart();
+
+    if (items.length === 0) {
+        return <p className="empty-cart">Il carrello è vuoto.</p>;
+    }
 
     return (
-        <div style={{ padding: "15px" }}>
-            <h2 style={{ marginBottom: "15px" }}>Riepilogo Carrello</h2>
+        <div className="cart-container">
+            <h2>Carrello</h2>
 
-            {items.length === 0 && <p>Il carrello è vuoto.</p>}
+            {items.map((item) => (
+                <div key={item.codice} className="cart-item">
 
-            {items.map((item) => {
-                const prezzoUnitario =
-                    item.prezzo_scontato > 0 ? item.prezzo_scontato : item.prezzo;
+                    {/* IMMAGINE */}
+                    {item.immagine && (
+                        <img
+                            src={item.immagine}
+                            alt={item.nome}
+                            className="cart-img"
+                        />
+                    )}
 
-                const totaleRiga = prezzoUnitario * item.quantity;
+                    <div className="cart-info">
+                        <div className="cart-name">{item.nome}</div>
+                        <div className="cart-code">Cod: {item.codice}</div>
 
-                return (
-                    <div
-                        key={item.codice}
-                        style={{
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "space-between",
-                            padding: "10px 0",
-                            borderBottom: "1px solid #ddd",
-                        }}
-                    >
-                        {/* INFO PRODOTTO */}
-                        <div style={{ flex: 1 }}>
-                            <h4 style={{ margin: 0 }}>{item.nome}</h4>
+                        {/* PREZZO */}
+                        <div className="cart-price">
+                            Prezzo: €{" "}
+                            {item.prezzo_scontato > 0
+                                ? item.prezzo_scontato
+                                : item.prezzo}
+                        </div>
 
-                            {/* CONTROLLI QUANTITÀ */}
-                            <div
-                                style={{
-                                    display: "flex",
-                                    alignItems: "center",
-                                    gap: "10px",
-                                    marginTop: "5px",
-                                }}
-                            >
+                        {/* QUANTITÀ */}
+                        {item.productType === "pezzi" ? (
+                            <div className="cart-qty">
                                 <button
+                                    className="btn-small"
                                     onClick={() => decreaseQuantity(item)}
-                                    style={{
-                                        padding: "5px 10px",
-                                        fontSize: "18px",
-                                        borderRadius: "6px",
-                                        border: "1px solid #ccc",
-                                    }}
                                 >
-                                    –
+                                    -
                                 </button>
 
-                                <span style={{ fontSize: "16px" }}>
-                                    {item.quantity}
-                                </span>
+                                <span>{item.quantity} pz</span>
 
                                 <button
-                                    onClick={() => addToCart(item)}
-                                    style={{
-                                        padding: "5px 10px",
-                                        fontSize: "18px",
-                                        borderRadius: "6px",
-                                        border: "1px solid #ccc",
-                                    }}
+                                    className="btn-small"
+                                    onClick={() =>
+                                        addToCart(item, {
+                                            productType: "pezzi",
+                                            quantity: 1,
+                                            weight: 0,
+                                        })
+                                    }
                                 >
                                     +
                                 </button>
-
-                                {/* RIMUOVI PRODOTTO */}
+                            </div>
+                        ) : (
+                            <div className="cart-qty">
                                 <button
-                                    onClick={() => removeFromCart(item)}
-                                    style={{
-                                        padding: "5px 10px",
-                                        fontSize: "14px",
-                                        borderRadius: "6px",
-                                        border: "1px solid red",
-                                        color: "red",
-                                    }}
+                                    className="btn-small"
+                                    onClick={() => decreaseQuantity(item)}
                                 >
-                                    Rimuovi
+                                    -
+                                </button>
+
+                                <span>{item.weight} g</span>
+
+                                <button
+                                    className="btn-small"
+                                    onClick={() =>
+                                        addToCart(item, {
+                                            productType: "peso",
+                                            quantity: 0,
+                                            weight: 50,
+                                        })
+                                    }
+                                >
+                                    +
                                 </button>
                             </div>
-                        </div>
+                        )}
 
-                        {/* TOTALE RIGA */}
-                        <div style={{ minWidth: "80px", textAlign: "right" }}>
-                            € {totaleRiga.toFixed(2)}
-                        </div>
+                        <button
+                            className="btn-remove"
+                            onClick={() => removeFromCart(item)}
+                        >
+                            Rimuovi
+                        </button>
                     </div>
-                );
-            })}
-
-            {/* TOTALE CARRELLO */}
-            {items.length > 0 && (
-                <div style={{ marginTop: "20px", textAlign: "right" }}>
-                    <h3>Totale: € {total.toFixed(2)}</h3>
-
-                    <Link
-                        to="/checkout"
-                        style={{
-                            display: "inline-block",
-                            marginTop: "10px",
-                            padding: "10px 20px",
-                            background: "#1976d2",
-                            color: "white",
-                            borderRadius: "8px",
-                            textDecoration: "none",
-                        }}
-                    >
-                        Procedi al Checkout
-                    </Link>
                 </div>
-            )}
+            ))}
+
+            {/* TOTALE */}
+            <div className="cart-total">
+                Totale: € {total.toFixed(2)}
+            </div>
+
+            <button className="btn-primary checkout-btn">
+                Procedi al checkout
+            </button>
+
+            <button className="btn-cancel" onClick={clearCart}>
+                Svuota carrello
+            </button>
         </div>
     );
 }
