@@ -23,13 +23,11 @@ export default function Carrello() {
                 <div key={item.codice} className="cart-item">
 
                     {/* IMMAGINE */}
-                    {item.immagine && (
-                        <img
-                            src={item.immagine}
-                            alt={item.nome}
-                            className="cart-img"
-                        />
-                    )}
+                    <img
+                        src={item.immagine || "/placeholder.png"}
+                        alt={item.nome}
+                        className="cart-img"
+                    />
 
                     <div className="cart-info">
                         <div className="cart-name">{item.nome}</div>
