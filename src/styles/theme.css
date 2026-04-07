@@ -153,6 +153,85 @@ body {
 }
 
 /* ===========================
+   CARRELLO
+=========================== */
+.cart-container {
+    padding: 15px;
+}
+
+.cart-item {
+    display: flex;
+    background: white;
+    padding: 12px;
+    border-radius: 10px;
+    margin-bottom: 12px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* 🔥 FIX DEFINITIVO IMMAGINI CARRELLO */
+.cart-img {
+    width: 90px;
+    height: 90px;
+    object-fit: contain;
+    background: #fff;
+    border-radius: 8px;
+    margin-right: 12px;
+}
+
+.cart-info {
+    flex: 1;
+}
+
+.cart-name {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.cart-code {
+    font-size: 12px;
+    color: #666;
+    margin-bottom: 6px;
+}
+
+.cart-price {
+    font-size: 15px;
+    font-weight: bold;
+    color: #28a745;
+    margin-bottom: 10px;
+}
+
+.cart-qty {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.btn-small {
+    padding: 5px 10px;
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.btn-remove {
+    padding: 6px 10px;
+    background: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.cart-total {
+    font-size: 20px;
+    font-weight: bold;
+    margin: 20px 0;
+}
+
+/* ===========================
    RESPONSIVE
 =========================== */
 @media (max-width: 480px) {
