@@ -44,13 +44,11 @@ export default function ProductList() {
                 {products.map((product) => (
                     <div key={product.codice} className="product-card">
 
-                        {product.immagine && (
-                            <img
-                                src={product.immagine}
-                                alt={product.nome}
-                                className="product-img"
-                            />
-                        )}
+                        <img
+                            src={product.immagine || "/placeholder.png"}
+                            alt={product.nome}
+                            className="product-img"
+                        />
 
                         <div className="product-name">{product.nome}</div>
                         <div className="product-code">Cod: {product.codice}</div>
