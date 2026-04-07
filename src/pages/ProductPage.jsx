@@ -3,7 +3,6 @@ import { useParams } from "react-router-dom";
 import api from "../api/axios";
 import { useCart } from "../context/CartContext";
 import "../styles/theme.css";
-import "../styles/product-page.css"; // 🔥 aggiunto CSS dedicato
 
 const ProductPage = () => {
     const { codice } = useParams();
