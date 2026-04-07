@@ -38,11 +38,47 @@ export default function Checkout() {
         setLoading(false);
     };
 
+    const sendWhatsApp = () => {
+        let message = `*Nuovo ordine PlusMarket Giuntelli*\n\n`;
+        message += `👤 *Cliente*: ${nome}\n📞 *Telefono*: ${telefono}\n🏠 *Indirizzo*: ${indirizzo}\n`;
+        if (note) message += `📝 *Note*: ${note}\n`;
+        message += `\n🛒 *Prodotti ordinati:*\n`;
+
+        items.forEach((item) => {
+            const qty =
+                item.productType === "pezzi"
+                    ? `${item.quantity} pz`
+                    : `${item.weight} g`;
+
+            const prezzo =
+                (item.prezzo_scontato > 0
+                    ? item.prezzo_scontato
+                    : item.prezzo) *
+                (item.productType === "pezzi"
+                    ? item.quantity
+                    : item.weight / 1000);
+
+            message += `• ${item.nome} — ${qty} — € ${prezzo.toFixed(2)}\n`;
+        });
+
+        message += `\n💰 *Totale*: € ${total.toFixed(2)}\n`;
+
+        const url = `https://wa.me/393495619948?text=${encodeURIComponent(
+            message
+        )}`;
+
+        window.open(url, "_blank");
+    };
+
     if (success) {
         return (
             <div className="checkout-success">
                 <h2>Ordine inviato!</h2>
                 <p>Grazie per aver ordinato da PlusMarket Giuntelli.</p>
+
+                <button className="btn-primary" onClick={sendWhatsApp}>
+                    Invia ordine via WhatsApp
+                </button>
             </div>
         );
     }
