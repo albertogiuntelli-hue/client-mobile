@@ -29,8 +29,11 @@
     text-decoration: none;
 }
 
+/* 🔥 FIX DEFINITIVO LOGO ENORME */
 .navbar-logo img {
+    width: 42px;
     height: 42px;
+    object-fit: contain;
     margin-right: 10px;
     border-radius: 8px;
 }
