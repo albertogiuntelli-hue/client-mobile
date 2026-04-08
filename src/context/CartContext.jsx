@@ -76,7 +76,6 @@ export function CartProvider({ children }) {
 
     const clearCart = () => setItems([]);
 
-    // 🔥 FIX DEFINITIVO: totale peso corretto
     const total = items.reduce((sum, item) => {
         const prezzoUnitario =
             item.prezzo_scontato > 0 ? item.prezzo_scontato : item.prezzo;
@@ -86,7 +85,7 @@ export function CartProvider({ children }) {
         }
 
         if (item.productType === "peso") {
-            const peso = Number(item.weight) || 0; // ← conversione sicura
+            const peso = Number(item.weight) || 0;
             return sum + (peso / 1000) * prezzoUnitario;
         }
 
