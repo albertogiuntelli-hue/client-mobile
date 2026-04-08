@@ -8,6 +8,7 @@ export default function ProductList() {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [popupProduct, setPopupProduct] = useState(null);
+    const [search, setSearch] = useState(""); // 🔥 Campo ricerca
 
     const { addToCart } = useCart();
 
@@ -27,31 +28,39 @@ export default function ProductList() {
         return <p style={{ padding: "20px" }}>Caricamento prodotti...</p>;
     }
 
-    // 🔥 Funzione corretta per aggiungere prodotti a peso
+    // 🔥 FIX: aggiunta prodotti a peso
     const handleAddWeight = (product, grams) => {
         if (!grams || grams <= 0) return;
 
-        addToCart(
-            {
-                ...product,
-                productType: "peso",
-                quantity: 0,
-                weight: grams,
-            },
-            {
-                productType: "peso",
-                quantity: 0,
-                weight: grams,
-            }
-        );
+        addToCart({
+            ...product,
+            productType: "peso",
+            quantity: 0,
+            weight: grams,
+        });
 
         setPopupProduct(null);
     };
 
+    // 🔥 FILTRO RICERCA
+    const filtered = products.filter((p) =>
+        p.nome.toLowerCase().includes(search.toLowerCase())
+    );
+
     return (
         <div className="products-container">
+
+            {/* 🔥 Barra ricerca */}
+            <input
+                type="text"
+                className="search-box"
+                placeholder="Cerca prodotto..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+            />
+
             <div className="product-grid">
-                {products.map((product) => (
+                {filtered.map((product) => (
                     <div key={product.codice} className="product-card">
 
                         <img
@@ -63,7 +72,6 @@ export default function ProductList() {
                         <div className="product-name">{product.nome}</div>
                         <div className="product-code">Cod: {product.codice}</div>
 
-                        {/* 🔥 MOSTRA TIPO BASATO SU a_peso */}
                         <div className="product-type">
                             Tipo: {product.a_peso ? "S (peso)" : "N (pezzo)"}
                         </div>
@@ -73,7 +81,6 @@ export default function ProductList() {
                             {product.a_peso ? " / Kg" : ""}
                         </div>
 
-                        {/* 🔥 LOGICA CORRETTA PER I BOTTONI */}
                         {product.a_peso ? (
                             <button
                                 className="btn-primary"
@@ -85,19 +92,12 @@ export default function ProductList() {
                             <button
                                 className="btn-primary"
                                 onClick={() =>
-                                    addToCart(
-                                        {
-                                            ...product,
-                                            productType: "pezzi",
-                                            quantity: 1,
-                                            weight: 0,
-                                        },
-                                        {
-                                            productType: "pezzi",
-                                            quantity: 1,
-                                            weight: 0,
-                                        }
-                                    )
+                                    addToCart({
+                                        ...product,
+                                        productType: "pezzi",
+                                        quantity: 1,
+                                        weight: 0,
+                                    })
                                 }
                             >
                                 Aggiungi al carrello
@@ -107,7 +107,6 @@ export default function ProductList() {
                 ))}
             </div>
 
-            {/* 🔥 Popup Peso */}
             {popupProduct && (
                 <PopupPeso
                     product={popupProduct}
