@@ -63,16 +63,18 @@ export default function ProductList() {
                         <div className="product-name">{product.nome}</div>
                         <div className="product-code">Cod: {product.codice}</div>
 
+                        {/* 🔥 MOSTRA TIPO BASATO SU a_peso */}
                         <div className="product-type">
-                            Tipo: {product.prezzo_al_kg ? "S (peso)" : "N (pezzo)"}
+                            Tipo: {product.a_peso ? "S (peso)" : "N (pezzo)"}
                         </div>
 
                         <div className="product-price">
                             € {product.prezzo}
-                            {product.prezzo_al_kg ? " / Kg" : ""}
+                            {product.a_peso ? " / Kg" : ""}
                         </div>
 
-                        {product.prezzo_al_kg ? (
+                        {/* 🔥 LOGICA CORRETTA PER I BOTTONI */}
+                        {product.a_peso ? (
                             <button
                                 className="btn-primary"
                                 onClick={() => setPopupProduct(product)}
