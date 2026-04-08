@@ -28,17 +28,16 @@ export default function ProductList() {
         return <p style={{ padding: "20px" }}>Caricamento prodotti...</p>;
     }
 
-    // 🔥 FIX DEFINITIVO: peso numerico
+    // 🔥 FIX DEFINITIVO: usa addToCart(product, options)
     const handleAddWeight = (product, grams) => {
-        const peso = Number(grams); // ← conversione numerica
+        const peso = Number(grams);
 
         if (!peso || peso <= 0) return;
 
-        addToCart({
-            ...product,
+        addToCart(product, {
             productType: "peso",
             quantity: 0,
-            weight: peso, // ← numero, non stringa
+            weight: peso,
         });
 
         setPopupProduct(null);
@@ -92,8 +91,7 @@ export default function ProductList() {
                             <button
                                 className="btn-primary"
                                 onClick={() =>
-                                    addToCart({
-                                        ...product,
+                                    addToCart(product, {
                                         productType: "pezzi",
                                         quantity: 1,
                                         weight: 0,
