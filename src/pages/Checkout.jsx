@@ -7,15 +7,26 @@ export default function Checkout() {
     const { items, total, clearCart } = useCart();
 
     const [nome, setNome] = useState("");
-    const [telefono, setTelefono] = useState("");
+    const [telefono, setTelefono] = useState("3356039828"); // 🔥 Numero pre-inserito
     const [indirizzo, setIndirizzo] = useState("");
     const [note, setNote] = useState("");
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
 
     const handleSubmit = async () => {
-        if (!nome || !telefono || !indirizzo) {
-            alert("Compila tutti i campi obbligatori.");
+        // 🔥 Protezioni obbligatorie
+        if (!nome.trim()) {
+            alert("Inserisci il nome.");
+            return;
+        }
+
+        if (!telefono.trim() || telefono.trim().length < 6) {
+            alert("Inserisci un numero di telefono valido.");
+            return;
+        }
+
+        if (!indirizzo.trim()) {
+            alert("Inserisci l'indirizzo.");
             return;
         }
 
@@ -63,6 +74,7 @@ export default function Checkout() {
 
         message += `\n💰 *Totale*: € ${total.toFixed(2)}\n`;
 
+        // 🔥 WhatsApp rimane invariato
         const url = `https://wa.me/393495619948?text=${encodeURIComponent(
             message
         )}`;
@@ -74,7 +86,7 @@ export default function Checkout() {
         return (
             <div className="checkout-success">
                 <h2>Ordine inviato!</h2>
-                <p>Grazie per aver ordinato da PlusMarket Giuntelli.</p>
+                <p>Ti contatteremo al numero <strong>{telefono}</strong>.</p>
 
                 <button className="btn-primary" onClick={sendWhatsApp}>
                     Invia ordine via WhatsApp
