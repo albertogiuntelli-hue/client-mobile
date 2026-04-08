@@ -7,7 +7,8 @@ export default function Navbar() {
     const [menuOpen, setMenuOpen] = useState(false);
     const { items, total } = useCart();
 
-    const cartCount = items.reduce((sum, item) => sum + item.quantity, 0);
+    // 🔥 FIX: conta ogni prodotto, anche quelli a peso
+    const cartCount = items.length;
 
     return (
         <>
