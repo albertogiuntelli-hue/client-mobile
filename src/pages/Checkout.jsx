@@ -7,26 +7,20 @@ export default function Checkout() {
     const { items, total, clearCart } = useCart();
 
     const [nome, setNome] = useState("");
-    const [telefono, setTelefono] = useState("3356039828"); // 🔥 Numero pre-inserito
+    const [telefono, setTelefono] = useState("3356039828"); // 🔥 numero pre-inserito
     const [indirizzo, setIndirizzo] = useState("");
     const [note, setNote] = useState("");
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
 
     const handleSubmit = async () => {
-        // 🔥 Protezioni obbligatorie
-        if (!nome.trim()) {
-            alert("Inserisci il nome.");
+        if (!nome.trim() || !telefono.trim() || !indirizzo.trim()) {
+            alert("Compila tutti i campi obbligatori.");
             return;
         }
 
-        if (!telefono.trim() || telefono.trim().length < 6) {
-            alert("Inserisci un numero di telefono valido.");
-            return;
-        }
-
-        if (!indirizzo.trim()) {
-            alert("Inserisci l'indirizzo.");
+        if (telefono.trim().length < 6) {
+            alert("Numero di telefono non valido.");
             return;
         }
 
@@ -74,8 +68,11 @@ export default function Checkout() {
 
         message += `\n💰 *Totale*: € ${total.toFixed(2)}\n`;
 
-        // 🔥 WhatsApp rimane invariato
-        const url = `https://wa.me/393495619948?text=${encodeURIComponent(
+        // 🔥 FIX: WhatsApp usa il numero inserito dal cliente
+        const numeroWhatsApp =
+            telefono.startsWith("39") ? telefono : "39" + telefono;
+
+        const url = `https://wa.me/${numeroWhatsApp}?text=${encodeURIComponent(
             message
         )}`;
 
