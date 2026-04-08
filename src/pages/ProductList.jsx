@@ -8,7 +8,7 @@ export default function ProductList() {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [popupProduct, setPopupProduct] = useState(null);
-    const [search, setSearch] = useState(""); // 🔥 Campo ricerca
+    const [search, setSearch] = useState("");
 
     const { addToCart } = useCart();
 
@@ -28,21 +28,22 @@ export default function ProductList() {
         return <p style={{ padding: "20px" }}>Caricamento prodotti...</p>;
     }
 
-    // 🔥 FIX: aggiunta prodotti a peso
+    // 🔥 FIX DEFINITIVO: peso numerico
     const handleAddWeight = (product, grams) => {
-        if (!grams || grams <= 0) return;
+        const peso = Number(grams);
+
+        if (!peso || peso <= 0) return;
 
         addToCart({
             ...product,
             productType: "peso",
             quantity: 0,
-            weight: grams,
+            weight: peso, // 🔥 conversione numerica
         });
 
         setPopupProduct(null);
     };
 
-    // 🔥 FILTRO RICERCA
     const filtered = products.filter((p) =>
         p.nome.toLowerCase().includes(search.toLowerCase())
     );
@@ -50,7 +51,6 @@ export default function ProductList() {
     return (
         <div className="products-container">
 
-            {/* 🔥 Barra ricerca */}
             <input
                 type="text"
                 className="search-box"
