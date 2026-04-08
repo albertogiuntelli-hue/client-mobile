@@ -5,14 +5,14 @@ export default function PopupPeso({ product, onConfirm, onClose }) {
     const [grams, setGrams] = useState("");
 
     const handleConfirm = () => {
-        const peso = Number(grams); // 🔥 conversione sicura
+        const peso = Number(grams); // 🔥 conversione numerica
 
         if (!peso || peso <= 0) {
             alert("Inserisci un peso valido.");
             return;
         }
 
-        onConfirm(peso); // 🔥 ora passa un numero, non una stringa
+        onConfirm(peso); // 🔥 passa un numero, non una stringa
     };
 
     return (

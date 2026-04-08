@@ -30,7 +30,7 @@ export default function ProductList() {
 
     // 🔥 FIX DEFINITIVO: peso numerico
     const handleAddWeight = (product, grams) => {
-        const peso = Number(grams);
+        const peso = Number(grams); // ← conversione numerica
 
         if (!peso || peso <= 0) return;
 
@@ -38,7 +38,7 @@ export default function ProductList() {
             ...product,
             productType: "peso",
             quantity: 0,
-            weight: peso, // 🔥 conversione numerica
+            weight: peso, // ← numero, non stringa
         });
 
         setPopupProduct(null);
