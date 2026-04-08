@@ -1,39 +1,40 @@
+import { useState } from "react";
 import "../styles/theme.css";
 
 export default function PopupPeso({ product, onConfirm, onClose }) {
+    const [grams, setGrams] = useState("");
+
+    const handleConfirm = () => {
+        const peso = Number(grams); // 🔥 conversione sicura
+
+        if (!peso || peso <= 0) {
+            alert("Inserisci un peso valido.");
+            return;
+        }
+
+        onConfirm(peso); // 🔥 ora passa un numero, non una stringa
+    };
+
     return (
         <div className="popup-overlay">
-            <div className="popup-box">
-                <h3>{product.nome}</h3>
-                <p>Seleziona la quantità in grammi:</p>
-
-                <div className="popup-buttons">
-                    {[100, 200, 300].map((g) => (
-                        <button
-                            key={g}
-                            className="btn-secondary"
-                            onClick={() => onConfirm(g)}
-                        >
-                            {g} g
-                        </button>
-                    ))}
-                </div>
+            <div className="popup">
+                <h3>Seleziona quantità (grammi)</h3>
 
                 <input
                     type="number"
-                    placeholder="Inserisci grammi"
-                    className="popup-input"
-                    onKeyDown={(e) => {
-                        if (e.key === "Enter") {
-                            const grams = Number(e.target.value);
-                            if (grams > 0) onConfirm(grams);
-                        }
-                    }}
+                    value={grams}
+                    onChange={(e) => setGrams(e.target.value)}
+                    placeholder="Es. 100"
                 />
 
-                <button className="btn-cancel" onClick={onClose}>
-                    Annulla
-                </button>
+                <div className="popup-buttons">
+                    <button className="btn-primary" onClick={handleConfirm}>
+                        Conferma
+                    </button>
+                    <button className="btn-secondary" onClick={onClose}>
+                        Annulla
+                    </button>
+                </div>
             </div>
         </div>
     );
