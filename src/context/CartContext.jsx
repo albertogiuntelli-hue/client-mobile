@@ -1,9 +1,18 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 
 const CartContext = createContext();
 
 export function CartProvider({ children }) {
-    const [items, setItems] = useState([]);
+    // 🔥 1. Carichiamo il carrello dal localStorage
+    const [items, setItems] = useState(() => {
+        const saved = localStorage.getItem("cart");
+        return saved ? JSON.parse(saved) : [];
+    });
+
+    // 🔥 2. Ogni volta che cambia, lo salviamo
+    useEffect(() => {
+        localStorage.setItem("cart", JSON.stringify(items));
+    }, [items]);
 
     const addToCart = (product, options = {}) => {
         const {
@@ -74,7 +83,10 @@ export function CartProvider({ children }) {
         setItems((prev) => prev.filter((p) => p.codice !== product.codice));
     };
 
-    const clearCart = () => setItems([]);
+    const clearCart = () => {
+        setItems([]);
+        localStorage.removeItem("cart"); // 🔥 pulizia totale
+    };
 
     const total = items.reduce((sum, item) => {
         const prezzoUnitario =
