@@ -268,6 +268,60 @@ body {
 }
 
 /* ===========================
+   CHECKOUT PAGE (MOBILE FIRST)
+=========================== */
+
+.checkout-container {
+    padding: 16px;
+}
+
+.checkout-summary,
+.checkout-form {
+    background: white;
+    padding: 16px;
+    border-radius: 12px;
+    margin-bottom: 18px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.checkout-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.checkout-item:last-child {
+    border-bottom: none;
+}
+
+.checkout-total {
+    font-size: 20px;
+    font-weight: bold;
+    margin-top: 12px;
+    text-align: right;
+}
+
+.checkout-form input,
+.checkout-form textarea {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 14px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 16px;
+}
+
+.checkout-success {
+    padding: 20px;
+    text-align: center;
+}
+
+.checkout-success button {
+    margin-top: 20px;
+}
+
+/* ===========================
    RESPONSIVE
 =========================== */
 @media (max-width: 480px) {

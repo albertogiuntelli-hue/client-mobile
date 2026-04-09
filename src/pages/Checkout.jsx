@@ -7,7 +7,7 @@ export default function Checkout() {
     const { items, total, clearCart } = useCart();
 
     const [nome, setNome] = useState("");
-    const [telefono, setTelefono] = useState("3356039828"); // 🔥 numero pre-inserito
+    const [telefono, setTelefono] = useState(""); // ✅ campo vuoto
     const [indirizzo, setIndirizzo] = useState("");
     const [note, setNote] = useState("");
     const [loading, setLoading] = useState(false);
@@ -68,11 +68,10 @@ export default function Checkout() {
 
         message += `\n💰 *Totale*: € ${total.toFixed(2)}\n`;
 
-        // 🔥 FIX: WhatsApp usa il numero inserito dal cliente
-        const numeroWhatsApp =
-            telefono.startsWith("39") ? telefono : "39" + telefono;
+        // ✅ WhatsApp invia SEMPRE a te
+        const numeroDestinatario = "393356039828";
 
-        const url = `https://wa.me/${numeroWhatsApp}?text=${encodeURIComponent(
+        const url = `https://wa.me/${numeroDestinatario}?text=${encodeURIComponent(
             message
         )}`;
 
