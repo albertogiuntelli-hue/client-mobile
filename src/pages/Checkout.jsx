@@ -7,7 +7,7 @@ export default function Checkout() {
     const { items, total, clearCart } = useCart();
 
     const [nome, setNome] = useState("");
-    const [telefono, setTelefono] = useState(""); // ✅ campo vuoto
+    const [telefono, setTelefono] = useState("");
     const [indirizzo, setIndirizzo] = useState("");
     const [note, setNote] = useState("");
     const [loading, setLoading] = useState(false);
@@ -33,7 +33,7 @@ export default function Checkout() {
                 totale: total.toFixed(2),
             });
 
-            clearCart();
+            // ❗ NON svuotiamo più il carrello qui
             setSuccess(true);
         } catch (err) {
             console.error("Errore invio ordine:", err);
@@ -68,7 +68,6 @@ export default function Checkout() {
 
         message += `\n💰 *Totale*: € ${total.toFixed(2)}\n`;
 
-        // ✅ WhatsApp invia SEMPRE a te
         const numeroDestinatario = "393356039828";
 
         const url = `https://wa.me/${numeroDestinatario}?text=${encodeURIComponent(
@@ -76,6 +75,9 @@ export default function Checkout() {
         )}`;
 
         window.open(url, "_blank");
+
+        // ✅ ORA svuotiamo il carrello DOPO l'invio WhatsApp
+        clearCart();
     };
 
     if (success) {
