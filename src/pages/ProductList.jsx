@@ -15,7 +15,7 @@ export default function ProductList() {
     const { addToCart } = useCart();
 
     useEffect(() => {
-        api.get("/api/products")
+        api.get("/products")
             .then((res) => {
                 setProducts(res.data);
                 setLoading(false);
