@@ -13,7 +13,8 @@ const ProductPage = () => {
     useEffect(() => {
         const fetchProduct = async () => {
             try {
-                const res = await api.get(`/api/products/${codice}`);
+                // ✅ ROUTE CORRETTA (senza doppio /api)
+                const res = await api.get(`/products/${codice}`);
                 setProduct(res.data || null);
                 setLoading(false);
             } catch (error) {
@@ -37,7 +38,7 @@ const ProductPage = () => {
         <div className="product-page">
 
             <img
-                src={product.immagine || "/logo.png"}   // 🔥 fallback corretto
+                src={product.immagine || "/logo.png"}
                 alt={product.nome}
                 className="product-page-image"
             />
