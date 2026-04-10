@@ -7,6 +7,7 @@ export default function Checkout() {
     const { items, total, clearCart } = useCart();
 
     const [nome, setNome] = useState("");
+    const [cognome, setCognome] = useState("");
     const [telefono, setTelefono] = useState("");
     const [indirizzo, setIndirizzo] = useState("");
     const [note, setNote] = useState("");
@@ -14,7 +15,7 @@ export default function Checkout() {
     const [success, setSuccess] = useState(false);
 
     const handleSubmit = async () => {
-        if (!nome.trim() || !telefono.trim() || !indirizzo.trim()) {
+        if (!nome.trim() || !cognome.trim() || !telefono.trim() || !indirizzo.trim()) {
             alert("Compila tutti i campi obbligatori.");
             return;
         }
@@ -27,9 +28,8 @@ export default function Checkout() {
         setLoading(true);
 
         try {
-            // ✅ ROUTE CORRETTA (senza doppio /api)
             await api.post("/orders", {
-                cliente: { nome, telefono, indirizzo, note },
+                cliente: { nome, cognome, telefono, indirizzo, note },
                 prodotti: items,
                 totale: total.toFixed(2),
             });
@@ -45,7 +45,7 @@ export default function Checkout() {
 
     const sendWhatsApp = () => {
         let message = `*Nuovo ordine PlusMarket Giuntelli*\n\n`;
-        message += `👤 *Cliente*: ${nome}\n📞 *Telefono*: ${telefono}\n🏠 *Indirizzo*: ${indirizzo}\n`;
+        message += `👤 *Cliente*: ${nome} ${cognome}\n📞 *Telefono*: ${telefono}\n🏠 *Indirizzo*: ${indirizzo}\n`;
         if (note) message += `📝 *Note*: ${note}\n`;
         message += `\n🛒 *Prodotti ordinati:*\n`;
 
@@ -130,9 +130,16 @@ export default function Checkout() {
 
                 <input
                     type="text"
-                    placeholder="Nome e cognome"
+                    placeholder="Nome"
                     value={nome}
                     onChange={(e) => setNome(e.target.value)}
+                />
+
+                <input
+                    type="text"
+                    placeholder="Cognome"
+                    value={cognome}
+                    onChange={(e) => setCognome(e.target.value)}
                 />
 
                 <input

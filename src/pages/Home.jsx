@@ -1,21 +1,42 @@
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import logo from "../../public/icon-192.png";
+import "../styles/theme.css";
 
 export default function Home() {
+    const navigate = useNavigate();
+
     return (
         <div className="home-container">
-            <h1 className="home-title">Benvenuto in PlusMarket Giuntelli</h1>
+            <img src={logo} alt="PlusMarket Giuntelli" className="home-logo" />
 
-            <p className="home-subtitle">
-                Il tuo negozio di fiducia, ora anche online.
+            <div className="home-buttons">
+                <button
+                    className="home-btn"
+                    onClick={() => navigate("/offers")}
+                >
+                    ORDINA ONLINE LE OFFERTE
+                </button>
+
+                <button
+                    className="home-btn"
+                    onClick={() => navigate("/products")}
+                >
+                    ORDINA ONLINE I PRODOTTI
+                </button>
+            </div>
+
+            <p className="home-description">
+                Il tuo negozio di fiducia, vicino a te ogni giorno.
             </p>
 
-            <p className="home-text">
-                Sfoglia i prodotti e inizia il tuo ordine direttamente dal tuo smartphone.
-            </p>
-
-            <Link to="/prodotti" className="btn-primary">
-                Vai ai Prodotti
-            </Link>
+            <a
+                href="https://www.plusmarket.it"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="home-link"
+            >
+                www.plusmarket.it
+            </a>
         </div>
     );
 }
