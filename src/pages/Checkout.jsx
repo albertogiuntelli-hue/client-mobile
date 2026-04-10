@@ -27,13 +27,13 @@ export default function Checkout() {
         setLoading(true);
 
         try {
-            await api.post("/api/orders", {
+            // ✅ ROUTE CORRETTA (senza doppio /api)
+            await api.post("/orders", {
                 cliente: { nome, telefono, indirizzo, note },
                 prodotti: items,
                 totale: total.toFixed(2),
             });
 
-            // ❗ NON svuotiamo più il carrello qui
             setSuccess(true);
         } catch (err) {
             console.error("Errore invio ordine:", err);
@@ -76,7 +76,6 @@ export default function Checkout() {
 
         window.open(url, "_blank");
 
-        // ✅ ORA svuotiamo il carrello DOPO l'invio WhatsApp
         clearCart();
     };
 
