@@ -103,6 +103,35 @@ body {
 }
 
 /* ===========================
+   TASTO TORNA INDIETRO
+=========================== */
+.back-btn {
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    padding: 10px 16px;
+    background: #6d4c41;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    z-index: 9999;
+}
+
+/* ===========================
+   SEARCH BOX
+=========================== */
+.search-box {
+    width: 100%;
+    max-width: 420px;
+    padding: 14px;
+    margin: 70px auto 20px auto;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    font-size: 16px;
+}
+
+/* ===========================
    GRID PRODOTTI
 =========================== */
 .products-container {

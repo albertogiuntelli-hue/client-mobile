@@ -3,6 +3,7 @@ import api from "../api/axios";
 import { useCart } from "../context/CartContext";
 import PopupPeso from "../components/PopupPeso";
 import Toast from "../components/Toast";
+import { useNavigate } from "react-router-dom";
 import "../styles/theme.css";
 
 export default function ProductList() {
@@ -13,6 +14,7 @@ export default function ProductList() {
     const [toast, setToast] = useState("");
 
     const { addToCart } = useCart();
+    const navigate = useNavigate();
 
     useEffect(() => {
         api.get("/products")
@@ -51,6 +53,12 @@ export default function ProductList() {
     return (
         <div className="products-container">
 
+            {/* 🔙 TASTO TORNA INDIETRO */}
+            <button className="back-btn" onClick={() => navigate("/")}>
+                ⬅ Torna indietro
+            </button>
+
+            {/* 🔍 BARRA DI RICERCA */}
             <input
                 type="text"
                 className="search-box"
@@ -59,6 +67,7 @@ export default function ProductList() {
                 onChange={(e) => setSearch(e.target.value)}
             />
 
+            {/* LISTA PRODOTTI */}
             <div className="product-grid">
                 {filtered.map((product) => (
                     <div key={product.codice} className="product-card">
