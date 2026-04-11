@@ -24,7 +24,7 @@ body {
 }
 
 /* ===========================
-   HOME PAGE MODERNA
+   HOME PAGE MODERNA CON SFONDO FOTO
 =========================== */
 .home-container {
     display: flex;
@@ -33,7 +33,17 @@ body {
     text-align: center;
     padding: 40px 20px;
     min-height: 100vh;
-    background: linear-gradient(180deg, #fff3e0, #ffe0b2);
+
+    /* FOTO DI SFONDO */
+    background-image: url("/background.jpg");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+
+    /* VELATURA ELEGANTE */
+    background-color: rgba(255, 255, 255, 0.78);
+    backdrop-filter: blur(2px);
+    background-blend-mode: lighten;
 }
 
 .home-logo {
@@ -103,19 +113,21 @@ body {
 }
 
 /* ===========================
-   TASTO TORNA INDIETRO
+   TASTO TORNA INDIETRO (POSIZIONE CORRETTA)
 =========================== */
 .back-btn {
     position: fixed;
-    top: 15px;
+    top: 70px;
+    /* 🔥 prima era 15px */
     left: 15px;
-    padding: 10px 16px;
+    padding: 12px 18px;
     background: #6d4c41;
     color: white;
     border: none;
-    border-radius: 8px;
-    font-size: 16px;
+    border-radius: 10px;
+    font-size: 18px;
     z-index: 9999;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
 /* ===========================
