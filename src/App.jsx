@@ -6,6 +6,7 @@ import Checkout from "./pages/Checkout";
 import InstallBanner from "./components/InstallBanner";
 import ProductList from "./pages/ProductList";
 import Navbar from "./components/Navbar";
+import ChiSiamo from "./pages/ChiSiamo"; // 🔥 IMPORTANTE
 
 function App() {
   return (
@@ -19,6 +20,9 @@ function App() {
         <Route path="/product/:codice" element={<ProductPage />} />
         <Route path="/cart" element={<Carrello />} />
         <Route path="/checkout" element={<Checkout />} />
+
+        {/* 🔥 ROTTA CHI SIAMO */}
+        <Route path="/chi-siamo" element={<ChiSiamo />} />
       </Routes>
     </>
   );
