@@ -35,7 +35,7 @@ body {
     min-height: 100vh;
 
     /* FOTO DI SFONDO — VERSIONE DEFINITIVA */
-    background-image: url("/background.jpg?v=1");
+    background-image: url("/background2.jpg");
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
