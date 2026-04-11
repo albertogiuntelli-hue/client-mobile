@@ -1,47 +1,72 @@
+/* ===========================
+   CONTAINER LISTA PRODOTTI
+=========================== */
 .products-container {
-    padding: 10px;
+    padding: 12px;
     width: 100%;
     max-width: 100%;
     overflow-x: hidden;
-    /* 🔥 evita sforamento */
 }
 
+/* ===========================
+   GRIGLIA PRODOTTI
+=========================== */
 .product-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-    /* 🔥 card più piccole */
-    gap: 12px;
+    gap: 16px;
+    /* 🔥 più aria tra le card */
     width: 100%;
 }
 
+/* ===========================
+   CARD PRODOTTO
+=========================== */
 .product-card {
     background: white;
-    padding: 10px;
-    border-radius: 10px;
+    padding: 12px;
+    border-radius: 14px;
+    /* 🔥 più moderna */
     text-align: center;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.12);
+    /* 🔥 ombra più morbida */
     width: 100%;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
+.product-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 14px rgba(0, 0, 0, 0.18);
+}
+
+/* ===========================
+   IMMAGINE PRODOTTO
+=========================== */
 .product-img {
     width: 100%;
-    height: 110px;
+    height: 120px;
     object-fit: contain;
-    background: #fff;
-    border-radius: 8px;
-    margin-bottom: 8px;
+    background: #fafafa;
+    /* 🔥 più elegante */
+    border-radius: 10px;
+    border: 1px solid #eee;
+    /* 🔥 definizione */
+    margin-bottom: 10px;
 }
 
+/* ===========================
+   TESTI PRODOTTO
+=========================== */
 .product-name {
     font-size: 15px;
-    font-weight: bold;
+    font-weight: 600;
     margin-bottom: 4px;
-    word-wrap: break-word;
+    color: #222;
 }
 
 .product-code {
     font-size: 12px;
-    color: #666;
+    color: #777;
     margin-bottom: 4px;
 }
 
@@ -52,19 +77,32 @@
 }
 
 .product-price {
-    font-size: 15px;
+    font-size: 16px;
     font-weight: bold;
     color: #28a745;
-    margin: 8px 0;
+    margin: 10px 0;
 }
 
+/* ===========================
+   BOTTONE
+=========================== */
 .btn-primary {
     width: 100%;
-    padding: 10px;
+    padding: 12px;
     background: #28a745;
     color: white;
     border: none;
-    border-radius: 6px;
+    border-radius: 10px;
+    /* 🔥 più moderno */
     cursor: pointer;
-    font-size: 14px;
+    font-size: 15px;
+    font-weight: 600;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+    transition: background 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
+}
+
+.btn-primary:hover {
+    background: #218838;
+    transform: translateY(-1px);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.18);
 }
