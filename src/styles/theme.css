@@ -8,6 +8,14 @@
     font-family: system-ui, sans-serif;
 }
 
+html,
+body {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+    /* 🔥 BLOCCA SCORRIMENTO A DESTRA */
+}
+
 body {
     background: #f7f7f7;
     color: #333;
@@ -34,13 +42,11 @@ body {
     padding: 40px 20px;
     min-height: 100vh;
 
-    /* FOTO DI SFONDO — VERSIONE DEFINITIVA */
     background-image: url("/background2.jpg");
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
 
-    /* VELATURA ELEGANTE */
     background-color: rgba(255, 255, 255, 0.78);
     backdrop-filter: blur(2px);
     background-blend-mode: lighten;
@@ -108,10 +114,6 @@ body {
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
 }
 
-.home-btn-secondary:hover {
-    background-color: #5d4037;
-}
-
 /* ===========================
    TASTO TORNA INDIETRO
 =========================== */
@@ -128,10 +130,6 @@ body {
     font-weight: bold;
     z-index: 9999;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
-}
-
-.back-btn:hover {
-    background: #fb8c00;
 }
 
 /* ===========================
@@ -274,57 +272,54 @@ body {
 }
 
 /* ===========================
-   CARRELLO
+   CARRELLO (MOBILE FIX)
 =========================== */
 .cart-container {
     padding: 15px;
+    width: 100%;
+    max-width: 100%;
 }
 
 .cart-item {
     display: flex;
+    gap: 10px;
     background: white;
     padding: 12px;
     border-radius: 10px;
     margin-bottom: 12px;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
 }
 
 .cart-img {
-    width: 90px;
-    height: 90px;
+    width: 80px;
+    height: 80px;
     object-fit: contain;
     background: #fff;
     border-radius: 8px;
-    margin-right: 12px;
+    flex-shrink: 0;
 }
 
 .cart-info {
     flex: 1;
+    min-width: 0;
 }
 
-.cart-name {
-    font-size: 16px;
-    font-weight: bold;
-}
-
-.cart-code {
-    font-size: 12px;
-    color: #666;
-    margin-bottom: 6px;
-}
-
+.cart-name,
+.cart-code,
 .cart-price {
-    font-size: 15px;
-    font-weight: bold;
-    color: #28a745;
-    margin-bottom: 10px;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
 }
 
 .cart-qty {
     display: flex;
     align-items: center;
     gap: 10px;
-    margin-bottom: 10px;
+    flex-wrap: wrap;
 }
 
 .btn-small {
@@ -390,10 +385,12 @@ body {
 }
 
 /* ===========================
-   CHECKOUT PAGE
+   CHECKOUT PAGE (MOBILE FIX)
 =========================== */
 .checkout-container {
     padding: 16px;
+    width: 100%;
+    max-width: 100%;
 }
 
 .checkout-summary,
@@ -403,17 +400,26 @@ body {
     border-radius: 12px;
     margin-bottom: 18px;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+
+    width: 100%;
+    max-width: 100%;
 }
 
 .checkout-item {
     display: flex;
     justify-content: space-between;
+    gap: 10px;
     padding: 8px 0;
     border-bottom: 1px solid #eee;
+
+    flex-wrap: wrap;
 }
 
-.checkout-item:last-child {
-    border-bottom: none;
+.item-name,
+.item-qty,
+.item-price {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
 }
 
 .checkout-total {
@@ -421,16 +427,6 @@ body {
     font-weight: bold;
     margin-top: 12px;
     text-align: right;
-}
-
-.checkout-form input,
-.checkout-form textarea {
-    width: 100%;
-    padding: 12px;
-    margin-bottom: 14px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    font-size: 16px;
 }
 
 .checkout-success {

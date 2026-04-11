@@ -18,7 +18,6 @@ export default function Carrello() {
         return <p className="empty-cart">Il carrello è vuoto.</p>;
     }
 
-    // 🔥 Calcolo prezzo corretto per ogni prodotto
     const getItemPrice = (item) => {
         const prezzoUnitario =
             item.prezzo_scontato > 0 ? item.prezzo_scontato : item.prezzo;
@@ -52,12 +51,10 @@ export default function Carrello() {
                         <div className="cart-name">{item.nome}</div>
                         <div className="cart-code">Cod: {item.codice}</div>
 
-                        {/* 🔥 PREZZO CORRETTO PER IL PESO */}
                         <div className="cart-price">
                             Prezzo: € {getItemPrice(item)}
                         </div>
 
-                        {/* 🔥 GESTIONE PRODOTTI A PEZZI */}
                         {item.productType === "pezzi" && (
                             <div className="cart-qty">
                                 <button
@@ -84,7 +81,6 @@ export default function Carrello() {
                             </div>
                         )}
 
-                        {/* 🔥 GESTIONE PRODOTTI A PESO */}
                         {item.productType === "peso" && (
                             <div className="cart-qty">
                                 <button
@@ -102,7 +98,7 @@ export default function Carrello() {
                                         addToCart(item, {
                                             productType: "peso",
                                             quantity: 0,
-                                            weight: 50, // aggiunge 50g
+                                            weight: 50,
                                         })
                                     }
                                 >
@@ -121,7 +117,6 @@ export default function Carrello() {
                 </div>
             ))}
 
-            {/* 🔥 TOTALE CORRETTO */}
             <div className="cart-total">
                 Totale: € {total.toFixed(2)}
             </div>
