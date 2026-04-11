@@ -5,6 +5,7 @@ import PopupPeso from "../components/PopupPeso";
 import Toast from "../components/Toast";
 import { useNavigate } from "react-router-dom";
 import "../styles/theme.css";
+import "../styles/productlist.css";   // 🔥 IMPORT CSS GRIGLIA (fondamentale!)
 
 export default function ProductList() {
     const [products, setProducts] = useState([]);
