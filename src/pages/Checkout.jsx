@@ -1,10 +1,12 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useCart } from "../context/CartContext";
 import api from "../api/axios";
+import { useNavigate } from "react-router-dom";
 import "../styles/theme.css";
 
 export default function Checkout() {
     const { items, total, clearCart } = useCart();
+    const navigate = useNavigate();
 
     const [nome, setNome] = useState("");
     const [cognome, setCognome] = useState("");
@@ -34,6 +36,7 @@ export default function Checkout() {
                 totale: total.toFixed(2),
             });
 
+            clearCart(); // 🔥 SVUOTA SUBITO IL CARRELLO
             setSuccess(true);
         } catch (err) {
             console.error("Errore invio ordine:", err);
@@ -43,41 +46,15 @@ export default function Checkout() {
         setLoading(false);
     };
 
-    const sendWhatsApp = () => {
-        let message = `*Nuovo ordine PlusMarket Giuntelli*\n\n`;
-        message += `👤 *Cliente*: ${nome} ${cognome}\n📞 *Telefono*: ${telefono}\n🏠 *Indirizzo*: ${indirizzo}\n`;
-        if (note) message += `📝 *Note*: ${note}\n`;
-        message += `\n🛒 *Prodotti ordinati:*\n`;
-
-        items.forEach((item) => {
-            const qty =
-                item.productType === "pezzi"
-                    ? `${item.quantity} pz`
-                    : `${item.weight} g`;
-
-            const prezzo =
-                (item.prezzo_scontato > 0
-                    ? item.prezzo_scontato
-                    : item.prezzo) *
-                (item.productType === "pezzi"
-                    ? item.quantity
-                    : item.weight / 1000);
-
-            message += `• ${item.nome} — ${qty} — € ${prezzo.toFixed(2)}\n`;
-        });
-
-        message += `\n💰 *Totale*: € ${total.toFixed(2)}\n`;
-
-        const numeroDestinatario = "393356039828";
-
-        const url = `https://wa.me/${numeroDestinatario}?text=${encodeURIComponent(
-            message
-        )}`;
-
-        window.open(url, "_blank");
-
-        clearCart();
-    };
+    // 🔥 RITORNO AUTOMATICO ALLA HOME DOPO 2 SECONDI
+    useEffect(() => {
+        if (success) {
+            const timer = setTimeout(() => {
+                navigate("/");
+            }, 2000);
+            return () => clearTimeout(timer);
+        }
+    }, [success, navigate]);
 
     if (success) {
         return (
@@ -85,8 +62,9 @@ export default function Checkout() {
                 <h2>Ordine inviato!</h2>
                 <p>Ti contatteremo al numero <strong>{telefono}</strong>.</p>
 
-                <button className="btn-primary" onClick={sendWhatsApp}>
-                    Invia ordine via WhatsApp
+                {/* 🔥 NESSUN BOTTONE WHATSAPP */}
+                <button className="btn-primary" onClick={() => navigate("/")}>
+                    Torna alla Home
                 </button>
             </div>
         );
@@ -100,13 +78,13 @@ export default function Checkout() {
                 <h3>Riepilogo ordine</h3>
                 {items.map((item) => (
                     <div key={item.codice} className="checkout-item">
-                        <span>{item.nome}</span>
-                        <span>
+                        <span className="item-name">{item.nome}</span>
+                        <span className="item-qty">
                             {item.productType === "pezzi"
                                 ? `${item.quantity} pz`
                                 : `${item.weight} g`}
                         </span>
-                        <span>
+                        <span className="item-price">
                             €{" "}
                             {(
                                 (item.prezzo_scontato > 0
