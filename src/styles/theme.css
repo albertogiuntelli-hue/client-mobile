@@ -34,8 +34,8 @@ body {
     padding: 40px 20px;
     min-height: 100vh;
 
-    /* FOTO DI SFONDO */
-    background-image: url("/background.jpg");
+    /* FOTO DI SFONDO — VERSIONE SICURA */
+    background-image: url("./background.jpg");
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -118,11 +118,9 @@ body {
 .back-btn {
     position: fixed;
     top: 70px;
-    /* più basso */
     left: 15px;
     padding: 12px 20px;
     background: #ff9800;
-    /* arancione moderno */
     color: white;
     border: none;
     border-radius: 12px;
