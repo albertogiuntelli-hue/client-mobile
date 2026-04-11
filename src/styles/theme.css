@@ -32,51 +32,74 @@ body {
     align-items: center;
     text-align: center;
     padding: 40px 20px;
+    min-height: 100vh;
+    background: linear-gradient(180deg, #fff3e0, #ffe0b2);
 }
 
 .home-logo {
-    width: 150px;
-    height: 150px;
-    margin-bottom: 30px;
+    width: 160px;
+    height: 160px;
+    margin-bottom: 35px;
 }
 
 .home-buttons {
     width: 100%;
-    max-width: 400px;
+    max-width: 420px;
     display: flex;
     flex-direction: column;
-    gap: 20px;
-    margin-bottom: 30px;
+    gap: 22px;
+    margin-bottom: 35px;
 }
 
 .home-btn {
     width: 100%;
-    padding: 18px;
-    font-size: 18px;
+    padding: 20px;
+    font-size: 20px;
     font-weight: bold;
-    background-color: #d32f2f;
+    background-color: #ff9800;
     color: white;
     border: none;
-    border-radius: 10px;
+    border-radius: 12px;
     cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
 }
 
 .home-btn:hover {
-    background-color: #b71c1c;
+    background-color: #fb8c00;
 }
 
 .home-description {
-    font-size: 16px;
+    font-size: 18px;
     margin-top: 10px;
-    color: #333;
+    color: #444;
+    font-weight: 500;
 }
 
 .home-link {
-    margin-top: 10px;
-    font-size: 16px;
-    color: #d32f2f;
+    margin-top: 15px;
+    font-size: 20px;
+    color: #e65100;
     text-decoration: none;
     font-weight: bold;
+}
+
+.home-btn-secondary {
+    margin-top: 25px;
+    width: 100%;
+    max-width: 420px;
+    padding: 18px;
+    font-size: 18px;
+    font-weight: bold;
+    background-color: #6d4c41;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+.home-btn-secondary:hover {
+    background-color: #5d4037;
 }
 
 /* ===========================
@@ -171,7 +194,7 @@ body {
 }
 
 /* ===========================
-   POPUP PESO (VERSIONE DEFINITIVA)
+   POPUP PESO
 =========================== */
 .popup-overlay {
     position: fixed;
@@ -286,7 +309,7 @@ body {
 }
 
 /* ===========================
-   TOAST (AGGIUNTO)
+   TOAST
 =========================== */
 .toast {
     position: fixed;
@@ -324,9 +347,8 @@ body {
 }
 
 /* ===========================
-   CHECKOUT PAGE (MOBILE FIRST)
+   CHECKOUT PAGE
 =========================== */
-
 .checkout-container {
     padding: 16px;
 }

@@ -12,14 +12,14 @@ export default function Home() {
             <div className="home-buttons">
                 <button
                     className="home-btn"
-                    onClick={() => navigate("/offers")}
+                    onClick={() => navigate("/prodotti")}
                 >
                     ORDINA ONLINE LE OFFERTE
                 </button>
 
                 <button
                     className="home-btn"
-                    onClick={() => navigate("/products")}
+                    onClick={() => navigate("/prodotti")}
                 >
                     ORDINA ONLINE I PRODOTTI
                 </button>
@@ -37,6 +37,13 @@ export default function Home() {
             >
                 www.plusmarket.it
             </a>
+
+            <button
+                className="home-btn-secondary"
+                onClick={() => navigate("/chi-siamo")}
+            >
+                CHI SIAMO
+            </button>
         </div>
     );
 }
