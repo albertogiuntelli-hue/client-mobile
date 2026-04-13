@@ -1,7 +1,6 @@
 import { useCart } from "../context/CartContext";
 import { useState } from "react";
 import { sendOrder } from "../api/orders";
-import "./Products.css";
 
 export default function Checkout() {
     const { cart, clearCart } = useCart();
@@ -43,7 +42,7 @@ export default function Checkout() {
     };
 
     const sendOrderWhatsApp = async () => {
-        await inviaOrdineBackend(); // 🔥 ORA SALVA ANCHE NEL BACKEND
+        await inviaOrdineBackend();
 
         const message = cart
             .map(
