@@ -171,10 +171,9 @@ export default function Checkout() {
                         />
                     </div>
 
-                    {/* 🔥 Pulsanti */}
+                    {/* 🔥 Pulsante grande */}
                     <button
-                        className="add-to-cart-btn"
-                        style={{ marginTop: "10px" }}
+                        className="checkout-submit-btn"
                         onClick={sendOrderWhatsApp}
                     >
                         Invia ordine
