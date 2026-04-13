@@ -36,7 +36,39 @@ export default function Checkout() {
                 totale: total.toFixed(2),
             });
 
-            clearCart(); // 🔥 SVUOTA SUBITO IL CARRELLO
+            // 🔥 CREA MESSAGGIO WHATSAPP
+            const prodottiMsg = items
+                .map((item) => {
+                    const qty =
+                        item.productType === "pezzi"
+                            ? `${item.quantity} pz`
+                            : `${item.weight} g`;
+
+                    const prezzo = (
+                        (item.prezzo_scontato > 0 ? item.prezzo_scontato : item.prezzo) *
+                        (item.productType === "pezzi"
+                            ? item.quantity
+                            : item.weight / 1000)
+                    ).toFixed(2);
+
+                    return `• ${item.nome} - ${qty} - €${prezzo}`;
+                })
+                .join("%0A");
+
+            const msg =
+                `🛒 *Nuovo ordine PlusMarket Giuntelli*%0A%0A` +
+                `👤 *Cliente:* ${nome} ${cognome}%0A` +
+                `📞 *Telefono:* ${telefono}%0A` +
+                `📍 *Indirizzo:* ${indirizzo}%0A` +
+                (note ? `📝 *Note:* ${note}%0A` : "") +
+                `%0A` +
+                `📦 *Prodotti:*%0A${prodottiMsg}%0A%0A` +
+                `💰 *Totale:* €${total.toFixed(2)}`;
+
+            // 🔥 INVIA WHATSAPP
+            window.open(`https://wa.me/393356039828?text=${msg}`, "_blank");
+
+            clearCart();
             setSuccess(true);
         } catch (err) {
             console.error("Errore invio ordine:", err);
@@ -62,7 +94,6 @@ export default function Checkout() {
                 <h2>Ordine inviato!</h2>
                 <p>Ti contatteremo al numero <strong>{telefono}</strong>.</p>
 
-                {/* 🔥 NESSUN BOTTONE WHATSAPP */}
                 <button className="btn-primary" onClick={() => navigate("/")}>
                     Torna alla Home
                 </button>
@@ -111,6 +142,7 @@ export default function Checkout() {
                     placeholder="Nome"
                     value={nome}
                     onChange={(e) => setNome(e.target.value)}
+                    style={{ fontSize: "18px", padding: "14px", height: "52px" }}
                 />
 
                 <input
@@ -118,6 +150,7 @@ export default function Checkout() {
                     placeholder="Cognome"
                     value={cognome}
                     onChange={(e) => setCognome(e.target.value)}
+                    style={{ fontSize: "18px", padding: "14px", height: "52px" }}
                 />
 
                 <input
@@ -125,6 +158,7 @@ export default function Checkout() {
                     placeholder="Telefono"
                     value={telefono}
                     onChange={(e) => setTelefono(e.target.value)}
+                    style={{ fontSize: "18px", padding: "14px", height: "52px" }}
                 />
 
                 <input
@@ -132,12 +166,14 @@ export default function Checkout() {
                     placeholder="Indirizzo"
                     value={indirizzo}
                     onChange={(e) => setIndirizzo(e.target.value)}
+                    style={{ fontSize: "18px", padding: "14px", height: "52px" }}
                 />
 
                 <textarea
                     placeholder="Note (opzionale)"
                     value={note}
                     onChange={(e) => setNote(e.target.value)}
+                    style={{ fontSize: "18px", padding: "14px", minHeight: "90px" }}
                 />
 
                 <button
