@@ -1,61 +1,66 @@
-import { useCart } from "../context/CartContext";
 import { useState } from "react";
+import { useCart } from "../context/CartContext";
 import { sendOrder } from "../api/orders";
 
 export default function Checkout() {
-    const { items, clearCart, total } = useCart();
+    const { items, total, clearCart } = useCart();
 
+    // 🔥 Campi cliente
+    const [nome, setNome] = useState("");
+    const [cognome, setCognome] = useState("");
+    const [telefonoCliente, setTelefonoCliente] = useState("");
     const [indirizzo, setIndirizzo] = useState("");
-    const telefono = "3356039828";
+    const [note, setNote] = useState("");
 
+    const telefonoNegozio = "3356039828";
+
+    // 🔥 Invio ordine al backend SEMPRE
     const inviaOrdineBackend = async () => {
-        try {
-            const ordine = {
-                cliente: {
-                    nome: "Cliente",
-                    cognome: "Online",
-                    telefono,
-                    indirizzo,
-                    note: ""
-                },
+        const ordine = {
+            cliente: {
+                nome,
+                cognome,
+                telefono: telefonoCliente,
+                indirizzo,
+                note,
+            },
 
-                prodotti: items.map((p) => {
-                    const isPeso = p.a_peso === "S";
+            prodotti: items.map((p) => {
+                const isPeso = p.a_peso === "S";
 
-                    return {
-                        codice: p.codice,
-                        nome: p.nome,
+                return {
+                    codice: p.codice,
+                    nome: p.nome,
 
-                        // 🔥 quantità corretta
-                        quantita: isPeso ? 0 : p.quantity,
+                    quantita: isPeso ? 0 : p.quantity,
+                    peso: isPeso ? p.weight : 0,
 
-                        // 🔥 peso corretto
-                        peso: isPeso ? p.weight : 0,
+                    tipo: p.a_peso, // S/N
 
-                        // 🔥 tipo corretto (S/N)
-                        tipo: p.a_peso,
+                    prezzo: p.prezzo, // in centesimi
+                    prezzo_scontato: 0,
+                };
+            }),
 
-                        // 🔥 prezzo in centesimi (backend lo vuole così)
-                        prezzo: p.prezzo,
+            totale: Math.round(total * 100), // 🔥 totale in centesimi
+        };
 
-                        // 🔥 obbligatorio per backend
-                        prezzo_scontato: 0
-                    };
-                }),
-
-                totale: total
-            };
-
-            await sendOrder(ordine);
-            console.log("Ordine inviato al backend");
-        } catch (error) {
-            console.error("Errore invio backend:", error);
-        }
+        await sendOrder(ordine);
     };
 
+    // 🔥 WhatsApp SOLO se disponibile
     const sendOrderWhatsApp = async () => {
-        await inviaOrdineBackend();
+        await inviaOrdineBackend(); // backend prima di tutto
 
+        // Se il dispositivo NON ha WhatsApp → fine
+        if (!navigator.userAgent.toLowerCase().includes("android") &&
+            !navigator.userAgent.toLowerCase().includes("iphone")) {
+            alert("Ordine inviato! (WhatsApp non disponibile su questo dispositivo)");
+            clearCart();
+            return;
+        }
+
+        // 🔥 Messaggio WhatsApp
         const message = items
             .map((p) => {
                 const isPeso = p.a_peso === "S";
@@ -75,14 +80,17 @@ export default function Checkout() {
             message +
             "\n------------------------------\n" +
             `Totale: ${total.toFixed(2).replace(".", ",")} €\n` +
-            `Indirizzo: ${indirizzo || "Non specificato"}\n\n` +
-            "Grazie!";
+            `Nome: ${nome}\n` +
+            `Cognome: ${cognome}\n` +
+            `Telefono: ${telefonoCliente}\n` +
+            `Indirizzo: ${indirizzo}\n` +
+            (note ? `Note: ${note}\n` : "") +
+            "\nGrazie!";
 
-        const url = `https://wa.me/39${telefono}?text=${encodeURIComponent(
-            finalMessage
-        )}`;
+        const url = `https://wa.me/39${telefonoNegozio}?text=${encodeURIComponent(finalMessage)}`;
 
         window.open(url, "_blank");
+        clearCart();
     };
 
     return (
@@ -93,6 +101,7 @@ export default function Checkout() {
                 <p>Il carrello è vuoto.</p>
             ) : (
                 <>
+                    {/* 🔥 Riepilogo prodotti */}
                     <div className="products-grid">
                         {items.map((item) => (
                             <div key={item.codice} className="product-card">
@@ -113,29 +122,55 @@ export default function Checkout() {
                         ))}
                     </div>
 
+                    {/* 🔥 Campi cliente */}
                     <div style={{ marginTop: "20px", textAlign: "center" }}>
                         <input
                             type="text"
-                            placeholder="Inserisci il tuo indirizzo"
+                            placeholder="Nome"
+                            value={nome}
+                            onChange={(e) => setNome(e.target.value)}
+                            style={inputStyle}
+                        />
+
+                        <input
+                            type="text"
+                            placeholder="Cognome"
+                            value={cognome}
+                            onChange={(e) => setCognome(e.target.value)}
+                            style={inputStyle}
+                        />
+
+                        <input
+                            type="text"
+                            placeholder="Telefono"
+                            value={telefonoCliente}
+                            onChange={(e) => setTelefonoCliente(e.target.value)}
+                            style={inputStyle}
+                        />
+
+                        <input
+                            type="text"
+                            placeholder="Indirizzo"
                             value={indirizzo}
                             onChange={(e) => setIndirizzo(e.target.value)}
-                            style={{
-                                padding: "10px",
-                                width: "80%",
-                                maxWidth: "400px",
-                                borderRadius: "8px",
-                                border: "1px solid #ccc",
-                                marginBottom: "15px",
-                            }}
+                            style={inputStyle}
+                        />
+
+                        <textarea
+                            placeholder="Note (opzionale)"
+                            value={note}
+                            onChange={(e) => setNote(e.target.value)}
+                            style={{ ...inputStyle, height: "80px" }}
                         />
                     </div>
 
+                    {/* 🔥 Pulsanti */}
                     <button
                         className="add-to-cart-btn"
                         style={{ marginTop: "10px" }}
                         onClick={sendOrderWhatsApp}
                     >
-                        Invia ordine via WhatsApp
+                        Invia ordine
                     </button>
 
                     <button
@@ -150,3 +185,12 @@ export default function Checkout() {
         </div>
     );
 }
+
+const inputStyle = {
+    padding: "10px",
+    width: "80%",
+    maxWidth: "400px",
+    borderRadius: "8px",
+    border: "1px solid #ccc",
+    marginBottom: "15px",
+};
