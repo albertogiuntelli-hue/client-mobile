@@ -1,194 +1,142 @@
-import { useState, useEffect } from "react";
 import { useCart } from "../context/CartContext";
-import api from "../api/axios";
-import { useNavigate } from "react-router-dom";
-import "../styles/theme.css";
+import { useState } from "react";
+import { sendOrder } from "../api/orders";
+import "./Products.css";
 
 export default function Checkout() {
-    const { items, total, clearCart } = useCart();
-    const navigate = useNavigate();
+    const { cart, clearCart } = useCart();
 
-    const [nome, setNome] = useState("");
-    const [cognome, setCognome] = useState("");
-    const [telefono, setTelefono] = useState("");
+    const telefono = "3356039828";
     const [indirizzo, setIndirizzo] = useState("");
-    const [note, setNote] = useState("");
-    const [loading, setLoading] = useState(false);
-    const [success, setSuccess] = useState(false);
 
-    const handleSubmit = async () => {
-        if (!nome.trim() || !cognome.trim() || !telefono.trim() || !indirizzo.trim()) {
-            alert("Compila tutti i campi obbligatori.");
-            return;
-        }
-
-        if (telefono.trim().length < 6) {
-            alert("Numero di telefono non valido.");
-            return;
-        }
-
-        setLoading(true);
-
+    const inviaOrdineBackend = async () => {
         try {
-            // 🔥 1) REGISTRA O AGGIORNA L’UTENTE
-            await api.post("/users/register", {
-                nome,
-                cognome,
-                telefono,
-                indirizzo,
-                note
-            });
+            const totale = cart.reduce(
+                (sum, p) => sum + p.prezzo * p.qty,
+                0
+            );
 
-            // 🔥 2) SALVA L’ORDINE NEL BACKEND
-            await api.post("/orders", {
-                cliente: { nome, cognome, telefono, indirizzo, note },
-                prodotti: items,
-                totale: total.toFixed(2),
-            });
+            const ordine = {
+                cliente: {
+                    nome: "Cliente",
+                    cognome: "",
+                    telefono,
+                    indirizzo,
+                    note: ""
+                },
+                prodotti: cart.map((p) => ({
+                    codice: p.codice || "",
+                    nome: p.nome,
+                    quantity: p.qty,
+                    prezzo: p.prezzo / 100,
+                    productType: "pezzi",
+                    weight: 0
+                })),
+                totale
+            };
 
-            // 🔥 3) CREA MESSAGGIO WHATSAPP
-            const prodottiMsg = items
-                .map((item) => {
-                    const qty =
-                        item.productType === "pezzi"
-                            ? `${item.quantity} pz`
-                            : `${item.weight} g`;
-
-                    const prezzo = (
-                        (item.prezzo_scontato > 0 ? item.prezzo_scontato : item.prezzo) *
-                        (item.productType === "pezzi"
-                            ? item.quantity
-                            : item.weight / 1000)
-                    ).toFixed(2);
-
-                    return `• ${item.nome} - ${qty} - €${prezzo}`;
-                })
-                .join("%0A");
-
-            const msg =
-                `🛒 *Nuovo ordine PlusMarket Giuntelli*%0A%0A` +
-                `👤 *Cliente:* ${nome} ${cognome}%0A` +
-                `📞 *Telefono:* ${telefono}%0A` +
-                `📍 *Indirizzo:* ${indirizzo}%0A` +
-                (note ? `📝 *Note:* ${note}%0A` : "") +
-                `%0A` +
-                `📦 *Prodotti:*%0A${prodottiMsg}%0A%0A` +
-                `💰 *Totale:* €${total.toFixed(2)}`;
-
-            // 🔥 4) INVIA WHATSAPP
-            window.open(`https://wa.me/393356039828?text=${msg}`, "_blank");
-
-            clearCart();
-            setSuccess(true);
-        } catch (err) {
-            console.error("Errore invio ordine:", err);
-            alert("Errore durante l'invio dell'ordine.");
+            await sendOrder(ordine);
+            console.log("Ordine inviato al backend");
+        } catch (error) {
+            console.error("Errore invio backend:", error);
         }
-
-        setLoading(false);
     };
 
-    // 🔥 RITORNO AUTOMATICO ALLA HOME DOPO 2 SECONDI
-    useEffect(() => {
-        if (success) {
-            const timer = setTimeout(() => {
-                navigate("/");
-            }, 2000);
-            return () => clearTimeout(timer);
-        }
-    }, [success, navigate]);
+    const sendOrderWhatsApp = async () => {
+        await inviaOrdineBackend(); // 🔥 ORA SALVA ANCHE NEL BACKEND
 
-    if (success) {
-        return (
-            <div className="checkout-success">
-                <h2>Ordine inviato!</h2>
-                <p>Ti contatteremo al numero <strong>{telefono}</strong>.</p>
+        const message = cart
+            .map(
+                (p) =>
+                    `• ${p.nome} x${p.qty} – ${(p.prezzo / 100)
+                        .toFixed(2)
+                        .replace(".", ",")} €`
+            )
+            .join("\n");
 
-                <button className="btn-primary" onClick={() => navigate("/")}>
-                    Torna alla Home
-                </button>
-            </div>
-        );
-    }
+        const totale = cart
+            .reduce((sum, p) => sum + p.prezzo * p.qty, 0)
+            .toFixed(2)
+            .replace(".", ",");
+
+        const separatore = "------------------------------";
+
+        const finalMessage =
+            "Ordine PlusMarket\n\n" +
+            separatore + "\n" +
+            message + "\n" +
+            separatore + "\n" +
+            `Totale: ${totale} €\n` +
+            `Indirizzo: ${indirizzo || "Non specificato"}\n\n` +
+            "Grazie!";
+
+        const url = `https://wa.me/39${telefono}?text=${encodeURIComponent(
+            finalMessage
+        )}`;
+
+        window.open(url, "_blank");
+    };
 
     return (
-        <div className="checkout-container">
-            <h2>Checkout</h2>
+        <div className="products-container">
+            <h1 className="page-title">Checkout</h1>
 
-            <div className="checkout-summary">
-                <h3>Riepilogo ordine</h3>
-                {items.map((item) => (
-                    <div key={item.codice} className="checkout-item">
-                        <span className="item-name">{item.nome}</span>
-                        <span className="item-qty">
-                            {item.productType === "pezzi"
-                                ? `${item.quantity} pz`
-                                : `${item.weight} g`}
-                        </span>
-                        <span className="item-price">
-                            €{" "}
-                            {(
-                                (item.prezzo_scontato > 0
-                                    ? item.prezzo_scontato
-                                    : item.prezzo) *
-                                (item.productType === "pezzi"
-                                    ? item.quantity
-                                    : item.weight / 1000)
-                            ).toFixed(2)}
-                        </span>
+            {cart.length === 0 ? (
+                <p>Il carrello è vuoto.</p>
+            ) : (
+                <>
+                    <div className="products-grid">
+                        {cart.map((item) => (
+                            <div key={item._id} className="product-card">
+                                <h3 className="product-name">{item.nome}</h3>
+
+                                <p className="product-price">
+                                    {(item.prezzo / 100)
+                                        .toFixed(2)
+                                        .replace(".", ",")} €
+                                </p>
+
+                                <p className="product-code">
+                                    Quantità: {item.qty}
+                                </p>
+                            </div>
+                        ))}
                     </div>
-                ))}
 
-                <div className="checkout-total">
-                    Totale: € {total.toFixed(2)}
-                </div>
-            </div>
+                    <div style={{ marginTop: "20px", textAlign: "center" }}>
+                        <input
+                            type="text"
+                            placeholder="Inserisci il tuo indirizzo"
+                            value={indirizzo}
+                            onChange={(e) => setIndirizzo(e.target.value)}
+                            style={{
+                                padding: "10px",
+                                width: "80%",
+                                maxWidth: "400px",
+                                borderRadius: "8px",
+                                border: "1px solid #ccc",
+                                marginBottom: "15px",
+                            }}
+                        />
+                    </div>
 
-            <div className="checkout-form">
-                <h3>Dati cliente</h3>
+                    <button
+                        className="add-to-cart-btn"
+                        style={{ marginTop: "10px" }}
+                        onClick={sendOrderWhatsApp}
+                    >
+                        Invia ordine via WhatsApp
+                    </button>
 
-                <input
-                    type="text"
-                    placeholder="Nome"
-                    value={nome}
-                    onChange={(e) => setNome(e.target.value)}
-                />
-
-                <input
-                    type="text"
-                    placeholder="Cognome"
-                    value={cognome}
-                    onChange={(e) => setCognome(e.target.value)}
-                />
-
-                <input
-                    type="text"
-                    placeholder="Telefono"
-                    value={telefono}
-                    onChange={(e) => setTelefono(e.target.value)}
-                />
-
-                <input
-                    type="text"
-                    placeholder="Indirizzo"
-                    value={indirizzo}
-                    onChange={(e) => setIndirizzo(e.target.value)}
-                />
-
-                <textarea
-                    placeholder="Note (opzionale)"
-                    value={note}
-                    onChange={(e) => setNote(e.target.value)}
-                />
-
-                <button
-                    className="btn-primary"
-                    onClick={handleSubmit}
-                    disabled={loading}
-                >
-                    {loading ? "Invio in corso..." : "Invia ordine"}
-                </button>
-            </div>
+                    <button
+                        className="add-to-cart-btn"
+                        style={{ marginTop: "10px", backgroundColor: "#dc3545" }}
+                        onClick={clearCart}
+                    >
+                        Svuota carrello
+                    </button>
+                </>
+            )}
         </div>
     );
 }
