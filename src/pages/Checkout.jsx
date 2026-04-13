@@ -26,10 +26,11 @@ export default function Checkout() {
                 prodotti: cart.map((p) => ({
                     codice: p.codice || "",
                     nome: p.nome,
-                    quantity: p.qty,
-                    prezzo: p.prezzo / 100,
-                    productType: "pezzi",
-                    weight: 0
+                    quantita: p.qty,              // <-- NOME CAMPO CORRETTO
+                    prezzo: p.prezzo,             // <-- IN CENTESIMI, COME IL BACKEND SI ASPETTA
+                    prezzo_scontato: 0,           // <-- OBBLIGATORIO PER IL BACKEND
+                    tipo: "pezzi",                // <-- NOME CAMPO CORRETTO
+                    peso: 0
                 })),
                 totale
             };
