@@ -3,36 +3,47 @@ import { useState } from "react";
 import { sendOrder } from "../api/orders";
 
 export default function Checkout() {
-    const { cart, clearCart } = useCart();
+    const { items, clearCart, total } = useCart();
 
-    const telefono = "3356039828";
     const [indirizzo, setIndirizzo] = useState("");
+    const telefono = "3356039828";
 
     const inviaOrdineBackend = async () => {
         try {
-            const totale = cart.reduce(
-                (sum, p) => sum + p.prezzo * p.qty,
-                0
-            );
-
             const ordine = {
                 cliente: {
                     nome: "Cliente",
-                    cognome: "",
+                    cognome: "Online",
                     telefono,
                     indirizzo,
                     note: ""
                 },
-                prodotti: cart.map((p) => ({
-                    codice: p.codice || "",
-                    nome: p.nome,
-                    quantita: p.qty,              // <-- NOME CAMPO CORRETTO
-                    prezzo: p.prezzo,             // <-- IN CENTESIMI, COME IL BACKEND SI ASPETTA
-                    prezzo_scontato: 0,           // <-- OBBLIGATORIO PER IL BACKEND
-                    tipo: "pezzi",                // <-- NOME CAMPO CORRETTO
-                    peso: 0
-                })),
-                totale
+
+                prodotti: items.map((p) => {
+                    const isPeso = p.a_peso === "S";
+
+                    return {
+                        codice: p.codice,
+                        nome: p.nome,
+
+                        // 🔥 quantità corretta
+                        quantita: isPeso ? 0 : p.quantity,
+
+                        // 🔥 peso corretto
+                        peso: isPeso ? p.weight : 0,
+
+                        // 🔥 tipo corretto (S/N)
+                        tipo: p.a_peso,
+
+                        // 🔥 prezzo in centesimi (backend lo vuole così)
+                        prezzo: p.prezzo,
+
+                        // 🔥 obbligatorio per backend
+                        prezzo_scontato: 0
+                    };
+                }),
+
+                totale: total
             };
 
             await sendOrder(ordine);
@@ -45,28 +56,25 @@ export default function Checkout() {
     const sendOrderWhatsApp = async () => {
         await inviaOrdineBackend();
 
-        const message = cart
-            .map(
-                (p) =>
-                    `• ${p.nome} x${p.qty} – ${(p.prezzo / 100)
-                        .toFixed(2)
-                        .replace(".", ",")} €`
-            )
+        const message = items
+            .map((p) => {
+                const isPeso = p.a_peso === "S";
+                const prezzoUnit = p.prezzo / 100;
+
+                const subtotal = isPeso
+                    ? ((p.weight / 1000) * prezzoUnit).toFixed(2)
+                    : (p.quantity * prezzoUnit).toFixed(2);
+
+                return `• ${p.nome} — ${isPeso ? p.weight + " g" : p.quantity + " pz"
+                    } — ${subtotal.replace(".", ",")} €`;
+            })
             .join("\n");
-
-        const totale = cart
-            .reduce((sum, p) => sum + p.prezzo * p.qty, 0)
-            .toFixed(2)
-            .replace(".", ",");
-
-        const separatore = "------------------------------";
 
         const finalMessage =
             "Ordine PlusMarket\n\n" +
-            separatore + "\n" +
-            message + "\n" +
-            separatore + "\n" +
-            `Totale: ${totale} €\n` +
+            message +
+            "\n------------------------------\n" +
+            `Totale: ${total.toFixed(2).replace(".", ",")} €\n` +
             `Indirizzo: ${indirizzo || "Non specificato"}\n\n` +
             "Grazie!";
 
@@ -81,13 +89,13 @@ export default function Checkout() {
         <div className="products-container">
             <h1 className="page-title">Checkout</h1>
 
-            {cart.length === 0 ? (
+            {items.length === 0 ? (
                 <p>Il carrello è vuoto.</p>
             ) : (
                 <>
                     <div className="products-grid">
-                        {cart.map((item) => (
-                            <div key={item._id} className="product-card">
+                        {items.map((item) => (
+                            <div key={item.codice} className="product-card">
                                 <h3 className="product-name">{item.nome}</h3>
 
                                 <p className="product-price">
@@ -97,7 +105,9 @@ export default function Checkout() {
                                 </p>
 
                                 <p className="product-code">
-                                    Quantità: {item.qty}
+                                    {item.a_peso === "S"
+                                        ? `Peso: ${item.weight} g`
+                                        : `Quantità: ${item.quantity} pz`}
                                 </p>
                             </div>
                         ))}
