@@ -47,8 +47,12 @@ export default function ProductList() {
         setToast("Aggiunto al carrello!");
     };
 
+    /* 🔥 RICERCA INTELLIGENTE (ignora punti, spazi, maiuscole) */
+    const normalize = (str) =>
+        str.toLowerCase().replace(/\./g, "").replace(/\s+/g, "");
+
     const filtered = products.filter((p) =>
-        p.nome.toLowerCase().includes(search.toLowerCase())
+        normalize(p.nome).includes(normalize(search))
     );
 
     return (

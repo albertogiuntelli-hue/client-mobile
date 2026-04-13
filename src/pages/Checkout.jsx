@@ -32,12 +32,12 @@ export default function Checkout() {
                     codice: p.codice,
                     nome: p.nome,
 
-                    quantita: isPeso ? 0 : p.quantity,
-                    peso: isPeso ? p.weight : 0,
+                    quantita: isPeso ? 0 : Number(p.quantity) || 0,
+                    peso: isPeso ? Number(p.weight) || 0 : 0,
 
                     tipo: p.a_peso, // S/N
 
-                    prezzo: p.prezzo, // in centesimi
+                    prezzo: Number(p.prezzo), // in centesimi
                     prezzo_scontato: 0,
                 };
             }),
@@ -52,25 +52,30 @@ export default function Checkout() {
     const sendOrderWhatsApp = async () => {
         await inviaOrdineBackend(); // backend prima di tutto
 
-        // Se il dispositivo NON ha WhatsApp → fine
-        if (!navigator.userAgent.toLowerCase().includes("android") &&
-            !navigator.userAgent.toLowerCase().includes("iphone")) {
+        const ua = navigator.userAgent.toLowerCase();
+        const hasWhatsApp =
+            ua.includes("android") || ua.includes("iphone");
+
+        if (!hasWhatsApp) {
             alert("Ordine inviato! (WhatsApp non disponibile su questo dispositivo)");
             clearCart();
             return;
         }
 
-        // 🔥 Messaggio WhatsApp
+        // 🔥 NORMALIZZAZIONE DATI per WhatsApp
         const message = items
             .map((p) => {
                 const isPeso = p.a_peso === "S";
-                const prezzoUnit = p.prezzo / 100;
+
+                const qty = Number(p.quantity) || 0;
+                const weight = Number(p.weight) || 0;
+                const prezzoUnit = Number(p.prezzo) / 100;
 
                 const subtotal = isPeso
-                    ? ((p.weight / 1000) * prezzoUnit).toFixed(2)
-                    : (p.quantity * prezzoUnit).toFixed(2);
+                    ? ((weight / 1000) * prezzoUnit).toFixed(2)
+                    : (qty * prezzoUnit).toFixed(2);
 
-                return `• ${p.nome} — ${isPeso ? p.weight + " g" : p.quantity + " pz"
+                return `• ${p.nome} — ${isPeso ? weight + " g" : qty + " pz"
                     } — ${subtotal.replace(".", ",")} €`;
             })
             .join("\n");
@@ -87,7 +92,9 @@ export default function Checkout() {
             (note ? `Note: ${note}\n` : "") +
             "\nGrazie!";
 
-        const url = `https://wa.me/39${telefonoNegozio}?text=${encodeURIComponent(finalMessage)}`;
+        const url = `https://wa.me/39${telefonoNegozio}?text=${encodeURIComponent(
+            finalMessage
+        )}`;
 
         window.open(url, "_blank");
         clearCart();

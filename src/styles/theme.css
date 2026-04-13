@@ -13,7 +13,6 @@ body {
     width: 100%;
     max-width: 100%;
     overflow-x: hidden;
-    /* 🔥 BLOCCA SCORRIMENTO A DESTRA */
 }
 
 body {
@@ -166,8 +165,6 @@ body {
 
 /* ===========================
    GRID PRODOTTI
-   (qui resta tutto come prima,
-   la logica è già corretta)
 =========================== */
 .products-container {
     padding: 15px;
@@ -500,9 +497,8 @@ body {
 }
 
 /* ===========================
-   PAGINE INFO (CHI SIAMO, CONTATTI, ECC.)
+   PAGINE INFO
 =========================== */
-
 .info-page {
     padding: 25px;
     max-width: 600px;
@@ -523,4 +519,29 @@ body {
     line-height: 1.6;
     color: #444;
     margin-bottom: 18px;
+}
+
+/* ===========================
+   🔥 PULSANTE GRANDE INVIO ORDINE
+=========================== */
+.checkout-submit-btn {
+    width: 90%;
+    max-width: 420px;
+    padding: 18px;
+    font-size: 20px;
+    font-weight: bold;
+    background-color: #ff9800;
+    color: white;
+    border: none;
+    border-radius: 14px;
+    margin: 25px auto 10px auto;
+    display: block;
+    text-align: center;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.18);
+    transition: background 0.2s ease, transform 0.1s ease;
+}
+
+.checkout-submit-btn:hover {
+    background-color: #fb8c00;
+    transform: translateY(-1px);
 }
