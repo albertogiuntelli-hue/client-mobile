@@ -8,12 +8,13 @@ const ProductPage = () => {
     const { codice } = useParams();
     const [product, setProduct] = useState(null);
     const [loading, setLoading] = useState(true);
+
+    // 🔥 ora CartContext esporta addToCart correttamente
     const { addToCart } = useCart();
 
     useEffect(() => {
         const fetchProduct = async () => {
             try {
-                // ✅ ROUTE CORRETTA (senza doppio /api)
                 const res = await api.get(`/products/${codice}`);
                 setProduct(res.data || null);
                 setLoading(false);
