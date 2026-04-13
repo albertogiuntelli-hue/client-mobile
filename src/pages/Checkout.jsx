@@ -30,13 +30,23 @@ export default function Checkout() {
         setLoading(true);
 
         try {
+            // 🔥 1) REGISTRA O AGGIORNA L’UTENTE
+            await api.post("/users/register", {
+                nome,
+                cognome,
+                telefono,
+                indirizzo,
+                note
+            });
+
+            // 🔥 2) SALVA L’ORDINE NEL BACKEND
             await api.post("/orders", {
                 cliente: { nome, cognome, telefono, indirizzo, note },
                 prodotti: items,
                 totale: total.toFixed(2),
             });
 
-            // 🔥 CREA MESSAGGIO WHATSAPP
+            // 🔥 3) CREA MESSAGGIO WHATSAPP
             const prodottiMsg = items
                 .map((item) => {
                     const qty =
@@ -65,7 +75,7 @@ export default function Checkout() {
                 `📦 *Prodotti:*%0A${prodottiMsg}%0A%0A` +
                 `💰 *Totale:* €${total.toFixed(2)}`;
 
-            // 🔥 INVIA WHATSAPP
+            // 🔥 4) INVIA WHATSAPP
             window.open(`https://wa.me/393356039828?text=${msg}`, "_blank");
 
             clearCart();
@@ -142,7 +152,6 @@ export default function Checkout() {
                     placeholder="Nome"
                     value={nome}
                     onChange={(e) => setNome(e.target.value)}
-                    style={{ fontSize: "18px", padding: "14px", height: "52px" }}
                 />
 
                 <input
@@ -150,7 +159,6 @@ export default function Checkout() {
                     placeholder="Cognome"
                     value={cognome}
                     onChange={(e) => setCognome(e.target.value)}
-                    style={{ fontSize: "18px", padding: "14px", height: "52px" }}
                 />
 
                 <input
@@ -158,7 +166,6 @@ export default function Checkout() {
                     placeholder="Telefono"
                     value={telefono}
                     onChange={(e) => setTelefono(e.target.value)}
-                    style={{ fontSize: "18px", padding: "14px", height: "52px" }}
                 />
 
                 <input
@@ -166,14 +173,12 @@ export default function Checkout() {
                     placeholder="Indirizzo"
                     value={indirizzo}
                     onChange={(e) => setIndirizzo(e.target.value)}
-                    style={{ fontSize: "18px", padding: "14px", height: "52px" }}
                 />
 
                 <textarea
                     placeholder="Note (opzionale)"
                     value={note}
                     onChange={(e) => setNote(e.target.value)}
-                    style={{ fontSize: "18px", padding: "14px", minHeight: "90px" }}
                 />
 
                 <button
