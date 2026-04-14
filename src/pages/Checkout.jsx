@@ -38,11 +38,13 @@ export default function Checkout() {
 
                     tipo: p.a_peso,
 
+                    // prezzo in EURO (come nel carrello)
                     prezzo: Number(p.prezzo),
                     prezzo_scontato: 0,
                 };
             }),
 
+            // totale in centesimi (ok)
             totale: Math.round(total * 100),
         };
 
@@ -68,7 +70,9 @@ export default function Checkout() {
 
                 const qty = parseFloat(String(p.quantity ?? 0).replace(",", ".").trim()) || 0;
                 const weight = parseFloat(String(p.weight ?? 0).replace(",", ".").trim()) || 0;
-                const prezzoUnit = Number(p.prezzo) / 100;
+
+                // prezzo in EURO, come nel carrello
+                const prezzoUnit = Number(p.prezzo);
 
                 const subtotal = isPeso
                     ? ((weight / 1000) * prezzoUnit).toFixed(2)
@@ -110,7 +114,7 @@ export default function Checkout() {
                     <div className="products-grid">
                         {items.map((item) => {
                             const isPeso = item.a_peso === "S";
-                            const prezzoUnit = item.prezzo / 100;
+                            const prezzoUnit = item.prezzo; // EURO
 
                             const subtotal = isPeso
                                 ? (item.weight / 1000) * prezzoUnit
