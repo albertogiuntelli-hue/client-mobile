@@ -26,8 +26,8 @@ export default function Checkout() {
             prodotti: items.map((p) => {
                 const isPeso = p.a_peso === "S";
 
-                const qty = parseFloat(String(p.quantity ?? 0).replace(",", ".").trim()) || 0;
-                const weight = parseFloat(String(p.weight ?? 0).replace(",", ".").trim()) || 0;
+                const qty = Number(p.quantity) || 0;
+                const weight = Number(p.weight) || 0;
 
                 return {
                     codice: p.codice,
@@ -38,13 +38,14 @@ export default function Checkout() {
 
                     tipo: p.a_peso,
 
-                    // prezzo in EURO (come nel carrello)
-                    prezzo: Number(p.prezzo),
+                    // 🔥 PREZZO IN CENTESIMI (come richiede il backend)
+                    prezzo: Math.round(Number(p.prezzo) * 100),
+
                     prezzo_scontato: 0,
                 };
             }),
 
-            // totale in centesimi (ok)
+            // 🔥 totale in centesimi (giusto)
             totale: Math.round(total * 100),
         };
 
@@ -68,11 +69,10 @@ export default function Checkout() {
             .map((p) => {
                 const isPeso = p.a_peso === "S";
 
-                const qty = parseFloat(String(p.quantity ?? 0).replace(",", ".").trim()) || 0;
-                const weight = parseFloat(String(p.weight ?? 0).replace(",", ".").trim()) || 0;
+                const qty = Number(p.quantity) || 0;
+                const weight = Number(p.weight) || 0;
 
-                // prezzo in EURO, come nel carrello
-                const prezzoUnit = Number(p.prezzo);
+                const prezzoUnit = Number(p.prezzo); // EURO
 
                 const subtotal = isPeso
                     ? ((weight / 1000) * prezzoUnit).toFixed(2)
