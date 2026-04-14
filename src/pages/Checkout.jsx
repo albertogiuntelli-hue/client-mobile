@@ -5,7 +5,6 @@ import { sendOrder } from "../api/orders";
 export default function Checkout() {
     const { items, total, clearCart } = useCart();
 
-    // 🔥 Campi cliente
     const [nome, setNome] = useState("");
     const [cognome, setCognome] = useState("");
     const [telefonoCliente, setTelefonoCliente] = useState("");
@@ -14,7 +13,6 @@ export default function Checkout() {
 
     const telefonoNegozio = "3356039828";
 
-    // 🔥 Invio ordine al backend SEMPRE
     const inviaOrdineBackend = async () => {
         const ordine = {
             cliente: {
@@ -28,7 +26,6 @@ export default function Checkout() {
             prodotti: items.map((p) => {
                 const isPeso = p.a_peso === "S";
 
-                // Normalizzazione sicura quantità/peso
                 const qty = parseFloat(String(p.quantity ?? 0).replace(",", ".").trim()) || 0;
                 const weight = parseFloat(String(p.weight ?? 0).replace(",", ".").trim()) || 0;
 
@@ -39,22 +36,21 @@ export default function Checkout() {
                     quantita: isPeso ? 0 : qty,
                     peso: isPeso ? weight : 0,
 
-                    tipo: p.a_peso, // S/N
+                    tipo: p.a_peso,
 
-                    prezzo: Number(p.prezzo), // in centesimi
+                    prezzo: Number(p.prezzo),
                     prezzo_scontato: 0,
                 };
             }),
 
-            totale: Math.round(total * 100), // 🔥 totale in centesimi
+            totale: Math.round(total * 100),
         };
 
         await sendOrder(ordine);
     };
 
-    // 🔥 WhatsApp SOLO se disponibile
     const sendOrderWhatsApp = async () => {
-        await inviaOrdineBackend(); // backend prima di tutto
+        await inviaOrdineBackend();
 
         const ua = navigator.userAgent.toLowerCase();
         const hasWhatsApp =
@@ -66,7 +62,6 @@ export default function Checkout() {
             return;
         }
 
-        // 🔥 NORMALIZZAZIONE DATI per WhatsApp
         const message = items
             .map((p) => {
                 const isPeso = p.a_peso === "S";
@@ -112,28 +107,35 @@ export default function Checkout() {
                 <p>Il carrello è vuoto.</p>
             ) : (
                 <>
-                    {/* 🔥 Riepilogo prodotti */}
                     <div className="products-grid">
-                        {items.map((item) => (
-                            <div key={item.codice} className="product-card">
-                                <h3 className="product-name">{item.nome}</h3>
+                        {items.map((item) => {
+                            const isPeso = item.a_peso === "S";
+                            const prezzoUnit = item.prezzo / 100;
 
-                                <p className="product-price">
-                                    {(item.prezzo / 100)
-                                        .toFixed(2)
-                                        .replace(".", ",")} €
-                                </p>
+                            const subtotal = isPeso
+                                ? (item.weight / 1000) * prezzoUnit
+                                : item.quantity * prezzoUnit;
 
-                                <p className="product-code">
-                                    {item.a_peso === "S"
-                                        ? `Peso: ${item.weight} g`
-                                        : `Quantità: ${item.quantity} pz`}
-                                </p>
-                            </div>
-                        ))}
+                            return (
+                                <div key={item.codice} className="product-card">
+                                    <h3 className="product-name">{item.nome}</h3>
+
+                                    <p className="product-price">
+                                        {subtotal
+                                            .toFixed(2)
+                                            .replace(".", ",")} €
+                                    </p>
+
+                                    <p className="product-code">
+                                        {isPeso
+                                            ? `Peso: ${item.weight} g`
+                                            : `Quantità: ${item.quantity} pz`}
+                                    </p>
+                                </div>
+                            );
+                        })}
                     </div>
 
-                    {/* 🔥 Campi cliente */}
                     <div style={{ marginTop: "20px", textAlign: "center" }}>
                         <input
                             type="text"
@@ -175,7 +177,6 @@ export default function Checkout() {
                         />
                     </div>
 
-                    {/* 🔥 Pulsante grande */}
                     <button
                         className="checkout-submit-btn"
                         onClick={sendOrderWhatsApp}
