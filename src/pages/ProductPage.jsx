@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import api from "../api/axios";
 import { useCart } from "../context/CartContext";
+import PopupPeso from "../components/PopupPeso";
 import "../styles/theme.css";
 
 const ProductPage = () => {
@@ -9,7 +10,8 @@ const ProductPage = () => {
     const [product, setProduct] = useState(null);
     const [loading, setLoading] = useState(true);
 
-    // 🔥 ora CartContext esporta addToCart correttamente
+    const [popupOpen, setPopupOpen] = useState(false);
+
     const { addToCart } = useCart();
 
     useEffect(() => {
@@ -34,6 +36,27 @@ const ProductPage = () => {
     if (!product) {
         return <p className="error">Prodotto non trovato.</p>;
     }
+
+    const handleAddWeight = (grams) => {
+        const peso = parseFloat(String(grams).replace(",", ".").trim()) || 0;
+        if (peso <= 0) return;
+
+        addToCart(product, {
+            productType: "peso",
+            quantity: 0,
+            weight: peso,
+        });
+
+        setPopupOpen(false);
+    };
+
+    const handleAddPiece = () => {
+        addToCart(product, {
+            productType: "pezzi",
+            quantity: 1,
+            weight: 0,
+        });
+    };
 
     return (
         <div className="product-page">
@@ -79,12 +102,29 @@ const ProductPage = () => {
                 </p>
             )}
 
-            <button
-                className="btn-add big"
-                onClick={() => addToCart(product)}
-            >
-                Aggiungi al carrello
-            </button>
+            {product.a_peso === "S" ? (
+                <button
+                    className="btn-add big"
+                    onClick={() => setPopupOpen(true)}
+                >
+                    Scegli quantità
+                </button>
+            ) : (
+                <button
+                    className="btn-add big"
+                    onClick={handleAddPiece}
+                >
+                    Aggiungi 1 pezzo
+                </button>
+            )}
+
+            {popupOpen && (
+                <PopupPeso
+                    product={product}
+                    onConfirm={handleAddWeight}
+                    onClose={() => setPopupOpen(false)}
+                />
+            )}
         </div>
     );
 };
