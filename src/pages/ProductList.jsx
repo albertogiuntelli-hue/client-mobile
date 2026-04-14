@@ -47,12 +47,52 @@ export default function ProductList() {
         setToast("Aggiunto al carrello!");
     };
 
+    // 🔥 NORMALIZZAZIONE TESTO
     const normalize = (str) =>
-        str.toLowerCase().replace(/\./g, "").replace(/\s+/g, "");
+        str
+            .toLowerCase()
+            .replace(/\./g, "")
+            .replace(/\s+/g, "")
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "");
 
-    const filtered = products.filter((p) =>
-        normalize(p.nome).includes(normalize(search))
-    );
+    // 🔥 LEVENSHTEIN (tolleranza errori)
+    function levenshtein(a, b) {
+        const matrix = [];
+
+        for (let i = 0; i <= b.length; i++) matrix[i] = [i];
+        for (let j = 0; j <= a.length; j++) matrix[0][j] = j;
+
+        for (let i = 1; i <= b.length; i++) {
+            for (let j = 1; j <= a.length; j++) {
+                matrix[i][j] =
+                    b.charAt(i - 1) === a.charAt(j - 1)
+                        ? matrix[i - 1][j - 1]
+                        : Math.min(
+                            matrix[i - 1][j - 1] + 1,
+                            matrix[i][j - 1] + 1,
+                            matrix[i - 1][j] + 1
+                        );
+            }
+        }
+
+        return matrix[b.length][a.length];
+    }
+
+    // 🔥 FILTRO PRODOTTI MIGLIORATO
+    const filtered = products.filter((p) => {
+        if (!search) return true;
+
+        const name = normalize(p.nome);
+        const term = normalize(search);
+
+        // match diretto
+        if (name.includes(term)) return true;
+
+        // fuzzy match (tolleranza 2 errori)
+        const distance = levenshtein(name, term);
+        return distance <= 2;
+    });
 
     return (
         <div className="products-container">
