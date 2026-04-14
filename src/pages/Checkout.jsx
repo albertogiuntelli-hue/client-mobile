@@ -28,12 +28,16 @@ export default function Checkout() {
             prodotti: items.map((p) => {
                 const isPeso = p.a_peso === "S";
 
+                // Normalizzazione sicura quantità/peso
+                const qty = parseFloat(String(p.quantity ?? 0).replace(",", ".").trim()) || 0;
+                const weight = parseFloat(String(p.weight ?? 0).replace(",", ".").trim()) || 0;
+
                 return {
                     codice: p.codice,
                     nome: p.nome,
 
-                    quantita: isPeso ? 0 : Number(p.quantity) || 0,
-                    peso: isPeso ? Number(p.weight) || 0 : 0,
+                    quantita: isPeso ? 0 : qty,
+                    peso: isPeso ? weight : 0,
 
                     tipo: p.a_peso, // S/N
 
@@ -67,8 +71,8 @@ export default function Checkout() {
             .map((p) => {
                 const isPeso = p.a_peso === "S";
 
-                const qty = Number(p.quantity) || 0;
-                const weight = Number(p.weight) || 0;
+                const qty = parseFloat(String(p.quantity ?? 0).replace(",", ".").trim()) || 0;
+                const weight = parseFloat(String(p.weight ?? 0).replace(",", ".").trim()) || 0;
                 const prezzoUnit = Number(p.prezzo) / 100;
 
                 const subtotal = isPeso
