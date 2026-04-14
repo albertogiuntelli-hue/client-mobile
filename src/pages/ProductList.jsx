@@ -5,7 +5,7 @@ import PopupPeso from "../components/PopupPeso";
 import Toast from "../components/Toast";
 import { useNavigate } from "react-router-dom";
 import "../styles/theme.css";
-import "../styles/productlist.css";   // 🔥 IMPORT CSS GRIGLIA (fondamentale!)
+import "../styles/productlist.css";
 
 export default function ProductList() {
     const [products, setProducts] = useState([]);
@@ -47,7 +47,6 @@ export default function ProductList() {
         setToast("Aggiunto al carrello!");
     };
 
-    /* 🔥 RICERCA INTELLIGENTE (ignora punti, spazi, maiuscole) */
     const normalize = (str) =>
         str.toLowerCase().replace(/\./g, "").replace(/\s+/g, "");
 
@@ -58,12 +57,10 @@ export default function ProductList() {
     return (
         <div className="products-container">
 
-            {/* 🔙 TASTO TORNA INDIETRO */}
             <button className="back-btn" onClick={() => navigate("/")}>
                 ⬅ Torna indietro
             </button>
 
-            {/* 🔍 BARRA DI RICERCA */}
             <input
                 type="text"
                 className="search-box"
@@ -72,7 +69,6 @@ export default function ProductList() {
                 onChange={(e) => setSearch(e.target.value)}
             />
 
-            {/* LISTA PRODOTTI */}
             <div className="product-grid">
                 {filtered.map((product) => (
                     <div key={product.codice} className="product-card">
@@ -87,15 +83,15 @@ export default function ProductList() {
                         <div className="product-code">Cod: {product.codice}</div>
 
                         <div className="product-type">
-                            Tipo: {product.a_peso ? "S (peso)" : "N (pezzo)"}
+                            Tipo: {product.a_peso === "S" ? "S (peso)" : "N (pezzo)"}
                         </div>
 
                         <div className="product-price">
                             € {product.prezzo}
-                            {product.a_peso ? " / Kg" : ""}
+                            {product.a_peso === "S" ? " / Kg" : ""}
                         </div>
 
-                        {product.a_peso ? (
+                        {product.a_peso === "S" ? (
                             <button
                                 className="btn-primary"
                                 onClick={() => setPopupProduct(product)}
