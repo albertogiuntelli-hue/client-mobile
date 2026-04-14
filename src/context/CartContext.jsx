@@ -21,16 +21,23 @@ export function CartProvider({ children }) {
             weight = 0,
         } = options;
 
+        // Normalizzazione numerica sicura
+        const qty = parseFloat(String(quantity).replace(",", ".").trim()) || 0;
+        const wgt = parseFloat(String(weight).replace(",", ".").trim()) || 0;
+
         setItems((prev) => {
             const existing = prev.find((p) => p.codice === product.codice);
 
             if (existing) {
+                const prevQty = parseFloat(String(existing.quantity).replace(",", ".").trim()) || 0;
+                const prevWgt = parseFloat(String(existing.weight).replace(",", ".").trim()) || 0;
+
                 return prev.map((p) =>
                     p.codice === product.codice
                         ? {
                             ...p,
-                            quantity: p.quantity + quantity,
-                            weight: p.weight + weight,
+                            quantity: prevQty + qty,
+                            weight: prevWgt + wgt,
                         }
                         : p
                 );
@@ -40,10 +47,10 @@ export function CartProvider({ children }) {
                 ...prev,
                 {
                     ...product,
-                    a_peso: product.a_peso,   // 🔥 SALVIAMO S/N
-                    productType,              // 🔥 "peso" o "pezzi"
-                    quantity,
-                    weight,
+                    a_peso: product.a_peso,   // S/N
+                    productType,              // "peso" o "pezzi"
+                    quantity: qty,
+                    weight: wgt,
                 },
             ];
         });
@@ -54,24 +61,27 @@ export function CartProvider({ children }) {
             const existing = prev.find((p) => p.codice === product.codice);
             if (!existing) return prev;
 
+            const prevQty = parseFloat(String(existing.quantity).replace(",", ".").trim()) || 0;
+            const prevWgt = parseFloat(String(existing.weight).replace(",", ".").trim()) || 0;
+
             if (existing.productType === "pezzi") {
-                if (existing.quantity <= 1) {
+                if (prevQty <= 1) {
                     return prev.filter((p) => p.codice !== product.codice);
                 }
                 return prev.map((p) =>
                     p.codice === product.codice
-                        ? { ...p, quantity: p.quantity - 1 }
+                        ? { ...p, quantity: prevQty - 1 }
                         : p
                 );
             }
 
             if (existing.productType === "peso") {
-                if (existing.weight <= 50) {
+                if (prevWgt <= 50) {
                     return prev.filter((p) => p.codice !== product.codice);
                 }
                 return prev.map((p) =>
                     p.codice === product.codice
-                        ? { ...p, weight: p.weight - 50 }
+                        ? { ...p, weight: prevWgt - 50 }
                         : p
                 );
             }
@@ -93,13 +103,15 @@ export function CartProvider({ children }) {
         const prezzoUnitario =
             item.prezzo_scontato > 0 ? item.prezzo_scontato : item.prezzo;
 
+        const qty = parseFloat(String(item.quantity).replace(",", ".").trim()) || 0;
+        const wgt = parseFloat(String(item.weight).replace(",", ".").trim()) || 0;
+
         if (item.productType === "pezzi") {
-            return sum + prezzoUnitario * item.quantity;
+            return sum + prezzoUnitario * qty;
         }
 
         if (item.productType === "peso") {
-            const peso = Number(item.weight) || 0;
-            return sum + (peso / 1000) * prezzoUnitario;
+            return sum + (wgt / 1000) * prezzoUnitario;
         }
 
         return sum;
@@ -124,4 +136,3 @@ export function CartProvider({ children }) {
 export function useCart() {
     return useContext(CartContext);
 }
-
