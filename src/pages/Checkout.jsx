@@ -11,9 +11,16 @@ export default function Checkout() {
     const [indirizzo, setIndirizzo] = useState("");
     const [note, setNote] = useState("");
 
+    const [isSending, setIsSending] = useState(false);
+
     const telefonoNegozio = "3356039828";
 
     const inviaOrdineBackend = async () => {
+        if (items.length === 0) {
+            alert("Il carrello è vuoto, impossibile inviare l’ordine.");
+            return;
+        }
+
         const ordine = {
             cliente: {
                 nome,
@@ -38,14 +45,11 @@ export default function Checkout() {
 
                     tipo: p.a_peso,
 
-                    // 🔥 PREZZO IN CENTESIMI (come richiede il backend)
                     prezzo: Math.round(Number(p.prezzo) * 100),
-
                     prezzo_scontato: 0,
                 };
             }),
 
-            // 🔥 totale in centesimi (giusto)
             totale: Math.round(total * 100),
         };
 
@@ -53,54 +57,67 @@ export default function Checkout() {
     };
 
     const sendOrderWhatsApp = async () => {
-        await inviaOrdineBackend();
-
-        const ua = navigator.userAgent.toLowerCase();
-        const hasWhatsApp =
-            ua.includes("android") || ua.includes("iphone");
-
-        if (!hasWhatsApp) {
-            alert("Ordine inviato! (WhatsApp non disponibile su questo dispositivo)");
-            clearCart();
+        if (isSending) return;
+        if (items.length === 0) {
+            alert("Il carrello è vuoto.");
             return;
         }
 
-        const message = items
-            .map((p) => {
-                const isPeso = p.a_peso === "S";
+        setIsSending(true);
 
-                const qty = Number(p.quantity) || 0;
-                const weight = Number(p.weight) || 0;
+        try {
+            await inviaOrdineBackend();
 
-                const prezzoUnit = Number(p.prezzo); // EURO
+            const ua = navigator.userAgent.toLowerCase();
+            const hasWhatsApp =
+                ua.includes("android") || ua.includes("iphone"); // 🔥 RIGA CORRETTA
 
-                const subtotal = isPeso
-                    ? ((weight / 1000) * prezzoUnit).toFixed(2)
-                    : (qty * prezzoUnit).toFixed(2);
+            if (!hasWhatsApp) {
+                alert("Ordine inviato! (WhatsApp non disponibile su questo dispositivo)");
+                clearCart();
+                setIsSending(false);
+                return;
+            }
 
-                return `• ${p.nome} — ${isPeso ? weight + " g" : qty + " pz"
-                    } — ${subtotal.replace(".", ",")} €`;
-            })
-            .join("\n");
+            const message = items
+                .map((p) => {
+                    const isPeso = p.a_peso === "S";
 
-        const finalMessage =
-            "Ordine PlusMarket\n\n" +
-            message +
-            "\n------------------------------\n" +
-            `Totale: ${total.toFixed(2).replace(".", ",")} €\n` +
-            `Nome: ${nome}\n` +
-            `Cognome: ${cognome}\n` +
-            `Telefono: ${telefonoCliente}\n` +
-            `Indirizzo: ${indirizzo}\n` +
-            (note ? `Note: ${note}\n` : "") +
-            "\nGrazie!";
+                    const qty = Number(p.quantity) || 0;
+                    const weight = Number(p.weight) || 0;
 
-        const url = `https://wa.me/39${telefonoNegozio}?text=${encodeURIComponent(
-            finalMessage
-        )}`;
+                    const prezzoUnit = Number(p.prezzo);
 
-        window.open(url, "_blank");
-        clearCart();
+                    const subtotal = isPeso
+                        ? ((weight / 1000) * prezzoUnit).toFixed(2)
+                        : (qty * prezzoUnit).toFixed(2);
+
+                    return `• ${p.nome} — ${isPeso ? weight + " g" : qty + " pz"
+                        } — ${subtotal.replace(".", ",")} €`;
+                })
+                .join("\n");
+
+            const finalMessage =
+                "Ordine PlusMarket\n\n" +
+                message +
+                "\n------------------------------\n" +
+                `Totale: ${total.toFixed(2).replace(".", ",")} €\n` +
+                `Nome: ${nome}\n` +
+                `Cognome: ${cognome}\n` +
+                `Telefono: ${telefonoCliente}\n` +
+                `Indirizzo: ${indirizzo}\n` +
+                (note ? `Note: ${note}\n` : "") +
+                "\nGrazie!";
+
+            const url = `https://wa.me/39${telefonoNegozio}?text=${encodeURIComponent(
+                finalMessage
+            )}`;
+
+            window.open(url, "_blank");
+            clearCart();
+        } finally {
+            setIsSending(false);
+        }
     };
 
     return (
@@ -114,7 +131,7 @@ export default function Checkout() {
                     <div className="products-grid">
                         {items.map((item) => {
                             const isPeso = item.a_peso === "S";
-                            const prezzoUnit = item.prezzo; // EURO
+                            const prezzoUnit = item.prezzo;
 
                             const subtotal = isPeso
                                 ? (item.weight / 1000) * prezzoUnit
@@ -184,14 +201,16 @@ export default function Checkout() {
                     <button
                         className="checkout-submit-btn"
                         onClick={sendOrderWhatsApp}
+                        disabled={isSending}
                     >
-                        Invia ordine
+                        {isSending ? "Invio in corso..." : "Invia ordine"}
                     </button>
 
                     <button
                         className="add-to-cart-btn"
                         style={{ marginTop: "10px", backgroundColor: "#dc3545" }}
                         onClick={clearCart}
+                        disabled={isSending}
                     >
                         Svuota carrello
                     </button>

@@ -91,7 +91,7 @@ export default function ProductList() {
 
         // fuzzy match (tolleranza 2 errori)
         const distance = levenshtein(name, term);
-        return distance <= 2;
+        return distance <= 3;
     });
 
     return (
