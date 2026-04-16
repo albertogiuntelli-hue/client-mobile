@@ -5,7 +5,6 @@ let listenerAdded = false;
 export function listenForInstallPrompt(onPromptReady) {
     callback = onPromptReady;
 
-    // Evita di aggiungere più listener
     if (listenerAdded) return;
     listenerAdded = true;
 
@@ -22,7 +21,6 @@ export async function triggerInstall() {
     deferredPrompt.prompt();
     const result = await deferredPrompt.userChoice;
 
-    // Reset dopo l’uso
     deferredPrompt = null;
 
     return result.outcome === "accepted";
