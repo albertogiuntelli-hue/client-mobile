@@ -93,7 +93,7 @@ export default function Checkout() {
                 alert("Ordine inviato! WhatsApp non disponibile su questo dispositivo.");
                 clearCart();
 
-                setTimeout(() => navigate("/"), 2000);
+                setTimeout(() => navigate("/grazie"), 1000);
                 return;
             }
 
@@ -132,10 +132,15 @@ export default function Checkout() {
                 finalMessage
             )}`;
 
+            // 🔥 APRI WHATSAPP
             window.open(url, "_blank");
+
+            // 🔥 SVUOTA CARRELLO
             clearCart();
 
-            setTimeout(() => navigate("/"), 2000);
+            // 🔥 DOPO 1 SECONDO → PAGINA GRAZIE
+            setTimeout(() => navigate("/grazie"), 1000);
+
         } finally {
             setIsSending(false);
         }
