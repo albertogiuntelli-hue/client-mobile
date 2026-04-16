@@ -1,13 +1,16 @@
 import { useState } from "react";
 import { useCart } from "../context/CartContext";
 import { sendOrder } from "../api/orders";
+import { useNavigate } from "react-router-dom";
 
 export default function Checkout() {
     const { items, total, clearCart } = useCart();
+    const navigate = useNavigate();
 
     const [nome, setNome] = useState("");
     const [cognome, setCognome] = useState("");
     const [telefonoCliente, setTelefonoCliente] = useState("");
+    const [email, setEmail] = useState("");
     const [indirizzo, setIndirizzo] = useState("");
     const [note, setNote] = useState("");
 
@@ -16,16 +19,12 @@ export default function Checkout() {
     const telefonoNegozio = "3356039828";
 
     const inviaOrdineBackend = async () => {
-        if (items.length === 0) {
-            alert("Il carrello è vuoto, impossibile inviare l’ordine.");
-            return;
-        }
-
         const ordine = {
             cliente: {
                 nome,
                 cognome,
                 telefono: telefonoCliente,
+                email,
                 indirizzo,
                 note,
             },
@@ -63,6 +62,24 @@ export default function Checkout() {
             return;
         }
 
+        // 🔥 CONTROLLI CAMPI OBBLIGATORI
+        if (!nome) {
+            alert("Inserisci il nome");
+            return;
+        }
+        if (!cognome) {
+            alert("Inserisci il cognome");
+            return;
+        }
+        if (!telefonoCliente && !email) {
+            alert("Inserisci almeno un numero di telefono o un'email");
+            return;
+        }
+        if (!indirizzo) {
+            alert("Inserisci l'indirizzo");
+            return;
+        }
+
         setIsSending(true);
 
         try {
@@ -70,12 +87,13 @@ export default function Checkout() {
 
             const ua = navigator.userAgent.toLowerCase();
             const hasWhatsApp =
-                ua.includes("android") || ua.includes("iphone"); // 🔥 RIGA CORRETTA
+                ua.includes("android") || ua.includes("iphone");
 
             if (!hasWhatsApp) {
-                alert("Ordine inviato! (WhatsApp non disponibile su questo dispositivo)");
+                alert("Ordine inviato! WhatsApp non disponibile su questo dispositivo.");
                 clearCart();
-                setIsSending(false);
+
+                setTimeout(() => navigate("/"), 2000);
                 return;
             }
 
@@ -105,6 +123,7 @@ export default function Checkout() {
                 `Nome: ${nome}\n` +
                 `Cognome: ${cognome}\n` +
                 `Telefono: ${telefonoCliente}\n` +
+                (email ? `Email: ${email}\n` : "") +
                 `Indirizzo: ${indirizzo}\n` +
                 (note ? `Note: ${note}\n` : "") +
                 "\nGrazie!";
@@ -115,6 +134,8 @@ export default function Checkout() {
 
             window.open(url, "_blank");
             clearCart();
+
+            setTimeout(() => navigate("/"), 2000);
         } finally {
             setIsSending(false);
         }
@@ -183,6 +204,14 @@ export default function Checkout() {
                         />
 
                         <input
+                            type="email"
+                            placeholder="Email (opzionale)"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            style={inputStyle}
+                        />
+
+                        <input
                             type="text"
                             placeholder="Indirizzo"
                             value={indirizzo}
@@ -191,7 +220,7 @@ export default function Checkout() {
                         />
 
                         <textarea
-                            placeholder="Note (opzionale)"
+                            placeholder="Note – aggiungi altri prodotti all'ordine"
                             value={note}
                             onChange={(e) => setNote(e.target.value)}
                             style={{ ...inputStyle, height: "80px" }}
