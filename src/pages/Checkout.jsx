@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useCart } from "../context/CartContext";
 import { sendOrder } from "../api/orders";
+import { registerUser } from "../api/users";
 import { useNavigate } from "react-router-dom";
 
 export default function Checkout() {
@@ -19,16 +20,21 @@ export default function Checkout() {
     const telefonoNegozio = "3356039828";
 
     const inviaOrdineBackend = async () => {
-        const ordine = {
-            cliente: {
-                nome,
-                cognome,
-                telefono: telefonoCliente,
-                email,
-                indirizzo,
-                note,
-            },
+        const cliente = {
+            nome,
+            cognome,
+            telefono: telefonoCliente,
+            email,
+            indirizzo,
+            note,
+        };
 
+        // 🔥 1) REGISTRA IL CLIENTE
+        await registerUser(cliente);
+
+        // 🔥 2) INVIA L’ORDINE
+        const ordine = {
+            cliente,
             prodotti: items.map((p) => {
                 const isPeso = p.a_peso === "S";
 
@@ -38,17 +44,13 @@ export default function Checkout() {
                 return {
                     codice: p.codice,
                     nome: p.nome,
-
                     quantita: isPeso ? 0 : qty,
                     peso: isPeso ? weight : 0,
-
                     tipo: p.a_peso,
-
                     prezzo: Math.round(Number(p.prezzo) * 100),
                     prezzo_scontato: 0,
                 };
             }),
-
             totale: Math.round(total * 100),
         };
 
@@ -62,23 +64,11 @@ export default function Checkout() {
             return;
         }
 
-        // 🔥 CONTROLLI CAMPI OBBLIGATORI
-        if (!nome) {
-            alert("Inserisci il nome");
-            return;
-        }
-        if (!cognome) {
-            alert("Inserisci il cognome");
-            return;
-        }
-        if (!telefonoCliente && !email) {
-            alert("Inserisci almeno un numero di telefono o un'email");
-            return;
-        }
-        if (!indirizzo) {
-            alert("Inserisci l'indirizzo");
-            return;
-        }
+        if (!nome) return alert("Inserisci il nome");
+        if (!cognome) return alert("Inserisci il cognome");
+        if (!telefonoCliente && !email)
+            return alert("Inserisci almeno un numero di telefono o un'email");
+        if (!indirizzo) return alert("Inserisci l'indirizzo");
 
         setIsSending(true);
 
@@ -90,9 +80,8 @@ export default function Checkout() {
                 ua.includes("android") || ua.includes("iphone");
 
             if (!hasWhatsApp) {
-                alert("Ordine inviato! WhatsApp non disponibile su questo dispositivo.");
+                alert("Ordine inviato! WhatsApp non disponibile.");
                 clearCart();
-
                 setTimeout(() => navigate("/grazie"), 1000);
                 return;
             }
@@ -100,10 +89,8 @@ export default function Checkout() {
             const message = items
                 .map((p) => {
                     const isPeso = p.a_peso === "S";
-
                     const qty = Number(p.quantity) || 0;
                     const weight = Number(p.weight) || 0;
-
                     const prezzoUnit = Number(p.prezzo);
 
                     const subtotal = isPeso
@@ -132,19 +119,23 @@ export default function Checkout() {
                 finalMessage
             )}`;
 
-            // 🔥 APRI WHATSAPP
             window.open(url, "_blank");
 
-            // 🔥 SVUOTA CARRELLO
             clearCart();
 
-            // 🔥 DOPO 1 SECONDO → PAGINA GRAZIE
-            setTimeout(() => navigate("/grazie"), 1000);
+            // 🔥 REDIRECT SICURO
+            localStorage.setItem("redirectAfterOrder", "1");
 
         } finally {
             setIsSending(false);
         }
     };
+
+    // 🔥 SE TORNA DALLA WHATSAPP → REDIRECT AUTOMATICO
+    if (localStorage.getItem("redirectAfterOrder") === "1") {
+        localStorage.removeItem("redirectAfterOrder");
+        navigate("/grazie");
+    }
 
     return (
         <div className="products-container">
