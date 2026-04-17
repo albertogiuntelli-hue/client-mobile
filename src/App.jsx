@@ -6,7 +6,8 @@ import Checkout from "./pages/Checkout";
 import InstallBanner from "./components/InstallBanner";
 import ProductList from "./pages/ProductList";
 import Navbar from "./components/Navbar";
-import ChiSiamo from "./pages/ChiSiamo"; // 🔥 IMPORTANTE
+import ChiSiamo from "./pages/ChiSiamo";
+import Grazie from "./pages/Grazie";   // 🔥 IMPORTANTE
 
 function App() {
   return (
@@ -23,6 +24,9 @@ function App() {
 
         {/* 🔥 ROTTA CHI SIAMO */}
         <Route path="/chi-siamo" element={<ChiSiamo />} />
+
+        {/* 🔥 ROTTA GRAZIE */}
+        <Route path="/grazie" element={<Grazie />} />
       </Routes>
     </>
   );
