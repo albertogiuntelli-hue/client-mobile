@@ -1,38 +1,25 @@
+import { useNavigate } from "react-router-dom";
+import "../styles/theme.css";
+
 export default function Grazie() {
+    const navigate = useNavigate();
+
     return (
-        <div
-            style={{
-                padding: "40px 20px",
-                textAlign: "center",
-            }}
-        >
-            <img
-                src="/icon-192.png"
-                alt="PlusMarket"
-                style={{ width: "90px", marginBottom: "20px" }}
-            />
+        <div className="thanks-container">
+            <h1 className="thanks-title">Grazie per il tuo ordine!</h1>
 
-            <h2 style={{ marginBottom: "10px" }}>Grazie per il tuo ordine!</h2>
-
-            <p style={{ fontSize: "18px", marginBottom: "30px" }}>
-                Abbiamo ricevuto il tuo ordine su WhatsApp.
-                Ti risponderemo il prima possibile.
+            <p className="thanks-text">
+                Il tuo ordine è stato inviato correttamente.
+                Ti contatteremo a breve per la conferma.
             </p>
 
-            <a
-                href="/"
-                style={{
-                    display: "inline-block",
-                    padding: "12px 20px",
-                    background: "#28a745",
-                    color: "#fff",
-                    borderRadius: "8px",
-                    textDecoration: "none",
-                    fontSize: "18px",
-                }}
+            <button
+                className="home-btn"
+                onClick={() => navigate("/")}
+                style={{ marginTop: "30px" }}
             >
                 Torna alla Home
-            </a>
+            </button>
         </div>
     );
 }

@@ -79,7 +79,7 @@ export default function ProductList() {
         return matrix[b.length][a.length];
     }
 
-    // 🔥 FILTRO PRODOTTI MIGLIORATO
+    // 🔥 FILTRO PRODOTTI MIGLIORATO (fuzzy + abbreviazioni)
     const filtered = products.filter((p) => {
         if (!search) return true;
 
@@ -89,9 +89,17 @@ export default function ProductList() {
         // match diretto
         if (name.includes(term)) return true;
 
-        // fuzzy match (tolleranza 2 errori)
+        // fuzzy match (tolleranza 3 errori)
         const distance = levenshtein(name, term);
-        return distance <= 3;
+        if (distance <= 3) return true;
+
+        // match per prefisso (es: "prosc" ≈ "prosciutto")
+        if (term.length > 4 && name.startsWith(term.slice(0, 4))) return true;
+
+        // match inverso (es: "prosciutto" ≈ "prosc")
+        if (name.length > 4 && term.startsWith(name.slice(0, 4))) return true;
+
+        return false;
     });
 
     return (

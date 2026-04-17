@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useCart } from "../context/CartContext";
 import { sendOrder } from "../api/orders";
 import { registerUser } from "../api/users";
@@ -19,6 +19,29 @@ export default function Checkout() {
 
     const telefonoNegozio = "3356039828";
 
+    /* ============================================================
+       AUTOCOMPILAZIONE — SOLO LOCALSTORAGE
+    ============================================================ */
+    useEffect(() => {
+        const saved = localStorage.getItem("clienteData");
+        if (saved) {
+            const c = JSON.parse(saved);
+            setNome(c.nome || "");
+            setCognome(c.cognome || "");
+            setTelefonoCliente(c.telefono || "");
+            setEmail(c.email || "");
+            setIndirizzo(c.indirizzo || "");
+            setNote(c.note || "");
+        }
+    }, []);
+
+    const salvaLocal = (cliente) => {
+        localStorage.setItem("clienteData", JSON.stringify(cliente));
+    };
+
+    /* ============================================================
+       INVIO ORDINE + REGISTRAZIONE CLIENTE
+    ============================================================ */
     const inviaOrdineBackend = async () => {
         const cliente = {
             nome,
@@ -29,10 +52,13 @@ export default function Checkout() {
             note,
         };
 
-        // 🔥 1) REGISTRA IL CLIENTE
+        // 🔥 Salva localmente per autocompilazione futura
+        salvaLocal(cliente);
+
+        // 🔥 Registra cliente nel backend
         await registerUser(cliente);
 
-        // 🔥 2) INVIA L’ORDINE
+        // 🔥 Prepara ordine
         const ordine = {
             cliente,
             prodotti: items.map((p) => {
@@ -57,6 +83,9 @@ export default function Checkout() {
         await sendOrder(ordine);
     };
 
+    /* ============================================================
+       INVIO WHATSAPP
+    ============================================================ */
     const sendOrderWhatsApp = async () => {
         if (isSending) return;
         if (items.length === 0) {
@@ -125,13 +154,12 @@ export default function Checkout() {
 
             // 🔥 REDIRECT SICURO
             localStorage.setItem("redirectAfterOrder", "1");
-
         } finally {
             setIsSending(false);
         }
     };
 
-    // 🔥 SE TORNA DALLA WHATSAPP → REDIRECT AUTOMATICO
+    // 🔥 SE TORNA DA WHATSAPP → REDIRECT AUTOMATICO
     if (localStorage.getItem("redirectAfterOrder") === "1") {
         localStorage.removeItem("redirectAfterOrder");
         navigate("/grazie");

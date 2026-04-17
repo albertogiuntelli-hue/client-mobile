@@ -26,7 +26,7 @@ export default function Home() {
             </div>
 
             <p className="home-description">
-                Il tuo negozio di fiducia vicino a te ogni giorno
+                Il tuo negozio di fiducia, vicino a te ogni giorno.
             </p>
 
             <a
