@@ -1,283 +1,128 @@
-import { useState, useEffect } from "react";
-import { useCart } from "../context/CartContext";
-import { sendOrder } from "../api/orders";
-import { registerUser } from "../api/users";
-import { useNavigate } from "react-router-dom";
+import React, { useState } from "react";
+import { createUser } from "../api/users";
+import { createOrder } from "../api/orders";
 
-export default function Checkout() {
-    const { items, total, clearCart } = useCart();
-    const navigate = useNavigate();
-
+export default function Checkout({ cartItems = [], onSuccess, redirectToSuccess }) {
     const [nome, setNome] = useState("");
     const [cognome, setCognome] = useState("");
-    const [telefonoCliente, setTelefonoCliente] = useState("");
+    const [telefono, setTelefono] = useState("");
     const [email, setEmail] = useState("");
     const [indirizzo, setIndirizzo] = useState("");
     const [note, setNote] = useState("");
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
 
-    const [isSending, setIsSending] = useState(false);
-
-    const telefonoNegozio = "3356039828";
-
-    /* ============================================================
-       AUTOCOMPILAZIONE — SOLO LOCALSTORAGE
-    ============================================================ */
-    useEffect(() => {
-        const saved = localStorage.getItem("clienteData");
-        if (saved) {
-            const c = JSON.parse(saved);
-            setNome(c.nome || "");
-            setCognome(c.cognome || "");
-            setTelefonoCliente(c.telefono || "");
-            setEmail(c.email || "");
-            setIndirizzo(c.indirizzo || "");
-            setNote(c.note || "");
+    const validate = () => {
+        if (!nome.trim()) {
+            setError("Inserisci il nome del cliente.");
+            return false;
         }
-    }, []);
-
-    const salvaLocal = (cliente) => {
-        localStorage.setItem("clienteData", JSON.stringify(cliente));
+        if (!email || !email.includes("@")) {
+            setError("Inserisci un'email valida.");
+            return false;
+        }
+        return true;
     };
 
-    /* ============================================================
-       INVIO ORDINE + REGISTRAZIONE CLIENTE
-    ============================================================ */
-    const inviaOrdineBackend = async () => {
-        const cliente = {
-            nome,
-            cognome,
-            telefono: telefonoCliente,
-            email,
-            indirizzo,
-            note,
-        };
+    const buildCustomerPayload = () => ({
+        nome: `${nome} ${cognome}`.trim(),
+        telefonoCliente: telefono || "",
+        indirizzo: indirizzo || "",
+        note: note || "",
+        email: email || "",
+    });
 
-        // 🔥 Salva localmente per autocompilazione futura
-        salvaLocal(cliente);
+    const buildOrderPayload = (customerId, customerPayload) => ({
+        items: cartItems.map((it) => ({
+            productId: it.id || it._id,
+            quantity: it.quantity || 1,
+            price: it.price || 0,
+        })),
+        total: cartItems.reduce((s, it) => s + (it.price || 0) * (it.quantity || 1), 0),
+        customerId: customerId || null,
+        customer: customerPayload,
+        status: "pending",
+    });
 
-        // 🔥 Registra cliente nel backend
-        await registerUser(cliente);
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setError(null);
 
-        // 🔥 Prepara ordine
-        const ordine = {
-            cliente,
-            prodotti: items.map((p) => {
-                const isPeso = p.a_peso === "S";
+        if (!validate()) return;
 
-                const qty = Number(p.quantity) || 0;
-                const weight = Number(p.weight) || 0;
-
-                return {
-                    codice: p.codice,
-                    nome: p.nome,
-                    quantita: isPeso ? 0 : qty,
-                    peso: isPeso ? weight : 0,
-                    tipo: p.a_peso,
-                    prezzo: Math.round(Number(p.prezzo) * 100),
-                    prezzo_scontato: 0,
-                };
-            }),
-            totale: Math.round(total * 100),
-        };
-
-        await sendOrder(ordine);
-    };
-
-    /* ============================================================
-       INVIO WHATSAPP
-    ============================================================ */
-    const sendOrderWhatsApp = async () => {
-        if (isSending) return;
-        if (items.length === 0) {
-            alert("Il carrello è vuoto.");
-            return;
-        }
-
-        if (!nome) return alert("Inserisci il nome");
-        if (!cognome) return alert("Inserisci il cognome");
-        if (!telefonoCliente && !email)
-            return alert("Inserisci almeno un numero di telefono o un'email");
-        if (!indirizzo) return alert("Inserisci l'indirizzo");
-
-        setIsSending(true);
+        setLoading(true);
 
         try {
-            await inviaOrdineBackend();
+            const customerPayload = buildCustomerPayload();
 
-            const ua = navigator.userAgent.toLowerCase();
-            const hasWhatsApp =
-                ua.includes("android") || ua.includes("iphone");
+            // 1️⃣ CREA IL CLIENTE
+            const customerData = await createUser(customerPayload);
+            const customerId = customerData.id || customerData._id || null;
 
-            if (!hasWhatsApp) {
-                alert("Ordine inviato! WhatsApp non disponibile.");
-                clearCart();
-                setTimeout(() => navigate("/grazie"), 1000);
-                return;
-            }
+            // 2️⃣ CREA L’ORDINE
+            const orderPayload = buildOrderPayload(customerId, customerPayload);
+            const orderData = await createOrder(orderPayload);
 
-            const message = items
-                .map((p) => {
-                    const isPeso = p.a_peso === "S";
-                    const qty = Number(p.quantity) || 0;
-                    const weight = Number(p.weight) || 0;
-                    const prezzoUnit = Number(p.prezzo);
+            // reset
+            setNome("");
+            setCognome("");
+            setTelefono("");
+            setEmail("");
+            setIndirizzo("");
+            setNote("");
+            setLoading(false);
 
-                    const subtotal = isPeso
-                        ? ((weight / 1000) * prezzoUnit).toFixed(2)
-                        : (qty * prezzoUnit).toFixed(2);
+            if (onSuccess) onSuccess({ customer: customerData, order: orderData });
+            if (redirectToSuccess) redirectToSuccess(orderData);
 
-                    return `• ${p.nome} — ${isPeso ? weight + " g" : qty + " pz"
-                        } — ${subtotal.replace(".", ",")} €`;
-                })
-                .join("\n");
-
-            const finalMessage =
-                "Ordine PlusMarket\n\n" +
-                message +
-                "\n------------------------------\n" +
-                `Totale: ${total.toFixed(2).replace(".", ",")} €\n` +
-                `Nome: ${nome}\n` +
-                `Cognome: ${cognome}\n` +
-                `Telefono: ${telefonoCliente}\n` +
-                (email ? `Email: ${email}\n` : "") +
-                `Indirizzo: ${indirizzo}\n` +
-                (note ? `Note: ${note}\n` : "") +
-                "\nGrazie!";
-
-            const url = `https://wa.me/39${telefonoNegozio}?text=${encodeURIComponent(
-                finalMessage
-            )}`;
-
-            window.open(url, "_blank");
-
-            clearCart();
-
-            // 🔥 REDIRECT SICURO
-            localStorage.setItem("redirectAfterOrder", "1");
-        } finally {
-            setIsSending(false);
+        } catch (err) {
+            console.error(err);
+            setError("Errore durante la registrazione.");
+            setLoading(false);
         }
     };
 
-    // 🔥 SE TORNA DA WHATSAPP → REDIRECT AUTOMATICO
-    if (localStorage.getItem("redirectAfterOrder") === "1") {
-        localStorage.removeItem("redirectAfterOrder");
-        navigate("/grazie");
-    }
-
     return (
-        <div className="products-container">
-            <h1 className="page-title">Checkout</h1>
+        <div className="checkout-container">
+            <h2>Checkout</h2>
 
-            {items.length === 0 ? (
-                <p>Il carrello è vuoto.</p>
-            ) : (
-                <>
-                    <div className="products-grid">
-                        {items.map((item) => {
-                            const isPeso = item.a_peso === "S";
-                            const prezzoUnit = item.prezzo;
+            {error && <div style={{ color: "red" }}>{error}</div>}
 
-                            const subtotal = isPeso
-                                ? (item.weight / 1000) * prezzoUnit
-                                : item.quantity * prezzoUnit;
+            <form onSubmit={handleSubmit}>
+                <div>
+                    <label>Nome</label>
+                    <input value={nome} onChange={(e) => setNome(e.target.value)} required />
+                </div>
 
-                            return (
-                                <div key={item.codice} className="product-card">
-                                    <h3 className="product-name">{item.nome}</h3>
+                <div>
+                    <label>Cognome</label>
+                    <input value={cognome} onChange={(e) => setCognome(e.target.value)} />
+                </div>
 
-                                    <p className="product-price">
-                                        {subtotal
-                                            .toFixed(2)
-                                            .replace(".", ",")} €
-                                    </p>
+                <div>
+                    <label>Telefono</label>
+                    <input value={telefono} onChange={(e) => setTelefono(e.target.value)} />
+                </div>
 
-                                    <p className="product-code">
-                                        {isPeso
-                                            ? `Peso: ${item.weight} g`
-                                            : `Quantità: ${item.quantity} pz`}
-                                    </p>
-                                </div>
-                            );
-                        })}
-                    </div>
+                <div>
+                    <label>Email</label>
+                    <input value={email} onChange={(e) => setEmail(e.target.value)} required />
+                </div>
 
-                    <div style={{ marginTop: "20px", textAlign: "center" }}>
-                        <input
-                            type="text"
-                            placeholder="Nome"
-                            value={nome}
-                            onChange={(e) => setNome(e.target.value)}
-                            style={inputStyle}
-                        />
+                <div>
+                    <label>Indirizzo</label>
+                    <input value={indirizzo} onChange={(e) => setIndirizzo(e.target.value)} />
+                </div>
 
-                        <input
-                            type="text"
-                            placeholder="Cognome"
-                            value={cognome}
-                            onChange={(e) => setCognome(e.target.value)}
-                            style={inputStyle}
-                        />
+                <div>
+                    <label>Note</label>
+                    <textarea value={note} onChange={(e) => setNote(e.target.value)} />
+                </div>
 
-                        <input
-                            type="text"
-                            placeholder="Telefono"
-                            value={telefonoCliente}
-                            onChange={(e) => setTelefonoCliente(e.target.value)}
-                            style={inputStyle}
-                        />
-
-                        <input
-                            type="email"
-                            placeholder="Email (opzionale)"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            style={inputStyle}
-                        />
-
-                        <input
-                            type="text"
-                            placeholder="Indirizzo"
-                            value={indirizzo}
-                            onChange={(e) => setIndirizzo(e.target.value)}
-                            style={inputStyle}
-                        />
-
-                        <textarea
-                            placeholder="Note – aggiungi altri prodotti all'ordine"
-                            value={note}
-                            onChange={(e) => setNote(e.target.value)}
-                            style={{ ...inputStyle, height: "80px" }}
-                        />
-                    </div>
-
-                    <button
-                        className="checkout-submit-btn"
-                        onClick={sendOrderWhatsApp}
-                        disabled={isSending}
-                    >
-                        {isSending ? "Invio in corso..." : "Invia ordine"}
-                    </button>
-
-                    <button
-                        className="add-to-cart-btn"
-                        style={{ marginTop: "10px", backgroundColor: "#dc3545" }}
-                        onClick={clearCart}
-                        disabled={isSending}
-                    >
-                        Svuota carrello
-                    </button>
-                </>
-            )}
+                <button type="submit" disabled={loading}>
+                    {loading ? "Sto registrando..." : "Conferma ordine e registra cliente"}
+                </button>
+            </form>
         </div>
     );
 }
-
-const inputStyle = {
-    padding: "10px",
-    width: "80%",
-    maxWidth: "400px",
-    borderRadius: "8px",
-    border: "1px solid #ccc",
-    marginBottom: "15px",
-};
