@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useCart } from "../context/CartContext";
-import { sendOrder } from "../api/orders";
+import { createOrder } from "../api/orders";
 
 export default function Checkout() {
     const { items, total, clearCart } = useCart();
@@ -46,7 +46,7 @@ export default function Checkout() {
             totale: Math.round(total * 100),
         };
 
-        await sendOrder(ordine);
+        await createOrder(ordine);
     };
 
     const sendOrderWhatsApp = async () => {
