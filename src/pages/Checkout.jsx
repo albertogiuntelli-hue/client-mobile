@@ -24,26 +24,63 @@ export default function Checkout({ cartItems = [], onSuccess, redirectToSuccess 
         return true;
     };
 
+    /* ============================================================
+       COSTRUZIONE PAYLOAD CLIENTE (formato backend)
+    ============================================================ */
     const buildCustomerPayload = () => ({
-        nome: `${nome} ${cognome}`.trim(),
-        telefonoCliente: telefono || "",
+        nome: nome || "",
+        cognome: cognome || "",
+        telefono: telefono || "",
+        email: email || "",
         indirizzo: indirizzo || "",
         note: note || "",
-        email: email || "",
     });
 
-    const buildOrderPayload = (customerId, customerPayload) => ({
-        items: cartItems.map((it) => ({
-            productId: it.id || it._id,
-            quantity: it.quantity || 1,
-            price: it.price || 0,
+    /* ============================================================
+       COSTRUZIONE PAYLOAD ORDINE (formato backend)
+    ============================================================ */
+    const buildOrderPayload = (customerPayload) => ({
+        cliente: customerPayload,
+
+        prodotti: cartItems.map((it) => ({
+            codice: it.codice,
+            nome: it.nome,
+            tipo: it.productType, // "peso" | "pezzi"
+
+            quantita: it.productType === "pezzi"
+                ? it.quantity
+                : 0,
+
+            peso: it.productType === "peso"
+                ? it.weight
+                : 0,
+
+            prezzo: it.prezzo,
+            prezzo_scontato: it.prezzo_scontato || 0,
         })),
-        total: cartItems.reduce((s, it) => s + (it.price || 0) * (it.quantity || 1), 0),
-        customerId: customerId || null,
-        customer: customerPayload,
-        status: "pending",
+
+        totale: cartItems.reduce((sum, it) => {
+            const prezzoUnitario =
+                it.prezzo_scontato > 0 ? it.prezzo_scontato : it.prezzo;
+
+            if (it.productType === "pezzi") {
+                return sum + prezzoUnitario * it.quantity;
+            }
+
+            if (it.productType === "peso") {
+                return sum + (it.weight / 1000) * prezzoUnitario;
+            }
+
+            return sum;
+        }, 0),
+
+        note: note || "",
+        stato: "in attesa",
     });
 
+    /* ============================================================
+       SUBMIT
+    ============================================================ */
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError(null);
@@ -55,15 +92,14 @@ export default function Checkout({ cartItems = [], onSuccess, redirectToSuccess 
         try {
             const customerPayload = buildCustomerPayload();
 
-            // 1️⃣ CREA IL CLIENTE
-            const customerData = await createUser(customerPayload);
-            const customerId = customerData.id || customerData._id || null;
+            // 1️⃣ REGISTRA CLIENTE
+            await createUser(customerPayload);
 
-            // 2️⃣ CREA L’ORDINE
-            const orderPayload = buildOrderPayload(customerId, customerPayload);
+            // 2️⃣ CREA ORDINE
+            const orderPayload = buildOrderPayload(customerPayload);
             const orderData = await createOrder(orderPayload);
 
-            // reset
+            // reset form
             setNome("");
             setCognome("");
             setTelefono("");
@@ -72,7 +108,7 @@ export default function Checkout({ cartItems = [], onSuccess, redirectToSuccess 
             setNote("");
             setLoading(false);
 
-            if (onSuccess) onSuccess({ customer: customerData, order: orderData });
+            if (onSuccess) onSuccess(orderData);
             if (redirectToSuccess) redirectToSuccess(orderData);
 
         } catch (err) {
