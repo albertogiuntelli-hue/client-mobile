@@ -1,49 +1,54 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useCart } from "../context/CartContext";
 import { createOrder } from "../api/orders";
+import { useNavigate } from "react-router-dom";
 
 export default function Checkout() {
     const { items, total, clearCart } = useCart();
+    const navigate = useNavigate();
 
-    const [nome, setNome] = useState("");
-    const [cognome, setCognome] = useState("");
-    const [telefonoCliente, setTelefonoCliente] = useState("");
-    const [indirizzo, setIndirizzo] = useState("");
-    const [note, setNote] = useState("");
+    // 🔥 Ripristina anagrafica salvata
+    const saved = JSON.parse(localStorage.getItem("cliente") || "{}");
+
+    const [nome, setNome] = useState(saved.nome || "");
+    const [cognome, setCognome] = useState(saved.cognome || "");
+    const [telefonoCliente, setTelefonoCliente] = useState(saved.telefono || "");
+    const [indirizzo, setIndirizzo] = useState(saved.indirizzo || "");
+    const [email, setEmail] = useState(saved.email || "");
+    const [note, setNote] = useState(saved.note || "");
 
     const telefonoNegozio = "3356039828";
 
     const inviaOrdineBackend = async () => {
-        const ordine = {
-            cliente: {
-                nome,
-                cognome,
-                telefono: telefonoCliente,
-                indirizzo,
-                note,
-            },
+        const cliente = {
+            nome,
+            cognome,
+            telefono: telefonoCliente,
+            indirizzo,
+            email,
+            note,
+        };
 
+        // 🔥 Salva anagrafica per la prossima volta
+        localStorage.setItem("cliente", JSON.stringify(cliente));
+
+        const ordine = {
+            cliente,
             prodotti: items.map((p) => {
                 const isPeso = p.a_peso === "S";
-
-                const qty = Number(p.quantity) || 0;
-                const weight = Number(p.weight) || 0;
 
                 return {
                     codice: p.codice,
                     nome: p.nome,
-
-                    quantita: isPeso ? 0 : qty,
-                    peso: isPeso ? weight : 0,
-
+                    quantita: isPeso ? 0 : Number(p.quantity),
+                    peso: isPeso ? Number(p.weight) : 0,
                     tipo: p.a_peso,
-
                     prezzo: Math.round(Number(p.prezzo) * 100),
                     prezzo_scontato: 0,
                 };
             }),
-
             totale: Math.round(total * 100),
+            createdAt: new Date().toISOString(), // ⭐ Data ordine
         };
 
         await createOrder(ordine);
@@ -53,22 +58,20 @@ export default function Checkout() {
         await inviaOrdineBackend();
 
         const ua = navigator.userAgent.toLowerCase();
-        const hasWhatsApp =
-            ua.includes("android") || ua.includes("iphone");
+        const hasWhatsApp = ua.includes("android") || ua.includes("iphone");
 
         if (!hasWhatsApp) {
-            alert("Ordine inviato! (WhatsApp non disponibile su questo dispositivo)");
+            alert("Ordine inviato! (WhatsApp non disponibile)");
             clearCart();
+            navigate("/grazie"); // ⭐ Pagina ringraziamento
             return;
         }
 
         const message = items
             .map((p) => {
                 const isPeso = p.a_peso === "S";
-
                 const qty = Number(p.quantity) || 0;
                 const weight = Number(p.weight) || 0;
-
                 const prezzoUnit = Number(p.prezzo);
 
                 const subtotal = isPeso
@@ -88,6 +91,7 @@ export default function Checkout() {
             `Cognome: ${cognome}\n` +
             `Telefono: ${telefonoCliente}\n` +
             `Indirizzo: ${indirizzo}\n` +
+            (email ? `Email: ${email}\n` : "") +
             (note ? `Note: ${note}\n` : "") +
             "\nGrazie!";
 
@@ -95,6 +99,7 @@ export default function Checkout() {
 
         window.open(url, "_blank");
         clearCart();
+        navigate("/grazie"); // ⭐ Pagina ringraziamento
     };
 
     return (
@@ -117,11 +122,9 @@ export default function Checkout() {
                             return (
                                 <div key={item.codice} className="product-card">
                                     <h3 className="product-name">{item.nome}</h3>
-
                                     <p className="product-price">
                                         {subtotal.toFixed(2).replace(".", ",")} €
                                     </p>
-
                                     <p className="product-code">
                                         {isPeso
                                             ? `Peso: ${item.weight} g`
@@ -133,37 +136,13 @@ export default function Checkout() {
                     </div>
 
                     <div style={{ marginTop: "20px", textAlign: "center" }}>
-                        <input
-                            type="text"
-                            placeholder="Nome"
-                            value={nome}
-                            onChange={(e) => setNome(e.target.value)}
-                            style={inputStyle}
-                        />
+                        <input style={inputStyle} placeholder="Nome" value={nome} onChange={(e) => setNome(e.target.value)} />
+                        <input style={inputStyle} placeholder="Cognome" value={cognome} onChange={(e) => setCognome(e.target.value)} />
+                        <input style={inputStyle} placeholder="Telefono" value={telefonoCliente} onChange={(e) => setTelefonoCliente(e.target.value)} />
+                        <input style={inputStyle} placeholder="Indirizzo" value={indirizzo} onChange={(e) => setIndirizzo(e.target.value)} />
 
-                        <input
-                            type="text"
-                            placeholder="Cognome"
-                            value={cognome}
-                            onChange={(e) => setCognome(e.target.value)}
-                            style={inputStyle}
-                        />
-
-                        <input
-                            type="text"
-                            placeholder="Telefono"
-                            value={telefonoCliente}
-                            onChange={(e) => setTelefonoCliente(e.target.value)}
-                            style={inputStyle}
-                        />
-
-                        <input
-                            type="text"
-                            placeholder="Indirizzo"
-                            value={indirizzo}
-                            onChange={(e) => setIndirizzo(e.target.value)}
-                            style={inputStyle}
-                        />
+                        {/* ⭐ Campo email ripristinato */}
+                        <input style={inputStyle} placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
 
                         <textarea
                             placeholder="Note (opzionale)"
@@ -173,10 +152,7 @@ export default function Checkout() {
                         />
                     </div>
 
-                    <button
-                        className="checkout-submit-btn"
-                        onClick={sendOrderWhatsApp}
-                    >
+                    <button className="checkout-submit-btn" onClick={sendOrderWhatsApp}>
                         Invia ordine
                     </button>
 
