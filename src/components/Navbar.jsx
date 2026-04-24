@@ -3,9 +3,9 @@ import { useCart } from "../context/CartContext";
 import "../styles/navbar.css";
 
 export default function Navbar() {
-    const { items } = useCart();
+    const { items, total } = useCart();
 
-    // Conta ogni prodotto (peso o pezzi)
+    // Numero articoli (peso o pezzi)
     const cartCount = items.length;
 
     return (
@@ -15,8 +15,17 @@ export default function Navbar() {
             </Link>
 
             <Link to="/cart" className="mobile-cart">
-                <span className="cart-count">{cartCount}</span>
-                🛒
+                <div className="cart-info">
+                    🛒
+                    {cartCount > 0 && (
+                        <>
+                            <span className="cart-count">{cartCount}</span>
+                            <span className="cart-total">
+                                €{total.toFixed(2).replace(".", ",")}
+                            </span>
+                        </>
+                    )}
+                </div>
             </Link>
         </nav>
     );

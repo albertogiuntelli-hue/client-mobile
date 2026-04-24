@@ -1,12 +1,23 @@
-/* NAVBAR MOBILE PLUSMARKET */
+/* ============================
+   NAVBAR MOBILE PLUSMARKET
+   Verde elegante + Totale carrello
+============================ */
 
+:root {
+    --verde: #6BCB77;
+    --verde-scuro: #4E9F3D;
+    --verde-chiaro: #E8F8EF;
+    --grafite: #2E2E2E;
+    --grigio-chiaro: #F5F5F5;
+}
+
+/* NAVBAR MOBILE */
 .mobile-navbar {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 12px 18px;
-    background: #6BCB77;
-    /* verde elegante */
+    background: var(--verde);
     border-bottom-left-radius: 12px;
     border-bottom-right-radius: 12px;
     box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
@@ -15,6 +26,7 @@
     z-index: 1000;
 }
 
+/* LOGO */
 .mobile-logo img {
     width: 42px;
     height: 42px;
@@ -22,21 +34,44 @@
     object-fit: contain;
 }
 
+/* CARRELLO */
 .mobile-cart {
-    font-size: 28px;
-    color: white;
     text-decoration: none;
+    color: white;
+    font-size: 26px;
     position: relative;
 }
 
+/* CONTENITORE INFO CARRELLO */
+.cart-info {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* NUMERO ARTICOLI */
 .cart-count {
-    position: absolute;
-    top: -6px;
-    right: -12px;
-    background: #4E9F3D;
+    background: var(--verde-scuro);
     color: white;
     padding: 2px 6px;
     border-radius: 50%;
     font-size: 12px;
     font-weight: bold;
+    position: relative;
+    top: -6px;
+}
+
+/* TOTALE CARRELLO */
+.cart-total {
+    font-size: 16px;
+    font-weight: 600;
+    color: white;
+}
+
+/* RESPONSIVE */
+@media (min-width: 769px) {
+    .mobile-navbar {
+        max-width: 600px;
+        margin: 0 auto;
+    }
 }
