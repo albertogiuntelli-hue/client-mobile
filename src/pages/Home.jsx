@@ -24,7 +24,6 @@ export default function Home() {
                     ORDINA ONLINE I PRODOTTI
                 </button>
 
-                {/* 🔥 BOTTONE CORRETTO */}
                 <button
                     className="home-btn"
                     onClick={() => navigate("/condizioni")}
@@ -55,3 +54,4 @@ export default function Home() {
         </div>
     );
 }
+

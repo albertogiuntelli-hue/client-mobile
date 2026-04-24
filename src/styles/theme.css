@@ -1,4 +1,4 @@
-/* ===========================
+/* ============================
    RESET BASE
 =========================== */
 * {
@@ -20,7 +20,7 @@ body {
     color: #333;
 }
 
-/* ===========================
+/* ============================
    CONTAINER GENERALE
 =========================== */
 #root {
@@ -30,7 +30,7 @@ body {
     text-align: left;
 }
 
-/* ===========================
+/* ============================
    HOME PAGE CON SFONDO FOTO
 =========================== */
 .home-container {
@@ -123,7 +123,7 @@ body {
     box-shadow: 0 5px 12px rgba(0, 0, 0, 0.22);
 }
 
-/* ===========================
+/* ============================
    TASTO TORNA INDIETRO
 =========================== */
 .back-btn {
@@ -148,7 +148,7 @@ body {
     box-shadow: 0 5px 12px rgba(0, 0, 0, 0.3);
 }
 
-/* ===========================
+/* ============================
    SEARCH BOX
 =========================== */
 .search-box {
@@ -163,7 +163,7 @@ body {
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
 }
 
-/* ===========================
+/* ============================
    GRID PRODOTTI
 =========================== */
 .products-container {
@@ -193,7 +193,7 @@ body {
     margin-bottom: 10px;
 }
 
-/* ===========================
+/* ============================
    TESTI PRODOTTO
 =========================== */
 .product-name {
@@ -221,7 +221,7 @@ body {
     margin: 10px 0;
 }
 
-/* ===========================
+/* ============================
    BOTTONI
 =========================== */
 .btn-primary {
@@ -279,7 +279,7 @@ body {
     box-shadow: 0 3px 8px rgba(0, 0, 0, 0.18);
 }
 
-/* ===========================
+/* ============================
    POPUP PESO
 =========================== */
 .popup-overlay {
@@ -315,7 +315,7 @@ body {
     min-width: 70px;
 }
 
-/* ===========================
+/* ============================
    CARRELLO (MOBILE FIX)
 =========================== */
 .cart-container {
@@ -359,11 +359,13 @@ body {
     overflow-wrap: break-word;
 }
 
+/* 🔥 FIX QUANTITÀ */
 .cart-qty {
     display: flex;
     align-items: center;
     gap: 10px;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
+    white-space: nowrap;
 }
 
 .btn-small {
@@ -390,7 +392,7 @@ body {
     margin: 20px 0;
 }
 
-/* ===========================
+/* ============================
    TOAST
 =========================== */
 .toast {
@@ -428,7 +430,7 @@ body {
     }
 }
 
-/* ===========================
+/* ============================
    CHECKOUT PAGE (MOBILE FIX)
 =========================== */
 .checkout-container {
@@ -482,66 +484,6 @@ body {
     margin-top: 20px;
 }
 
-/* ===========================
+/* ============================
    RESPONSIVE
 =========================== */
-@media (max-width: 480px) {
-    .product-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-
-    .back-btn {
-        font-size: 15px;
-        padding: 8px 16px;
-    }
-}
-
-/* ===========================
-   PAGINE INFO
-=========================== */
-.info-page {
-    padding: 25px;
-    max-width: 600px;
-    margin: 0 auto;
-    text-align: left;
-}
-
-.info-title {
-    font-size: 26px;
-    font-weight: 700;
-    margin-bottom: 20px;
-    color: #222;
-    text-align: center;
-}
-
-.info-text {
-    font-size: 17px;
-    line-height: 1.6;
-    color: #444;
-    margin-bottom: 18px;
-}
-
-/* ===========================
-   🔥 PULSANTE GRANDE INVIO ORDINE
-=========================== */
-.checkout-submit-btn {
-    width: 90%;
-    max-width: 420px;
-    padding: 18px;
-    font-size: 20px;
-    font-weight: bold;
-    background-color: #ff9800;
-    color: white;
-    border: none;
-    border-radius: 14px;
-    margin: 25px auto 10px auto;
-    display: block;
-    text-align: center;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.18);
-    transition: background 0.2s ease, transform 0.1s ease;
-}
-
-.checkout-submit-btn:hover {
-    background-color: #fb8c00;
-    transform: translateY(-1px);
-}
