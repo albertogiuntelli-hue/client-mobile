@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useCart } from "../context/CartContext";
 import { createOrder } from "../api/orders";
 import { useNavigate } from "react-router-dom";
@@ -29,7 +29,7 @@ export default function Checkout() {
             note,
         };
 
-        // 🔥 Salva anagrafica per la prossima volta
+        // 🔥 Salva anagrafica
         localStorage.setItem("cliente", JSON.stringify(cliente));
 
         const ordine = {
@@ -48,13 +48,30 @@ export default function Checkout() {
                 };
             }),
             totale: Math.round(total * 100),
-            createdAt: new Date().toISOString(), // ⭐ Data ordine
+            createdAt: new Date().toISOString(),
         };
 
         await createOrder(ordine);
     };
 
     const sendOrderWhatsApp = async () => {
+
+        // 🔥 VALIDAZIONE COMPLETA
+        if (!nome.trim() || !cognome.trim() || !telefonoCliente.trim() || !indirizzo.trim()) {
+            alert("Per favore compila Nome, Cognome, Telefono e Indirizzo.");
+            return;
+        }
+
+        if (telefonoCliente.replace(/\D/g, "").length < 7) {
+            alert("Inserisci un numero di telefono valido.");
+            return;
+        }
+
+        if (total < 20) {
+            alert("L'importo minimo per inviare l'ordine è di 20€.");
+            return;
+        }
+
         await inviaOrdineBackend();
 
         const ua = navigator.userAgent.toLowerCase();
@@ -63,7 +80,7 @@ export default function Checkout() {
         if (!hasWhatsApp) {
             alert("Ordine inviato! (WhatsApp non disponibile)");
             clearCart();
-            navigate("/grazie"); // ⭐ Pagina ringraziamento
+            navigate("/grazie");
             return;
         }
 
@@ -99,7 +116,7 @@ export default function Checkout() {
 
         window.open(url, "_blank");
         clearCart();
-        navigate("/grazie"); // ⭐ Pagina ringraziamento
+        navigate("/grazie");
     };
 
     return (
@@ -140,27 +157,15 @@ export default function Checkout() {
                         <input style={inputStyle} placeholder="Cognome" value={cognome} onChange={(e) => setCognome(e.target.value)} />
                         <input style={inputStyle} placeholder="Telefono" value={telefonoCliente} onChange={(e) => setTelefonoCliente(e.target.value)} />
                         <input style={inputStyle} placeholder="Indirizzo" value={indirizzo} onChange={(e) => setIndirizzo(e.target.value)} />
-
-                        {/* ⭐ Campo email ripristinato */}
-                        <input style={inputStyle} placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
-
-                        <textarea
-                            placeholder="Note (opzionale)"
-                            value={note}
-                            onChange={(e) => setNote(e.target.value)}
-                            style={{ ...inputStyle, height: "80px" }}
-                        />
+                        <input style={inputStyle} placeholder="Email (opzionale)" value={email} onChange={(e) => setEmail(e.target.value)} />
+                        <textarea placeholder="Note (opzionale)" value={note} onChange={(e) => setNote(e.target.value)} style={{ ...inputStyle, height: "80px" }} />
                     </div>
 
                     <button className="checkout-submit-btn" onClick={sendOrderWhatsApp}>
                         Invia ordine
                     </button>
 
-                    <button
-                        className="add-to-cart-btn"
-                        style={{ marginTop: "10px", backgroundColor: "#dc3545" }}
-                        onClick={clearCart}
-                    >
+                    <button className="add-to-cart-btn" style={{ marginTop: "10px", backgroundColor: "#dc3545" }} onClick={clearCart}>
                         Svuota carrello
                     </button>
                 </>
