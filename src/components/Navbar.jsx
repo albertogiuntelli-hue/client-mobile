@@ -1,51 +1,23 @@
-import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 import "../styles/navbar.css";
 
 export default function Navbar() {
-    const [menuOpen, setMenuOpen] = useState(false);
-    const { items, total } = useCart();
+    const { items } = useCart();
 
-    // 🔥 FIX: conta ogni prodotto, anche quelli a peso
+    // Conta ogni prodotto (peso o pezzi)
     const cartCount = items.length;
 
     return (
-        <>
-            <nav className="navbar">
-                <Link to="/" className="navbar-logo">
-                    <img src="/logo.png" alt="Logo" />
-                    <span className="navbar-title">PlusMarket Giuntelli</span>
-                </Link>
+        <nav className="mobile-navbar">
+            <Link to="/" className="mobile-logo">
+                <img src="/icon-192.png" alt="PlusMarket" />
+            </Link>
 
-                <Link to="/cart" className="cart-link">
-                    <span className="cart-badge">{cartCount}</span>
-                    🛒 €{total.toFixed(2)}
-                </Link>
-
-                <div
-                    className="hamburger"
-                    onClick={() => setMenuOpen(!menuOpen)}
-                >
-                    <div></div>
-                    <div></div>
-                    <div></div>
-                </div>
-            </nav>
-
-            <div className={`mobile-menu ${menuOpen ? "open" : ""}`}>
-                <Link to="/" onClick={() => setMenuOpen(false)}>
-                    Home
-                </Link>
-
-                <Link to="/prodotti" onClick={() => setMenuOpen(false)}>
-                    Prodotti
-                </Link>
-
-                <Link to="/cart" onClick={() => setMenuOpen(false)}>
-                    🛒 {cartCount} — €{total.toFixed(2)}
-                </Link>
-            </div>
-        </>
+            <Link to="/cart" className="mobile-cart">
+                <span className="cart-count">{cartCount}</span>
+                🛒
+            </Link>
+        </nav>
     );
 }
