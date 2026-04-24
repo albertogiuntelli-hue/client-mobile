@@ -24,6 +24,11 @@
     position: sticky;
     top: 0;
     z-index: 1000;
+
+    /* 🔥 Protezione anti-sforamento */
+    overflow: hidden;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 /* LOGO */
@@ -40,6 +45,12 @@
     color: white;
     font-size: 26px;
     position: relative;
+
+    /* 🔥 Impedisce che il carrello occupi troppo spazio */
+    max-width: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
 }
 
 /* CONTENITORE INFO CARRELLO */
@@ -47,6 +58,9 @@
     display: flex;
     align-items: center;
     gap: 6px;
+
+    /* 🔥 Impedisce che il totale vada a capo e allunghi la navbar */
+    white-space: nowrap;
 }
 
 /* NUMERO ARTICOLI */
@@ -66,6 +80,11 @@
     font-size: 16px;
     font-weight: 600;
     color: white;
+
+    /* 🔥 Impedisce allungamenti */
+    max-width: 100px;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 /* RESPONSIVE */

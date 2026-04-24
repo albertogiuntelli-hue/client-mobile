@@ -1,7 +1,10 @@
+import { useNavigate } from "react-router-dom";
 import logo from "../../public/icon-192.png";
 import "../styles/theme.css";
 
 export default function Conditions() {
+    const navigate = useNavigate();
+
     return (
         <div className="thanks-container" style={{ padding: "20px" }}>
             <img
@@ -11,6 +14,23 @@ export default function Conditions() {
             />
 
             <h1 className="thanks-title">Condizioni di vendita</h1>
+
+            {/* 🔥 BOTTONE TORNA INDIETRO */}
+            <button
+                onClick={() => navigate(-1)}
+                style={{
+                    backgroundColor: "#4E9F3D",
+                    color: "white",
+                    padding: "10px 20px",
+                    borderRadius: "8px",
+                    border: "none",
+                    marginBottom: "20px",
+                    fontSize: "16px",
+                    cursor: "pointer",
+                }}
+            >
+                Torna indietro
+            </button>
 
             <p className="thanks-text" style={{ textAlign: "left", lineHeight: "1.6" }}>
                 <strong>Condizioni di vendita (App)</strong><br /><br />

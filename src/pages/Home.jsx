@@ -24,12 +24,12 @@ export default function Home() {
                     ORDINA ONLINE I PRODOTTI
                 </button>
 
-                {/* NUOVO BOTTONE */}
+                {/* 🔥 BOTTONE CORRETTO */}
                 <button
                     className="home-btn"
                     onClick={() => navigate("/condizioni")}
                 >
-                    CONDIZIONI DI VENDITA APP
+                    CONDIZIONI DI VENDITA
                 </button>
             </div>
 
