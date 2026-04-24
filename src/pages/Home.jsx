@@ -23,6 +23,14 @@ export default function Home() {
                 >
                     ORDINA ONLINE I PRODOTTI
                 </button>
+
+                {/* NUOVO BOTTONE */}
+                <button
+                    className="home-btn"
+                    onClick={() => navigate("/condizioni")}
+                >
+                    CONDIZIONI DI VENDITA APP
+                </button>
             </div>
 
             <p className="home-description">
