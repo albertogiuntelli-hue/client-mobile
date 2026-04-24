@@ -7,7 +7,8 @@ import InstallBanner from "./components/InstallBanner";
 import ProductList from "./pages/ProductList";
 import Navbar from "./components/Navbar";
 import ChiSiamo from "./pages/ChiSiamo";
-import Grazie from "./pages/Grazie";   // 🔥 IMPORTANTE
+import Grazie from "./pages/Grazie";
+import Conditions from "./pages/Conditions";   // ⭐ IMPORTANTE
 
 function App() {
   return (
@@ -27,6 +28,9 @@ function App() {
 
         {/* 🔥 ROTTA GRAZIE */}
         <Route path="/grazie" element={<Grazie />} />
+
+        {/* ⭐ ROTTA CONDIZIONI DI VENDITA */}
+        <Route path="/condizioni" element={<Conditions />} />
       </Routes>
     </>
   );
