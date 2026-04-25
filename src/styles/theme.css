@@ -1,96 +1,368 @@
 /* ============================
-   NAVBAR MOBILE PLUSMARKET
-   Verde elegante + Totale carrello
-============================ */
-
-:root {
-    --verde: #6BCB77;
-    --verde-scuro: #4E9F3D;
-    --verde-chiaro: #E8F8EF;
-    --grafite: #2E2E2E;
-    --grigio-chiaro: #F5F5F5;
-}
-
-/* NAVBAR MOBILE */
-.mobile-navbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px 18px;
-    background: var(--verde);
-    border-bottom-left-radius: 12px;
-    border-bottom-right-radius: 12px;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-
-    /* 🔥 Protezione anti-sforamento */
-    overflow: hidden;
-    width: 100%;
+   RESET BASE
+=========================== */
+* {
+    margin: 0;
+    padding: 0;
     box-sizing: border-box;
+    font-family: system-ui, sans-serif;
 }
 
-/* LOGO */
-.mobile-logo img {
-    width: 42px;
-    height: 42px;
-    border-radius: 8px;
-    object-fit: contain;
+html,
+body {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
 }
 
-/* CARRELLO */
-.mobile-cart {
-    text-decoration: none;
+body {
+    background: #f7f7f7;
+    color: #333;
+}
+
+/* ============================
+   CONTAINER GENERALE
+=========================== */
+#root {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    text-align: left;
+}
+
+/* ============================
+   HOME PAGE CON SFONDO FOTO
+=========================== */
+.home-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 40px 20px;
+    min-height: 100vh;
+
+    background-image: url("/background2.jpg");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+
+    background-color: rgba(255, 255, 255, 0.78);
+    backdrop-filter: blur(2px);
+    background-blend-mode: lighten;
+}
+
+.home-logo {
+    width: 160px;
+    height: 160px;
+    margin-bottom: 35px;
+}
+
+.home-buttons {
+    width: 100%;
+    max-width: 420px;
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    margin-bottom: 35px;
+}
+
+.home-btn {
+    width: 100%;
+    padding: 20px;
+    font-size: 20px;
+    font-weight: bold;
+    background-color: #ff9800;
     color: white;
-    font-size: 26px;
-    position: relative;
-
-    /* 🔥 Impedisce che il carrello occupi troppo spazio */
-    max-width: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
+    border: none;
+    border-radius: 14px;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.18);
+    transition: background 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
 }
 
-/* CONTENITORE INFO CARRELLO */
+.home-btn:hover {
+    background-color: #fb8c00;
+    transform: translateY(-1px);
+    box-shadow: 0 5px 12px rgba(0, 0, 0, 0.22);
+}
+
+.home-description {
+    font-size: 18px;
+    margin-top: 10px;
+    color: #444;
+    font-weight: 500;
+}
+
+.home-link {
+    margin-top: 15px;
+    font-size: 20px;
+    color: #e65100;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.home-btn-secondary {
+    margin-top: 25px;
+    width: 100%;
+    max-width: 420px;
+    padding: 18px;
+    font-size: 18px;
+    font-weight: bold;
+    background-color: #6d4c41;
+    color: white;
+    border: none;
+    border-radius: 14px;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.18);
+    transition: background 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
+}
+
+.home-btn-secondary:hover {
+    background-color: #5d4037;
+    transform: translateY(-1px);
+    box-shadow: 0 5px 12px rgba(0, 0, 0, 0.22);
+}
+
+/* ============================
+   TASTO TORNA INDIETRO
+=========================== */
+.back-btn {
+    position: fixed;
+    top: 70px;
+    left: 15px;
+    padding: 10px 18px;
+    background: #ff9800;
+    color: white;
+    border: none;
+    border-radius: 999px;
+    font-size: 16px;
+    font-weight: bold;
+    z-index: 9999;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+    transition: background 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
+}
+
+.back-btn:hover {
+    background: #fb8c00;
+    transform: translateY(-1px);
+    box-shadow: 0 5px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* ============================
+   SEARCH BOX
+=========================== */
+.search-box {
+    width: 100%;
+    max-width: 420px;
+    padding: 14px;
+    margin: 70px auto 20px auto;
+    border: 1px solid #ccc;
+    border-radius: 12px;
+    font-size: 16px;
+    background: #ffffff;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+}
+
+/* ============================
+   POPUP PESO
+=========================== */
+.popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.45);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 99999 !important;
+}
+
+.popup {
+    background: white;
+    padding: 22px;
+    border-radius: 14px;
+    width: 85%;
+    max-width: 360px;
+    text-align: center;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+}
+
+.weight-buttons {
+    display: flex;
+    justify-content: space-around;
+    margin: 15px 0;
+}
+
+.weight-buttons button {
+    min-width: 70px;
+}
+
+/* ============================
+   CARRELLO (VERSIONE CORRETTA)
+=========================== */
+.cart-container {
+    padding: 15px;
+    width: 100%;
+    max-width: 100%;
+}
+
+.cart-item {
+    display: flex;
+    gap: 10px;
+    background: white;
+    padding: 12px;
+    border-radius: 10px;
+    margin-bottom: 12px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+}
+
+.cart-img {
+    width: 80px;
+    height: 80px;
+    object-fit: contain;
+    background: #fff;
+    border-radius: 8px;
+    flex-shrink: 0;
+}
+
 .cart-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.cart-name,
+.cart-code,
+.cart-price {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+.cart-qty {
     display: flex;
     align-items: center;
-    gap: 6px;
-
-    /* 🔥 Impedisce che il totale vada a capo e allunghi la navbar */
+    gap: 10px;
+    flex-wrap: nowrap;
     white-space: nowrap;
 }
 
-/* NUMERO ARTICOLI */
-.cart-count {
-    background: var(--verde-scuro);
+.btn-small {
+    padding: 5px 10px;
+    background: #007bff;
     color: white;
-    padding: 2px 6px;
-    border-radius: 50%;
-    font-size: 12px;
-    font-weight: bold;
-    position: relative;
-    top: -6px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
 }
 
-/* TOTALE CARRELLO */
+.btn-remove {
+    padding: 6px 10px;
+    background: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
 .cart-total {
-    font-size: 16px;
-    font-weight: 600;
-    color: white;
-
-    /* 🔥 Impedisce allungamenti */
-    max-width: 100px;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    font-size: 20px;
+    font-weight: bold;
+    margin: 20px 0;
 }
 
-/* RESPONSIVE */
-@media (min-width: 769px) {
-    .mobile-navbar {
-        max-width: 600px;
-        margin: 0 auto;
+/* ============================
+   TOAST
+=========================== */
+.toast {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #4caf50;
+    color: white;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-size: 16px;
+    animation: fadeInOut 1.5s ease;
+    z-index: 999999;
+}
+
+@keyframes fadeInOut {
+    0% {
+        opacity: 0;
+        transform: translateX(-50%) translateY(10px);
     }
+
+    10% {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+
+    90% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0;
+        transform: translateX(-50%) translateY(10px);
+    }
+}
+
+/* ============================
+   CHECKOUT PAGE
+=========================== */
+.checkout-container {
+    padding: 16px;
+    width: 100%;
+    max-width: 100%;
+}
+
+.checkout-summary,
+.checkout-form {
+    background: white;
+    padding: 16px;
+    border-radius: 12px;
+    margin-bottom: 18px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+
+    width: 100%;
+    max-width: 100%;
+}
+
+.checkout-item {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid #eee;
+
+    flex-wrap: wrap;
+}
+
+.item-name,
+.item-qty,
+.item-price {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+.checkout-total {
+    font-size: 20px;
+    font-weight: bold;
+    margin-top: 12px;
+    text-align: right;
+}
+
+.checkout-success {
+    padding: 20px;
+    text-align: center;
+}
+
+.checkout-success button {
+    margin-top: 20px;
 }
