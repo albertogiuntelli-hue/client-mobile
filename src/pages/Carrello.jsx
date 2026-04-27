@@ -61,71 +61,55 @@ export default function Carrello() {
                     />
 
                     <div className="cart-info">
+
+                        {/* Nome prodotto */}
                         <div className="cart-name">{item.nome}</div>
+
+                        {/* Codice */}
                         <div className="cart-code">Cod: {item.codice}</div>
 
+                        {/* Prezzo */}
                         <div className="cart-price">
                             Prezzo: € {getItemPrice(item)}
                         </div>
 
-                        {item.productType === "pezzi" && (
-                            <div className="cart-qty">
-                                <button
-                                    className="btn-small"
-                                    onClick={() => decreaseQuantity(item)}
-                                >
-                                    -
-                                </button>
+                        {/* Quantità */}
+                        <div className="cart-qty">
+                            <button
+                                className="btn-small"
+                                onClick={() => decreaseQuantity(item)}
+                            >
+                                -
+                            </button>
 
-                                <span>{item.quantity} pz</span>
+                            <span>
+                                {item.productType === "pezzi"
+                                    ? `${item.quantity} pz`
+                                    : `${item.weight} g`}
+                            </span>
 
-                                <button
-                                    className="btn-small"
-                                    onClick={() =>
-                                        addToCart(item, {
-                                            productType: "pezzi",
-                                            quantity: 1,
-                                            weight: 0,
-                                        })
-                                    }
-                                >
-                                    +
-                                </button>
-                            </div>
-                        )}
+                            <button
+                                className="btn-small"
+                                onClick={() =>
+                                    addToCart(item, {
+                                        productType: item.productType,
+                                        quantity: item.productType === "pezzi" ? 1 : 0,
+                                        weight: item.productType === "peso" ? 50 : 0,
+                                    })
+                                }
+                            >
+                                +
+                            </button>
+                        </div>
 
-                        {item.productType === "peso" && (
-                            <div className="cart-qty">
-                                <button
-                                    className="btn-small"
-                                    onClick={() => decreaseQuantity(item)}
-                                >
-                                    -
-                                </button>
-
-                                <span>{item.weight} g</span>
-
-                                <button
-                                    className="btn-small"
-                                    onClick={() =>
-                                        addToCart(item, {
-                                            productType: "peso",
-                                            quantity: 0,
-                                            weight: 50,
-                                        })
-                                    }
-                                >
-                                    +
-                                </button>
-                            </div>
-                        )}
-
+                        {/* 🔥 Rimuovi sotto la quantità */}
                         <button
                             className="btn-remove"
                             onClick={() => removeFromCart(item)}
                         >
                             Rimuovi
                         </button>
+
                     </div>
                 </div>
             ))}

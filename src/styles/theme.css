@@ -151,7 +151,7 @@ body {
 }
 
 /* ============================
-   CARRELLO (VERSIONE DEFINITIVA)
+   CARRELLO — VERSIONE STABILE
 =========================== */
 .cart-container {
     padding: 15px;
@@ -188,25 +188,18 @@ body {
     flex-shrink: 0;
 }
 
-/* INFO PRODOTTO — GRIGLIA PERFETTA */
+/* INFO PRODOTTO — TUTTO IN COLONNA */
 .cart-info {
     flex: 1;
-    display: grid;
-    grid-template-columns: 1fr auto;
-    grid-template-rows: auto auto auto;
-    grid-template-areas:
-        "name name"
-        "price price"
-        "remove qty";
-    row-gap: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
 }
 
 /* DESCRIZIONE */
 .cart-name {
-    grid-area: name;
     font-size: 15px;
     font-weight: 600;
-    max-width: 78%;
     word-wrap: break-word;
     overflow-wrap: break-word;
 }
@@ -215,42 +208,41 @@ body {
 .cart-code {
     font-size: 10px;
     color: #777;
-    margin-top: 2px;
 }
 
 /* PREZZO */
 .cart-price {
-    grid-area: price;
     font-size: 16px;
     font-weight: bold;
     color: #28a745;
 }
 
-/* 🔥 RIMUOVI SOTTO IL PREZZO, A SINISTRA */
-.btn-remove {
-    grid-area: remove;
-    padding: 8px 14px;
-    font-size: 15px;
-    background: #dc3545;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    width: fit-content;
-}
-
-/* 🔥 QUANTITÀ A DESTRA DEL RIMUOVI */
+/* QUANTITÀ — RIGA DEDICATA */
 .cart-qty {
-    grid-area: qty;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
+    flex-wrap: nowrap;
 }
 
+/* PULSANTI + E - */
 .btn-small {
     padding: 4px 10px;
     font-size: 16px;
     background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+/* 🔥 RIMUOVI SOTTO LA QUANTITÀ */
+.btn-remove {
+    margin-top: 4px;
+    width: fit-content;
+    padding: 8px 14px;
+    font-size: 15px;
+    background: #dc3545;
     color: white;
     border: none;
     border-radius: 6px;
