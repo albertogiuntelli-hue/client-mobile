@@ -203,7 +203,10 @@ body {
     display: flex;
     align-items: center;
     gap: 10px;
-    white-space: nowrap;
+    flex-wrap: wrap;
+    /* 🔥 FIX overflow */
+    white-space: normal;
+    /* 🔥 FIX overflow */
 }
 
 .btn-small {
