@@ -169,6 +169,8 @@ body {
 
 .cart-item {
     display: flex;
+    flex-wrap: wrap;
+    /* 🔥 permette il riordino */
     gap: 10px;
     background: white;
     padding: 12px;
@@ -178,7 +180,7 @@ body {
     width: 100%;
 }
 
-/* FOTO RIDOTTA */
+/* FOTO */
 .cart-img {
     width: 65px;
     height: 65px;
@@ -186,19 +188,22 @@ body {
     background: #fff;
     border-radius: 8px;
     flex-shrink: 0;
+    order: 1;
 }
 
 /* INFO PRODOTTO */
 .cart-info {
     flex: 1;
     min-width: 0;
-    margin-bottom: 6px;
+    order: 2;
 }
 
-/* 🔥 DESCRIZIONE RIDOTTA (FIX PRINCIPALE) */
+/* 🔥 DESCRIZIONE NON DEBORDANTE */
 .cart-name {
-    font-size: 13px;
+    font-size: 15px;
     font-weight: 600;
+    max-width: 78%;
+    /* 🔥 evita che spinga a destra */
     word-wrap: break-word;
     overflow-wrap: break-word;
 }
@@ -210,36 +215,37 @@ body {
     margin-bottom: 4px;
 }
 
+/* PREZZO */
 .cart-price {
     font-size: 16px;
     font-weight: bold;
     color: #28a745;
+    order: 3;
 }
 
-/* FIX overflow + layout */
+/* 🔥 RIMUOVI SOTTO IL PREZZO, A SINISTRA DEL + */
+.btn-remove {
+    order: 4;
+    display: inline-block;
+    padding: 8px 14px;
+    font-size: 15px;
+    background: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+/* QUANTITÀ */
 .cart-qty {
     display: flex;
     align-items: center;
     gap: 8px;
     flex-wrap: wrap;
     white-space: normal;
+    order: 5;
 }
 
-/* RIMUOVI */
-.btn-remove {
-    display: block;
-    width: fit-content;
-    padding: 8px 14px;
-    font-size: 16px;
-    background: #dc3545;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    margin: 6px 0 0 0;
-}
-
-/* PULSANTI + E - */
 .btn-small {
     padding: 4px 10px;
     font-size: 16px;
