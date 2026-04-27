@@ -193,14 +193,27 @@ body {
     flex: 1;
     min-width: 0;
     margin-bottom: 6px;
-    /* spazio per il tasto rimuovi */
 }
 
-.cart-name,
-.cart-code,
-.cart-price {
+/* 🔥 DESCRIZIONE RIDOTTA (FIX PRINCIPALE) */
+.cart-name {
+    font-size: 13px;
+    font-weight: 600;
     word-wrap: break-word;
     overflow-wrap: break-word;
+}
+
+.cart-code {
+    font-size: 10px;
+    color: #777;
+    margin-top: 2px;
+    margin-bottom: 4px;
+}
+
+.cart-price {
+    font-size: 16px;
+    font-weight: bold;
+    color: #28a745;
 }
 
 /* FIX overflow + layout */
@@ -212,7 +225,7 @@ body {
     white-space: normal;
 }
 
-/* 🔥 RIMUOVI SPOSTATO SOTTO LA DESCRIZIONE */
+/* RIMUOVI */
 .btn-remove {
     display: block;
     width: fit-content;
@@ -224,7 +237,6 @@ body {
     border-radius: 6px;
     cursor: pointer;
     margin: 6px 0 0 0;
-    /* allineato a sinistra */
 }
 
 /* PULSANTI + E - */
