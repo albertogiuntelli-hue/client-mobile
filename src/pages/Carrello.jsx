@@ -15,7 +15,14 @@ export default function Carrello() {
     const navigate = useNavigate();
 
     if (items.length === 0) {
-        return <p className="empty-cart">Il carrello è vuoto.</p>;
+        return (
+            <div className="cart-container">
+                <button className="back-btn" onClick={() => navigate(-1)}>
+                    ← Torna indietro
+                </button>
+                <p className="empty-cart">Il carrello è vuoto.</p>
+            </div>
+        );
     }
 
     const getItemPrice = (item) => {
@@ -36,6 +43,12 @@ export default function Carrello() {
 
     return (
         <div className="cart-container">
+
+            {/* 🔙 Tasto torna indietro */}
+            <button className="back-btn" onClick={() => navigate(-1)}>
+                ← Torna indietro
+            </button>
+
             <h2>Carrello</h2>
 
             {items.map((item) => (
@@ -128,7 +141,8 @@ export default function Carrello() {
                 Procedi al checkout
             </button>
 
-            <button className="btn-cancel" onClick={clearCart}>
+            {/* 🔥 Tasto svuota carrello più grande */}
+            <button className="btn-cancel btn-big" onClick={clearCart}>
                 Svuota carrello
             </button>
         </div>

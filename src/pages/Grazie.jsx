@@ -1,6 +1,19 @@
+import { useNavigate } from "react-router-dom";
+import "../styles/theme.css";
+
 export default function Grazie() {
+    const navigate = useNavigate();
+
     return (
-        <div className="products-container" style={{ textAlign: "center", padding: "30px" }}>
+        <div
+            className="products-container"
+            style={{
+                textAlign: "center",
+                padding: "30px",
+                maxWidth: "480px",
+                margin: "0 auto",
+            }}
+        >
             <h1 className="page-title">Grazie per il tuo ordine!</h1>
 
             <p style={{ fontSize: "18px", marginTop: "20px" }}>
@@ -14,7 +27,7 @@ export default function Grazie() {
             <hr style={{ margin: "30px 0", opacity: 0.3 }} />
 
             <p style={{ fontSize: "16px", marginBottom: "10px" }}>
-                📄 Prima di chiudere, puoi visionare le
+                📄 Puoi anche visionare le
             </p>
 
             <a
@@ -29,9 +42,19 @@ export default function Grazie() {
                 Condizioni di vendita dell’app
             </a>
 
+            {/* 🔙 Tasto grande torna alla Home */}
+            <button
+                className="btn-home"
+                onClick={() => navigate("/")}
+            >
+                Torna alla Home
+            </button>
+
             <p style={{ marginTop: "30px", fontSize: "14px", opacity: 0.7 }}>
                 PlusMarket Giuntelli
             </p>
         </div>
     );
+}
+
 }

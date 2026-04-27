@@ -2,12 +2,13 @@ import { useState } from "react";
 import { useCart } from "../context/CartContext";
 import { createOrder } from "../api/orders";
 import { useNavigate } from "react-router-dom";
+import "../styles/theme.css";
 
 export default function Checkout() {
     const { items, total, clearCart } = useCart();
     const navigate = useNavigate();
 
-    // 🔥 Ripristina anagrafica salvata
+    // Ripristina anagrafica salvata
     const saved = JSON.parse(localStorage.getItem("cliente") || "{}");
 
     const [nome, setNome] = useState(saved.nome || "");
@@ -29,7 +30,6 @@ export default function Checkout() {
             note,
         };
 
-        // 🔥 Salva anagrafica
         localStorage.setItem("cliente", JSON.stringify(cliente));
 
         const ordine = {
@@ -55,8 +55,6 @@ export default function Checkout() {
     };
 
     const sendOrderWhatsApp = async () => {
-
-        // 🔥 VALIDAZIONE COMPLETA
         if (!nome.trim() || !cognome.trim() || !telefonoCliente.trim() || !indirizzo.trim()) {
             alert("Per favore compila Nome, Cognome, Telefono e Indirizzo.");
             return;
@@ -120,14 +118,20 @@ export default function Checkout() {
     };
 
     return (
-        <div className="products-container">
+        <div className="checkout-container">
+
+            {/* 🔙 Tasto torna indietro */}
+            <button className="back-btn" onClick={() => navigate(-1)}>
+                ← Torna indietro
+            </button>
+
             <h1 className="page-title">Checkout</h1>
 
             {items.length === 0 ? (
                 <p>Il carrello è vuoto.</p>
             ) : (
                 <>
-                    <div className="products-grid">
+                    <div className="checkout-summary">
                         {items.map((item) => {
                             const isPeso = item.a_peso === "S";
                             const prezzoUnit = item.prezzo;
@@ -137,22 +141,24 @@ export default function Checkout() {
                                 : item.quantity * prezzoUnit;
 
                             return (
-                                <div key={item.codice} className="product-card">
-                                    <h3 className="product-name">{item.nome}</h3>
-                                    <p className="product-price">
+                                <div key={item.codice} className="checkout-item">
+                                    <div className="item-name">{item.nome}</div>
+                                    <div className="item-qty">
+                                        {isPeso ? `${item.weight} g` : `${item.quantity} pz`}
+                                    </div>
+                                    <div className="item-price">
                                         {subtotal.toFixed(2).replace(".", ",")} €
-                                    </p>
-                                    <p className="product-code">
-                                        {isPeso
-                                            ? `Peso: ${item.weight} g`
-                                            : `Quantità: ${item.quantity} pz`}
-                                    </p>
+                                    </div>
                                 </div>
                             );
                         })}
+
+                        <div className="checkout-total">
+                            Totale: {total.toFixed(2).replace(".", ",")} €
+                        </div>
                     </div>
 
-                    <div style={{ marginTop: "20px", textAlign: "center" }}>
+                    <div className="checkout-form">
                         <input style={inputStyle} placeholder="Nome" value={nome} onChange={(e) => setNome(e.target.value)} />
                         <input style={inputStyle} placeholder="Cognome" value={cognome} onChange={(e) => setCognome(e.target.value)} />
                         <input style={inputStyle} placeholder="Telefono" value={telefonoCliente} onChange={(e) => setTelefonoCliente(e.target.value)} />
@@ -165,7 +171,7 @@ export default function Checkout() {
                         Invia ordine
                     </button>
 
-                    <button className="add-to-cart-btn" style={{ marginTop: "10px", backgroundColor: "#dc3545" }} onClick={clearCart}>
+                    <button className="btn-cancel btn-big" onClick={clearCart}>
                         Svuota carrello
                     </button>
                 </>
@@ -176,8 +182,7 @@ export default function Checkout() {
 
 const inputStyle = {
     padding: "10px",
-    width: "80%",
-    maxWidth: "400px",
+    width: "100%",
     borderRadius: "8px",
     border: "1px solid #ccc",
     marginBottom: "15px",
