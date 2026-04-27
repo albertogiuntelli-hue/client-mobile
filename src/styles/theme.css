@@ -178,7 +178,7 @@ body {
     width: 100%;
 }
 
-/* 🔥 FOTO RIDOTTA PER EVITARE DEBORDO */
+/* FOTO RIDOTTA */
 .cart-img {
     width: 65px;
     height: 65px;
@@ -188,9 +188,12 @@ body {
     flex-shrink: 0;
 }
 
+/* INFO PRODOTTO */
 .cart-info {
     flex: 1;
     min-width: 0;
+    margin-bottom: 6px;
+    /* spazio per il tasto rimuovi */
 }
 
 .cart-name,
@@ -200,7 +203,7 @@ body {
     overflow-wrap: break-word;
 }
 
-/* 🔥 FIX DEFINITIVO DEL DEBORDO */
+/* FIX overflow + layout */
 .cart-qty {
     display: flex;
     align-items: center;
@@ -209,22 +212,26 @@ body {
     white-space: normal;
 }
 
-/* 🔥 PULSANTI PIÙ COMPATTI */
-.btn-small {
-    padding: 4px 10px;
+/* 🔥 RIMUOVI SPOSTATO SOTTO LA DESCRIZIONE */
+.btn-remove {
+    display: block;
+    width: fit-content;
+    padding: 8px 14px;
     font-size: 16px;
-    background: #007bff;
+    background: #dc3545;
     color: white;
     border: none;
     border-radius: 6px;
     cursor: pointer;
+    margin: 6px 0 0 0;
+    /* allineato a sinistra */
 }
 
-.btn-remove {
-    margin-top: 8px;
-    padding: 8px 14px;
+/* PULSANTI + E - */
+.btn-small {
+    padding: 4px 10px;
     font-size: 16px;
-    background: #dc3545;
+    background: #007bff;
     color: white;
     border: none;
     border-radius: 6px;
