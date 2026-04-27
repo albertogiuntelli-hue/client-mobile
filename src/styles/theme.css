@@ -178,9 +178,10 @@ body {
     width: 100%;
 }
 
+/* 🔥 FOTO RIDOTTA PER EVITARE DEBORDO */
 .cart-img {
-    width: 80px;
-    height: 80px;
+    width: 65px;
+    height: 65px;
     object-fit: contain;
     background: #fff;
     border-radius: 8px;
@@ -199,19 +200,19 @@ body {
     overflow-wrap: break-word;
 }
 
+/* 🔥 FIX DEFINITIVO DEL DEBORDO */
 .cart-qty {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
     flex-wrap: wrap;
-    /* 🔥 FIX overflow */
     white-space: normal;
-    /* 🔥 FIX overflow */
 }
 
+/* 🔥 PULSANTI PIÙ COMPATTI */
 .btn-small {
-    padding: 6px 12px;
-    font-size: 18px;
+    padding: 4px 10px;
+    font-size: 16px;
     background: #007bff;
     color: white;
     border: none;
