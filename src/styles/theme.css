@@ -151,7 +151,7 @@ body {
 }
 
 /* ============================
-   CARRELLO
+   CARRELLO (VERSIONE DEFINITIVA)
 =========================== */
 .cart-container {
     padding: 15px;
@@ -169,8 +169,6 @@ body {
 
 .cart-item {
     display: flex;
-    flex-wrap: wrap;
-    /* 🔥 permette il riordino */
     gap: 10px;
     background: white;
     padding: 12px;
@@ -188,45 +186,49 @@ body {
     background: #fff;
     border-radius: 8px;
     flex-shrink: 0;
-    order: 1;
 }
 
-/* INFO PRODOTTO */
+/* INFO PRODOTTO — GRIGLIA PERFETTA */
 .cart-info {
     flex: 1;
-    min-width: 0;
-    order: 2;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-rows: auto auto auto;
+    grid-template-areas:
+        "name name"
+        "price price"
+        "remove qty";
+    row-gap: 6px;
 }
 
-/* 🔥 DESCRIZIONE NON DEBORDANTE */
+/* DESCRIZIONE */
 .cart-name {
+    grid-area: name;
     font-size: 15px;
     font-weight: 600;
     max-width: 78%;
-    /* 🔥 evita che spinga a destra */
     word-wrap: break-word;
     overflow-wrap: break-word;
 }
 
+/* CODICE */
 .cart-code {
     font-size: 10px;
     color: #777;
     margin-top: 2px;
-    margin-bottom: 4px;
 }
 
 /* PREZZO */
 .cart-price {
+    grid-area: price;
     font-size: 16px;
     font-weight: bold;
     color: #28a745;
-    order: 3;
 }
 
-/* 🔥 RIMUOVI SOTTO IL PREZZO, A SINISTRA DEL + */
+/* 🔥 RIMUOVI SOTTO IL PREZZO, A SINISTRA */
 .btn-remove {
-    order: 4;
-    display: inline-block;
+    grid-area: remove;
     padding: 8px 14px;
     font-size: 15px;
     background: #dc3545;
@@ -234,16 +236,15 @@ body {
     border: none;
     border-radius: 6px;
     cursor: pointer;
+    width: fit-content;
 }
 
-/* QUANTITÀ */
+/* 🔥 QUANTITÀ A DESTRA DEL RIMUOVI */
 .cart-qty {
+    grid-area: qty;
     display: flex;
     align-items: center;
     gap: 8px;
-    flex-wrap: wrap;
-    white-space: normal;
-    order: 5;
 }
 
 .btn-small {
@@ -256,6 +257,7 @@ body {
     cursor: pointer;
 }
 
+/* TOTALE */
 .cart-total {
     font-size: 20px;
     font-weight: bold;
