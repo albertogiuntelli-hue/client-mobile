@@ -3,11 +3,9 @@ import { BrowserRouter } from "react-router-dom";
 import App from "./App";
 import { CartProvider } from "./context/CartContext";
 import "./styles/theme.css";
-import { registerSW } from "virtual:pwa-register";
+import { registerSW } from "./registerSW";
 
-registerSW({
-  immediate: true,
-});
+registerSW();
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <CartProvider>
