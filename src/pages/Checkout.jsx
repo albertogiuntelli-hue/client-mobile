@@ -60,8 +60,10 @@ export default function Checkout() {
             return;
         }
 
-        if (telefonoCliente.replace(/\D/g, "").length < 7) {
-            alert("Inserisci un numero di telefono valido.");
+        // ✅ Validazione numero di telefono (solo cifre, 9-10 caratteri)
+        const telefonoPulito = telefonoCliente.replace(/\D/g, "");
+        if (telefonoPulito.length < 9 || telefonoPulito.length > 10) {
+            alert("Inserisci un numero di telefono valido (9-10 cifre).");
             return;
         }
 
