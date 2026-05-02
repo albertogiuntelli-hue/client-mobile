@@ -1,7 +1,13 @@
 import { triggerInstall } from "../installPrompt";
 
-export default function InstallBanner({ visible }) {
+export default function InstallBanner({ visible, onClose }) {
     if (!visible) return null;
+
+    const handleInstall = async () => {
+        console.log("Tentativo di installazione...");
+        const accepted = await triggerInstall();
+        console.log("Installazione accettata?", accepted);
+    };
 
     return (
         <div
@@ -20,12 +26,31 @@ export default function InstallBanner({ visible }) {
                 maxWidth: "350px"
             }}
         >
+            {/* Pulsante chiudi (opzionale, non rompe nulla) */}
+            {onClose && (
+                <button
+                    onClick={onClose}
+                    aria-label="Chiudi"
+                    style={{
+                        position: "absolute",
+                        top: "5px",
+                        right: "10px",
+                        background: "transparent",
+                        border: "none",
+                        fontSize: "18px",
+                        cursor: "pointer"
+                    }}
+                >
+                    ×
+                </button>
+            )}
+
             <p style={{ margin: 0, marginBottom: "10px", fontWeight: "bold" }}>
                 Installa l'app PlusMarket
             </p>
 
             <button
-                onClick={triggerInstall}
+                onClick={handleInstall}
                 style={{
                     padding: "10px 20px",
                     background: "#28a745",

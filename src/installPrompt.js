@@ -9,6 +9,7 @@ export function listenForInstallPrompt(onPromptReady) {
     listenerAdded = true;
 
     window.addEventListener("beforeinstallprompt", (e) => {
+        console.log("beforeinstallprompt intercettato");
         e.preventDefault();
         deferredPrompt = e;
         if (callback) callback();
@@ -16,12 +17,17 @@ export function listenForInstallPrompt(onPromptReady) {
 }
 
 export async function triggerInstall() {
-    if (!deferredPrompt) return false;
+    if (!deferredPrompt) {
+        console.log("Nessun prompt di installazione disponibile");
+        return false;
+    }
 
     deferredPrompt.prompt();
     const result = await deferredPrompt.userChoice;
 
     deferredPrompt = null;
+
+    console.log("Risultato installazione:", result.outcome);
 
     return result.outcome === "accepted";
 }

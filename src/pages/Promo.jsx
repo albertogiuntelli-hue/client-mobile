@@ -10,11 +10,25 @@ export default function Promo() {
     useEffect(() => {
         const fetchPromo = async () => {
             try {
-                const res = await api.get("/api/promo");
+                // 1️⃣ Carico le promo
+                const resPromo = await api.get("/api/promo");
 
-                const valid = res.data.filter(
-                    (p) => p.nome && p.nome.trim() !== ""
-                );
+                // 2️⃣ Carico le date del blocco promo
+                const resDate = await api.get("/api/promo/date");
+
+                const { data_inizio, data_fine } = resDate.data;
+
+                // 3️⃣ Converto le date in oggetti Date
+                const start = new Date(data_inizio);
+                const end = new Date(data_fine);
+                const today = new Date();
+
+                // 4️⃣ Filtro le promo valide
+                const valid = resPromo.data.filter((p) => {
+                    const hasName = p.nome && p.nome.trim() !== "";
+                    const inRange = today >= start && today <= end;
+                    return hasName && inRange;
+                });
 
                 setPromo(valid);
             } catch (error) {
