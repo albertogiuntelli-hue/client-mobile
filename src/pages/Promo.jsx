@@ -5,6 +5,8 @@ import "../styles/productlist.css";
 
 export default function Promo() {
     const [promo, setPromo] = useState([]);
+    const [dataInizio, setDataInizio] = useState(null);
+    const [dataFine, setDataFine] = useState(null);
     const { addToCart } = useCart();
 
     useEffect(() => {
@@ -14,9 +16,12 @@ export default function Promo() {
                 const resPromo = await api.get("/api/promo");
 
                 // 2️⃣ Carico le date del blocco promo
-                const resDate = await api.get("/api/promo/date");
+                const resDate = await api.get("/api/promo/dates");
 
                 const { data_inizio, data_fine } = resDate.data;
+
+                setDataInizio(data_inizio);
+                setDataFine(data_fine);
 
                 // 3️⃣ Converto le date in oggetti Date
                 const start = new Date(data_inizio);
@@ -25,7 +30,7 @@ export default function Promo() {
 
                 // 4️⃣ Filtro le promo valide
                 const valid = resPromo.data.filter((p) => {
-                    const hasName = p.nome && p.nome.trim() !== "";
+                    const hasName = p.descrizione || p.nome;
                     const inRange = today >= start && today <= end;
                     return hasName && inRange;
                 });
@@ -43,6 +48,23 @@ export default function Promo() {
         <div className="products-container">
             <h1 className="page-title">Offerte Speciali</h1>
 
+            {/* 🔥 Banner date promo */}
+            {dataInizio && dataFine && (
+                <p
+                    style={{
+                        background: "#f5f5f5",
+                        padding: "10px",
+                        borderRadius: "8px",
+                        fontSize: "16px",
+                        marginBottom: "20px",
+                        textAlign: "center",
+                    }}
+                >
+                    Offerte valide dal <strong>{dataInizio}</strong> al{" "}
+                    <strong>{dataFine}</strong>
+                </p>
+            )}
+
             {promo.length === 0 && <p>Nessuna promo disponibile</p>}
 
             <div className="product-grid">
@@ -54,11 +76,13 @@ export default function Promo() {
                         <div key={p.codice} className="product-card">
                             <img
                                 src={p.immagine || "/placeholder.png"}
-                                alt={p.nome}
+                                alt={p.descrizione || p.nome}
                                 className="product-image"
                             />
 
-                            <h3 className="product-name">{p.nome}</h3>
+                            <h3 className="product-name">
+                                {p.descrizione || p.nome}
+                            </h3>
 
                             <p className="product-code">Codice: {p.codice}</p>
 
