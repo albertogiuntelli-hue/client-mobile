@@ -22,7 +22,9 @@ export default function ProductList() {
         new URLSearchParams(window.location.search).get("promo") === "true";
 
     useEffect(() => {
-        api.get("/products")
+        const endpoint = isPromoPage ? "/promo" : "/products";
+
+        api.get(endpoint)
             .then((res) => {
                 setProducts(res.data);
                 setLoading(false);
@@ -31,7 +33,7 @@ export default function ProductList() {
                 console.error("Errore caricamento prodotti:", err);
                 setLoading(false);
             });
-    }, []);
+    }, [isPromoPage]);
 
     if (loading) {
         return <p style={{ padding: "20px" }}>Caricamento prodotti...</p>;
@@ -82,7 +84,7 @@ export default function ProductList() {
     }
 
     // 🔥 FILTRO RICERCA
-    const filteredBySearch = products.filter((p) => {
+    const filtered = products.filter((p) => {
         if (!search) return true;
 
         const name = normalize(p.nome);
@@ -100,11 +102,6 @@ export default function ProductList() {
         return false;
     });
 
-    // 🔥 FILTRO OFFERTE (solo se promo=true)
-    const finalList = isPromoPage
-        ? filteredBySearch.filter((p) => p.prezzoSco > 0)
-        : filteredBySearch;
-
     return (
         <div className="products-container">
             <button className="back-btn" onClick={() => navigate("/")}>
@@ -120,8 +117,9 @@ export default function ProductList() {
             />
 
             <div className="product-grid">
-                {finalList.map((product) => (
+                {filtered.map((product) => (
                     <div key={product.codice} className="product-card">
+
                         {/* 🔥 BADGE OFFERTA DIAGONALE */}
                         {isPromoPage && (
                             <span className="badge-offerta">OFFERTA</span>
@@ -141,7 +139,7 @@ export default function ProductList() {
                         </div>
 
                         <div className="product-price">
-                            € {isPromoPage ? product.prezzoSco : product.prezzo}
+                            € {product.prezzo}
                             {product.a_peso === "S" ? " / Kg" : ""}
                         </div>
 
