@@ -1,4 +1,6 @@
 import { Routes, Route } from "react-router-dom";
+import { useEffect, useState } from "react";
+
 import Home from "./pages/Home";
 import ProductPage from "./pages/ProductPage";
 import Carrello from "./pages/Carrello.jsx";
@@ -8,12 +10,28 @@ import ProductList from "./pages/ProductList";
 import Navbar from "./components/Navbar";
 import ChiSiamo from "./pages/ChiSiamo";
 import Grazie from "./pages/Grazie";
-import Conditions from "./pages/Conditions";   // ⭐ IMPORTANTE
+import Conditions from "./pages/Conditions";
+
+import { listenForInstallPrompt } from "./installPrompt";
 
 function App() {
+  const [showBanner, setShowBanner] = useState(false);
+
+  useEffect(() => {
+    // Quando arriva l'evento beforeinstallprompt → attiva il banner
+    listenForInstallPrompt(() => {
+      console.log("Evento beforeinstallprompt ricevuto → mostro banner");
+      setShowBanner(true);
+    });
+  }, []);
+
   return (
     <>
-      <InstallBanner />
+      <InstallBanner
+        visible={showBanner}
+        onClose={() => setShowBanner(false)}
+      />
+
       <Navbar />
 
       <Routes>
@@ -23,13 +41,8 @@ function App() {
         <Route path="/cart" element={<Carrello />} />
         <Route path="/checkout" element={<Checkout />} />
 
-        {/* 🔥 ROTTA CHI SIAMO */}
         <Route path="/chi-siamo" element={<ChiSiamo />} />
-
-        {/* 🔥 ROTTA GRAZIE */}
         <Route path="/grazie" element={<Grazie />} />
-
-        {/* ⭐ ROTTA CONDIZIONI DI VENDITA */}
         <Route path="/condizioni" element={<Conditions />} />
       </Routes>
     </>
