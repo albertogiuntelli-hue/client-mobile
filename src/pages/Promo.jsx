@@ -74,10 +74,14 @@ export default function Promo() {
 
                     return (
                         <div key={p.codice} className="product-card">
+
+                            {/* 🔥 BADGE DIAGONALE OFFERTA */}
+                            <span className="badge-offerta">OFFERTA</span>
+
                             <img
                                 src={p.immagine || "/placeholder.png"}
                                 alt={p.descrizione || p.nome}
-                                className="product-image"
+                                className="product-img"
                             />
 
                             <h3 className="product-name">
@@ -91,7 +95,7 @@ export default function Promo() {
                             </p>
 
                             <button
-                                className="btn-add"
+                                className="btn-primary"
                                 onClick={() => addToCart(p)}
                             >
                                 Aggiungi al carrello
