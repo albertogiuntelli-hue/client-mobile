@@ -1,13 +1,13 @@
-import { triggerInstall } from "../installPrompt";
+cimport { triggerInstall } from "../installPrompt";
 import { useEffect, useState } from "react";
 
 export default function InstallBanner({ visible, onClose }) {
     const [isWebView, setIsWebView] = useState(false);
+    const [installedMessage, setInstalledMessage] = useState(false);
 
     useEffect(() => {
         const ua = navigator.userAgent || navigator.vendor || window.opera;
 
-        // Rilevamento WebView di WhatsApp, Facebook, Instagram, Messenger
         const webviewDetected =
             ua.includes("FBAN") ||
             ua.includes("FBAV") ||
@@ -18,7 +18,7 @@ export default function InstallBanner({ visible, onClose }) {
         setIsWebView(webviewDetected);
     }, []);
 
-    // 🔥 Caso 1: Siamo in WebView → mostra avviso
+    // 🔥 Caso WebView → mostra avviso
     if (isWebView) {
         return (
             <div
@@ -59,13 +59,46 @@ export default function InstallBanner({ visible, onClose }) {
         );
     }
 
-    // 🔥 Caso 2: Browser vero → mostra banner installazione normale
+    // 🔥 Caso: messaggio "App installata"
+    if (installedMessage) {
+        return (
+            <div
+                style={{
+                    position: "fixed",
+                    bottom: "20px",
+                    left: "50%",
+                    transform: "translateX(-50%)",
+                    background: "#28a745",
+                    color: "#fff",
+                    padding: "15px 20px",
+                    borderRadius: "12px",
+                    boxShadow: "0 0 10px rgba(0,0,0,0.2)",
+                    zIndex: 9999,
+                    textAlign: "center",
+                    width: "90%",
+                    maxWidth: "350px",
+                    fontWeight: "bold"
+                }}
+            >
+                App installata ✔️
+            </div>
+        );
+    }
+
+    // 🔥 Caso: banner installazione normale
     if (!visible) return null;
 
     const handleInstall = async () => {
-        console.log("Tentativo di installazione...");
         const accepted = await triggerInstall();
-        console.log("Installazione accettata?", accepted);
+
+        // Chiudi banner
+        if (onClose) onClose();
+
+        // Mostra messaggio "App installata"
+        if (accepted) {
+            setInstalledMessage(true);
+            setTimeout(() => setInstalledMessage(false), 2000);
+        }
     };
 
     return (

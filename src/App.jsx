@@ -18,9 +18,7 @@ function App() {
   const [showBanner, setShowBanner] = useState(false);
 
   useEffect(() => {
-    // Quando arriva l'evento beforeinstallprompt → attiva il banner
     listenForInstallPrompt(() => {
-      console.log("Evento beforeinstallprompt ricevuto → mostro banner");
       setShowBanner(true);
     });
   }, []);
@@ -40,7 +38,6 @@ function App() {
         <Route path="/product/:codice" element={<ProductPage />} />
         <Route path="/cart" element={<Carrello />} />
         <Route path="/checkout" element={<Checkout />} />
-
         <Route path="/chi-siamo" element={<ChiSiamo />} />
         <Route path="/grazie" element={<Grazie />} />
         <Route path="/condizioni" element={<Conditions />} />
