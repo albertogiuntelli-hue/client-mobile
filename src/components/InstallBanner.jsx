@@ -1,4 +1,4 @@
-cimport { triggerInstall } from "../installPrompt";
+import { triggerInstall } from "../installPrompt";
 import { useEffect, useState } from "react";
 
 export default function InstallBanner({ visible, onClose }) {
@@ -18,7 +18,7 @@ export default function InstallBanner({ visible, onClose }) {
         setIsWebView(webviewDetected);
     }, []);
 
-    // 🔥 Caso WebView → mostra avviso
+    // Caso WebView
     if (isWebView) {
         return (
             <div
@@ -59,7 +59,7 @@ export default function InstallBanner({ visible, onClose }) {
         );
     }
 
-    // 🔥 Caso: messaggio "App installata"
+    // Messaggio "App installata"
     if (installedMessage) {
         return (
             <div
@@ -85,16 +85,13 @@ export default function InstallBanner({ visible, onClose }) {
         );
     }
 
-    // 🔥 Caso: banner installazione normale
     if (!visible) return null;
 
     const handleInstall = async () => {
         const accepted = await triggerInstall();
 
-        // Chiudi banner
         if (onClose) onClose();
 
-        // Mostra messaggio "App installata"
         if (accepted) {
             setInstalledMessage(true);
             setTimeout(() => setInstalledMessage(false), 2000);
