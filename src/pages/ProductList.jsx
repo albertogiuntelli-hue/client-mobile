@@ -17,16 +17,13 @@ export default function ProductList() {
     const { addToCart } = useCart();
     const navigate = useNavigate();
 
+    // 🔥 SE SIAMO NELLA PAGINA PROMO → TUTTI I PRODOTTI SONO PROMO
+    const isPromoPage = window.location.pathname.includes("promo");
+
     useEffect(() => {
         api.get("/products")
             .then((res) => {
-                // 🔥 Aggiungo flag isPromo se esiste prezzo_scontato
-                const prodotti = res.data.map((p) => ({
-                    ...p,
-                    isPromo: p.prezzo_scontato && p.prezzo_scontato > 0
-                }));
-
-                setProducts(prodotti);
+                setProducts(res.data);
                 setLoading(false);
             })
             .catch((err) => {
@@ -53,7 +50,6 @@ export default function ProductList() {
         setToast("Aggiunto al carrello!");
     };
 
-    // 🔥 NORMALIZZAZIONE TESTO
     const normalize = (str) =>
         str
             .toLowerCase()
@@ -62,7 +58,6 @@ export default function ProductList() {
             .normalize("NFD")
             .replace(/[\u0300-\u036f]/g, "");
 
-    // 🔥 LEVENSHTEIN (tolleranza errori)
     function levenshtein(a, b) {
         const matrix = [];
 
@@ -85,7 +80,6 @@ export default function ProductList() {
         return matrix[b.length][a.length];
     }
 
-    // 🔥 FILTRO PRODOTTI MIGLIORATO (fuzzy + abbreviazioni)
     const filtered = products.filter((p) => {
         if (!search) return true;
 
@@ -123,8 +117,8 @@ export default function ProductList() {
                 {filtered.map((product) => (
                     <div key={product.codice} className="product-card">
 
-                        {/* 🔥 BADGE OFFERTA */}
-                        {product.isPromo && (
+                        {/* 🔥 BADGE OFFERTA DIAGONALE */}
+                        {isPromoPage && (
                             <span className="badge-offerta">OFFERTA</span>
                         )}
 
@@ -141,22 +135,9 @@ export default function ProductList() {
                             Tipo: {product.a_peso === "S" ? "S (peso)" : "N (pezzo)"}
                         </div>
 
-                        {/* 🔥 PREZZO CON SCONTO */}
                         <div className="product-price">
-                            {product.isPromo ? (
-                                <>
-                                    <span className="old-price">€ {product.prezzo}</span>
-                                    <span className="new-price">
-                                        € {product.prezzo_scontato}
-                                        {product.a_peso === "S" ? " / Kg" : ""}
-                                    </span>
-                                </>
-                            ) : (
-                                <>
-                                    € {product.prezzo}
-                                    {product.a_peso === "S" ? " / Kg" : ""}
-                                </>
-                            )}
+                            € {product.prezzo}
+                            {product.a_peso === "S" ? " / Kg" : ""}
                         </div>
 
                         {product.a_peso === "S" ? (
