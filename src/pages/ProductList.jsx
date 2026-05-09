@@ -20,7 +20,13 @@ export default function ProductList() {
     useEffect(() => {
         api.get("/products")
             .then((res) => {
-                setProducts(res.data);
+                // 🔥 Aggiungo flag isPromo se esiste prezzo_scontato
+                const prodotti = res.data.map((p) => ({
+                    ...p,
+                    isPromo: p.prezzo_scontato && p.prezzo_scontato > 0
+                }));
+
+                setProducts(prodotti);
                 setLoading(false);
             })
             .catch((err) => {
@@ -86,17 +92,13 @@ export default function ProductList() {
         const name = normalize(p.nome);
         const term = normalize(search);
 
-        // match diretto
         if (name.includes(term)) return true;
 
-        // fuzzy match (tolleranza 3 errori)
         const distance = levenshtein(name, term);
         if (distance <= 3) return true;
 
-        // match per prefisso (es: "prosc" ≈ "prosciutto")
         if (term.length > 4 && name.startsWith(term.slice(0, 4))) return true;
 
-        // match inverso (es: "prosciutto" ≈ "prosc")
         if (name.length > 4 && term.startsWith(name.slice(0, 4))) return true;
 
         return false;
@@ -121,6 +123,11 @@ export default function ProductList() {
                 {filtered.map((product) => (
                     <div key={product.codice} className="product-card">
 
+                        {/* 🔥 BADGE OFFERTA */}
+                        {product.isPromo && (
+                            <span className="badge-offerta">OFFERTA</span>
+                        )}
+
                         <img
                             src={product.immagine || "/placeholder.png"}
                             alt={product.nome}
@@ -134,9 +141,22 @@ export default function ProductList() {
                             Tipo: {product.a_peso === "S" ? "S (peso)" : "N (pezzo)"}
                         </div>
 
+                        {/* 🔥 PREZZO CON SCONTO */}
                         <div className="product-price">
-                            € {product.prezzo}
-                            {product.a_peso === "S" ? " / Kg" : ""}
+                            {product.isPromo ? (
+                                <>
+                                    <span className="old-price">€ {product.prezzo}</span>
+                                    <span className="new-price">
+                                        € {product.prezzo_scontato}
+                                        {product.a_peso === "S" ? " / Kg" : ""}
+                                    </span>
+                                </>
+                            ) : (
+                                <>
+                                    € {product.prezzo}
+                                    {product.a_peso === "S" ? " / Kg" : ""}
+                                </>
+                            )}
                         </div>
 
                         {product.a_peso === "S" ? (
