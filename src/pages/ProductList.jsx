@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import api from "../api/axios";
 import { useCart } from "../context/CartContext";
 import PopupPeso from "../components/PopupPeso";
 import Toast from "../components/Toast";
@@ -22,11 +21,14 @@ export default function ProductList() {
         new URLSearchParams(window.location.search).get("promo") === "true";
 
     useEffect(() => {
-        const endpoint = isPromoPage ? "/promo" : "/products";
+        const endpoint = isPromoPage
+            ? "https://backend-nuova-production.up.railway.app/api/promo"
+            : "https://backend-nuova-production.up.railway.app/api/prodotti";
 
-        api.get(endpoint)
-            .then((res) => {
-                setProducts(res.data);
+        fetch(endpoint)
+            .then((res) => res.json())
+            .then((data) => {
+                setProducts(data);
                 setLoading(false);
             })
             .catch((err) => {
