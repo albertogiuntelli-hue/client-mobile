@@ -1,108 +1,64 @@
-import React, { useEffect, useState } from "react";
-import api from "../api/axios";
-import { useCart } from "../context/CartContext";
-import "../styles/productlist.css";
+import { useEffect, useState } from "react";
+import axios from "../api/axios";
+import "./Promo.css";
 
 export default function Promo() {
     const [promo, setPromo] = useState([]);
-    const [dataInizio, setDataInizio] = useState(null);
-    const [dataFine, setDataFine] = useState(null);
-    const { addToCart } = useCart();
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const fetchPromo = async () => {
+        const loadPromo = async () => {
             try {
-                // 1️⃣ Carico le promo
-                const resPromo = await api.get("/api/promo");
+                const res = await axios.get("/promo");
+                const data = res.data || [];
 
-                // 2️⃣ Carico le date del blocco promo
-                const resDate = await api.get("/api/promo/dates");
+                // 🔥 PARSING CORRETTO PER IL FORMATO DEL BACKEND
+                const parsed = data.map((row) => {
+                    const raw = Object.values(row)[0]; // prende la stringa intera
+                    const parts = raw.split(",");
 
-                const { data_inizio, data_fine } = resDate.data;
-
-                setDataInizio(data_inizio);
-                setDataFine(data_fine);
-
-                // 3️⃣ Converto le date in oggetti Date
-                const start = new Date(data_inizio);
-                const end = new Date(data_fine);
-                const today = new Date();
-
-                // 4️⃣ Filtro le promo valide
-                const valid = resPromo.data.filter((p) => {
-                    const hasName = p.descrizione || p.nome;
-                    const inRange = today >= start && today <= end;
-                    return hasName && inRange;
+                    return {
+                        codice: parts[0]?.trim(),
+                        nome: parts[1]?.trim(),
+                        prezzo: parts[2]?.trim(),
+                        a_peso: parts[3]?.trim(),
+                        immagine: parts[4]?.trim(),
+                    };
                 });
 
-                setPromo(valid);
-            } catch (error) {
-                console.error("Errore caricamento promo:", error);
+                setPromo(parsed);
+            } catch (err) {
+                console.error("Errore caricamento promo:", err);
             }
+            setLoading(false);
         };
 
-        fetchPromo();
+        loadPromo();
     }, []);
 
+    if (loading) return <h2 style={{ textAlign: "center" }}>Caricamento promo...</h2>;
+
     return (
-        <div className="products-container">
-            <h1 className="page-title">Offerte Speciali</h1>
+        <div className="promo-container">
+            <h2 className="promo-title">Offerte Speciali</h2>
 
-            {/* 🔥 Banner date promo */}
-            {dataInizio && dataFine && (
-                <p
-                    style={{
-                        background: "#f5f5f5",
-                        padding: "10px",
-                        borderRadius: "8px",
-                        fontSize: "16px",
-                        marginBottom: "20px",
-                        textAlign: "center",
-                    }}
-                >
-                    Offerte valide dal <strong>{dataInizio}</strong> al{" "}
-                    <strong>{dataFine}</strong>
-                </p>
-            )}
+            <div className="promo-grid">
+                {promo.map((p, index) => (
+                    <div key={index} className="promo-card">
+                        <img
+                            src={p.immagine || "/placeholder.png"}
+                            alt={p.nome}
+                            className="promo-image"
+                        />
 
-            {promo.length === 0 && <p>Nessuna promo disponibile</p>}
-
-            <div className="product-grid">
-                {promo.map((p) => {
-                    const prezzoFinale =
-                        p.prezzoSco > 0 ? p.prezzoSco : p.prezzo;
-
-                    return (
-                        <div key={p.codice} className="product-card">
-
-                            {/* 🔥 BADGE DIAGONALE OFFERTA */}
-                            <span className="badge-offerta">OFFERTA</span>
-
-                            <img
-                                src={p.immagine || "/placeholder.png"}
-                                alt={p.descrizione || p.nome}
-                                className="product-img"
-                            />
-
-                            <h3 className="product-name">
-                                {p.descrizione || p.nome}
-                            </h3>
-
-                            <p className="product-code">Codice: {p.codice}</p>
-
-                            <p className="product-price">
-                                € {prezzoFinale.toFixed(2)}
+                        <div className="promo-info">
+                            <h3 className="promo-name">{p.nome}</h3>
+                            <p className="promo-price">
+                                {p.prezzo ? Number(p.prezzo).toFixed(2) + " €" : "—"}
                             </p>
-
-                            <button
-                                className="btn-primary"
-                                onClick={() => addToCart(p)}
-                            >
-                                Aggiungi al carrello
-                            </button>
                         </div>
-                    );
-                })}
+                    </div>
+                ))}
             </div>
         </div>
     );
