@@ -16,14 +16,13 @@ export default function ProductList() {
     const { addToCart } = useCart();
     const navigate = useNavigate();
 
-    // 🔥 Modalità offerte attiva se arrivo da /prodotti?promo=true
     const isPromoPage =
         new URLSearchParams(window.location.search).get("promo") === "true";
 
     useEffect(() => {
         const endpoint = isPromoPage
             ? "https://backend-nuova-production.up.railway.app/api/promo"
-            : "https://backend-nuova-production.up.railway.app/api/prodotti";
+            : "https://backend-nuova-production.up.railway.app/api/products";
 
         fetch(endpoint)
             .then((res) => res.json())
@@ -85,11 +84,10 @@ export default function ProductList() {
         return matrix[b.length][a.length];
     }
 
-    // 🔥 FILTRO RICERCA
     const filtered = products.filter((p) => {
         if (!search) return true;
 
-        const name = normalize(p.nome);
+        const name = normalize(p.nome || "");
         const term = normalize(search);
 
         if (name.includes(term)) return true;
@@ -122,7 +120,6 @@ export default function ProductList() {
                 {filtered.map((product) => (
                     <div key={product.codice} className="product-card">
 
-                        {/* 🔥 BADGE OFFERTA DIAGONALE */}
                         {isPromoPage && (
                             <span className="badge-offerta">OFFERTA</span>
                         )}
@@ -137,15 +134,15 @@ export default function ProductList() {
                         <div className="product-code">Cod: {product.codice}</div>
 
                         <div className="product-type">
-                            Tipo: {product.a_peso === "S" ? "S (peso)" : "N (pezzo)"}
+                            Tipo: {product.categoria === "S" ? "S (peso)" : "N (pezzo)"}
                         </div>
 
                         <div className="product-price">
                             € {product.prezzo}
-                            {product.a_peso === "S" ? " / Kg" : ""}
+                            {product.categoria === "S" ? " / Kg" : ""}
                         </div>
 
-                        {product.a_peso === "S" ? (
+                        {product.categoria === "S" ? (
                             <button
                                 className="btn-primary"
                                 onClick={() => setPopupProduct(product)}
