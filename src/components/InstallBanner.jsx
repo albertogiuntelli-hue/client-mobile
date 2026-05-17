@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 
 export default function InstallBanner({ visible, onClose }) {
     const [isWebView, setIsWebView] = useState(false);
+    const [isIOS, setIsIOS] = useState(false);
     const [installedMessage, setInstalledMessage] = useState(false);
 
     useEffect(() => {
@@ -16,9 +17,14 @@ export default function InstallBanner({ visible, onClose }) {
             ua.includes("Messenger");
 
         setIsWebView(webviewDetected);
+
+        const iOS =
+            /iPhone|iPad|iPod/i.test(ua) &&
+            !window.MSStream;
+
+        setIsIOS(iOS);
     }, []);
 
-    // Caso WebView
     if (isWebView) {
         return (
             <div
@@ -59,7 +65,54 @@ export default function InstallBanner({ visible, onClose }) {
         );
     }
 
-    // Messaggio "App installata"
+    if (isIOS && visible) {
+        return (
+            <div
+                style={{
+                    position: "fixed",
+                    bottom: "20px",
+                    left: "50%",
+                    transform: "translateX(-50%)",
+                    background: "#ffffff",
+                    padding: "15px 20px",
+                    borderRadius: "12px",
+                    boxShadow: "0 0 10px rgba(0,0,0,0.2)",
+                    zIndex: 9999,
+                    textAlign: "center",
+                    width: "90%",
+                    maxWidth: "350px"
+                }}
+            >
+                {onClose && (
+                    <button
+                        onClick={onClose}
+                        aria-label="Chiudi"
+                        style={{
+                            position: "absolute",
+                            top: "5px",
+                            right: "10px",
+                            background: "transparent",
+                            border: "none",
+                            fontSize: "18px",
+                            cursor: "pointer"
+                        }}
+                    >
+                        ×
+                    </button>
+                )}
+
+                <p style={{ margin: 0, marginBottom: "10px", fontWeight: "bold" }}>
+                    Installa l’app su iPhone
+                </p>
+
+                <p style={{ margin: 0, fontSize: "14px" }}>
+                    Tocca il pulsante <b>Condividi</b> e poi
+                    <b>Aggiungi alla schermata Home</b>.
+                </p>
+            </div>
+        );
+    }
+
     if (installedMessage) {
         return (
             <div

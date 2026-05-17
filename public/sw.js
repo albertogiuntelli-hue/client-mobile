@@ -1,56 +1,23 @@
-// Nome della cache (incrementato per forzare aggiornamento)
-const CACHE_NAME = "plusmarket-cache-v2";
+// Service Worker SEMPRE aggiornato
 
-// File da mettere subito in cache
-const ASSETS_TO_CACHE = [
-    "/",
-    "/index.html",
-    "/manifest.json",
-    "/icon-192.png",
-    "/icon-512.png"
-];
-
-// Installazione SW → cache iniziale
 self.addEventListener("install", (event) => {
+    // Forza installazione immediata
     self.skipWaiting();
-    event.waitUntil(
-        caches.open(CACHE_NAME).then((cache) => {
-            return cache.addAll(ASSETS_TO_CACHE);
-        })
-    );
 });
 
-// Attivazione SW → pulizia cache vecchie
 self.addEventListener("activate", (event) => {
+    // Cancella TUTTE le cache esistenti
     event.waitUntil(
         caches.keys().then((keys) =>
-            Promise.all(
-                keys
-                    .filter((key) => key !== CACHE_NAME)
-                    .map((key) => caches.delete(key))
-            )
+            Promise.all(keys.map((key) => caches.delete(key)))
         )
     );
+
+    // Prende subito il controllo delle pagine aperte
     self.clients.claim();
 });
 
-// Strategia: Network first, fallback cache
+// Nessuna cache dei file JS/CSS/HTML → sempre aggiornati
 self.addEventListener("fetch", (event) => {
-    if (!event.request.url.startsWith(self.location.origin)) return;
-
-    event.respondWith(
-        fetch(event.request)
-            .then((response) => {
-                const cloned = response.clone();
-                caches.open(CACHE_NAME).then((cache) => {
-                    cache.put(event.request, cloned);
-                });
-                return response;
-            })
-            .catch(() => {
-                return caches.match(event.request).then((cached) => {
-                    return cached || caches.match("/index.html");
-                });
-            })
-    );
+    event.respondWith(fetch(event.request));
 });
