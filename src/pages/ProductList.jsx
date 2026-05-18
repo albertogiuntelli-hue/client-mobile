@@ -102,6 +102,16 @@ export default function ProductList() {
         return false;
     });
 
+    const getImage = (img) => {
+        if (!img || img.trim() === "") return "/plusmarket-logo.png";
+        return img;
+    };
+
+    const isPeso = (product) => {
+        if (isPromoPage) return false;
+        return product.a_peso === "S";
+    };
+
     return (
         <div className="products-container">
             <button className="back-btn" onClick={() => navigate("/")}>
@@ -125,7 +135,7 @@ export default function ProductList() {
                         )}
 
                         <img
-                            src={product.immagine || "/placeholder.png"}
+                            src={getImage(product.immagine)}
                             alt={product.nome}
                             className="product-img"
                         />
@@ -133,16 +143,18 @@ export default function ProductList() {
                         <div className="product-name">{product.nome}</div>
                         <div className="product-code">Cod: {product.codice}</div>
 
-                        <div className="product-type">
-                            Tipo: {product.categoria === "S" ? "S (peso)" : "N (pezzo)"}
-                        </div>
+                        {!isPromoPage && (
+                            <div className="product-type">
+                                Tipo: {isPeso(product) ? "Peso" : "Pezzo"}
+                            </div>
+                        )}
 
                         <div className="product-price">
                             € {product.prezzo}
-                            {product.categoria === "S" ? " / Kg" : ""}
+                            {isPeso(product) ? " / Kg" : ""}
                         </div>
 
-                        {product.categoria === "S" ? (
+                        {isPeso(product) ? (
                             <button
                                 className="btn-primary"
                                 onClick={() => setPopupProduct(product)}
