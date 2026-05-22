@@ -40,18 +40,26 @@ export default function ProductList() {
         return <p style={{ padding: "20px" }}>Caricamento prodotti...</p>;
     }
 
-    const handleAddWeight = (product, grams) => {
-        const peso = Number(grams);
-        if (!peso || peso <= 0) return;
+    const getImage = (img) => {
+        if (!isPromoPage) {
+            // I PRODOTTI NORMALI NON DEVONO AVERE IMMAGINI
+            return "/logo.png";
+        }
 
-        addToCart(product, {
-            productType: "peso",
-            quantity: 0,
-            weight: peso,
-        });
+        if (!img || img.trim() === "") {
+            return "/logo.png";
+        }
 
-        setPopupProduct(null);
-        setToast("Aggiunto al carrello!");
+        if (img.startsWith("http")) {
+            return img;
+        }
+
+        return `https://backend-nuova-production.up.railway.app/api/images/${img}`;
+    };
+
+    const isPeso = (product) => {
+        if (isPromoPage) return false;
+        return product.a_peso === "S";
     };
 
     const normalize = (str) =>
@@ -64,7 +72,6 @@ export default function ProductList() {
 
     function levenshtein(a, b) {
         const matrix = [];
-
         for (let i = 0; i <= b.length; i++) matrix[i] = [i];
         for (let j = 0; j <= a.length; j++) matrix[0][j] = j;
 
@@ -101,16 +108,6 @@ export default function ProductList() {
 
         return false;
     });
-
-    const getImage = (img) => {
-        if (!img || img.trim() === "") return "/plusmarket-logo.png";
-        return img;
-    };
-
-    const isPeso = (product) => {
-        if (isPromoPage) return false;
-        return product.a_peso === "S";
-    };
 
     return (
         <div className="products-container">

@@ -14,6 +14,18 @@ export default function Carrello() {
 
     const navigate = useNavigate();
 
+    const getImage = (img) => {
+        if (!img || img.trim() === "") {
+            return "/logo.png";
+        }
+
+        if (img.startsWith("http")) {
+            return img;
+        }
+
+        return `https://backend-nuova-production.up.railway.app/api/images/${img}`;
+    };
+
     if (items.length === 0) {
         return (
             <div className="cart-container">
@@ -44,7 +56,6 @@ export default function Carrello() {
     return (
         <div className="cart-container">
 
-            {/* 🔙 Tasto torna indietro */}
             <button className="back-btn" onClick={() => navigate(-1)}>
                 ← Torna indietro
             </button>
@@ -55,25 +66,21 @@ export default function Carrello() {
                 <div key={item.codice} className="cart-item">
 
                     <img
-                        src={item.immagine || "/placeholder.png"}
+                        src={getImage(item.immagine)}
                         alt={item.nome}
                         className="cart-img"
                     />
 
                     <div className="cart-info">
 
-                        {/* Nome prodotto */}
                         <div className="cart-name">{item.nome}</div>
 
-                        {/* Codice */}
                         <div className="cart-code">Cod: {item.codice}</div>
 
-                        {/* Prezzo */}
                         <div className="cart-price">
                             Prezzo: € {getItemPrice(item)}
                         </div>
 
-                        {/* Quantità */}
                         <div className="cart-qty">
                             <button
                                 className="btn-small"
@@ -102,7 +109,6 @@ export default function Carrello() {
                             </button>
                         </div>
 
-                        {/* 🔥 Rimuovi sotto la quantità */}
                         <button
                             className="btn-remove"
                             onClick={() => removeFromCart(item)}
@@ -125,7 +131,6 @@ export default function Carrello() {
                 Procedi al checkout
             </button>
 
-            {/* 🔥 Tasto svuota carrello più grande */}
             <button className="btn-cancel btn-big" onClick={clearCart}>
                 Svuota carrello
             </button>
