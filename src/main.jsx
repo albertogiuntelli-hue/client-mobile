@@ -3,9 +3,8 @@ import { BrowserRouter } from "react-router-dom";
 import App from "./App";
 import { CartProvider } from "./context/CartContext";
 import "./styles/theme.css";
-import { registerSW } from "./registerSW";
 
-registerSW();
+// ❌ registerSW rimosso per evitare cache PWA bloccata
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <CartProvider>
