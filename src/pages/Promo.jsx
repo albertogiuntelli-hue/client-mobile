@@ -15,7 +15,7 @@ export default function Promo() {
                 const parsed = data.map((row) => ({
                     codice: row.codice,
                     nome: row.descrizione,
-                    prezzo: row.prezzo,
+                    prezzo: row.prezzo, // EURO
                     immagine: row.immagine,
                 }));
 
@@ -29,12 +29,13 @@ export default function Promo() {
         loadPromo();
     }, []);
 
-    // ✔ PREZZO IN EURO (NESSUN /100)
+    // 🔥 FORMATO EURO CORRETTO
     const formatPrice = (value) => {
         if (value === null || value === undefined || value === "" || isNaN(value)) {
             return "—";
         }
-        return Number(value).toFixed(2) + " €";
+
+        return Number(value).toFixed(2).replace(".", ",") + " €";
     };
 
     if (loading) return <h2 style={{ textAlign: "center" }}>Caricamento promo...</h2>;
