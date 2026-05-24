@@ -37,9 +37,12 @@ export default function Carrello() {
         );
     }
 
+    // ✔ PREZZO IN CENTESIMI → EURO
     const getItemPrice = (item) => {
-        const prezzoUnitario =
+        const prezzoUnitarioCentesimi =
             item.prezzo_scontato > 0 ? item.prezzo_scontato : item.prezzo;
+
+        const prezzoUnitario = prezzoUnitarioCentesimi / 100;
 
         if (item.productType === "pezzi") {
             return (prezzoUnitario * item.quantity).toFixed(2);
@@ -120,8 +123,9 @@ export default function Carrello() {
                 </div>
             ))}
 
+            {/* ✔ TOTALE CORRETTO (centesimi → euro) */}
             <div className="cart-total">
-                Totale: € {total.toFixed(2)}
+                Totale: € {(total / 100).toFixed(2)}
             </div>
 
             <button

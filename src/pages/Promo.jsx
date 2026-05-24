@@ -36,6 +36,12 @@ export default function Promo() {
         loadPromo();
     }, []);
 
+    // ✔ CORRETTO: PREZZO IN CENTESIMI → EURO
+    const formatPrice = (value) => {
+        if (!value || isNaN(value)) return "—";
+        return (Number(value) / 100).toFixed(2) + " €";
+    };
+
     if (loading) return <h2 style={{ textAlign: "center" }}>Caricamento promo...</h2>;
 
     return (
@@ -53,9 +59,9 @@ export default function Promo() {
 
                         <div className="promo-info">
                             <h3 className="promo-name">{p.nome}</h3>
-                            <p className="promo-price">
-                                {p.prezzo ? Number(p.prezzo).toFixed(2) + " €" : "—"}
-                            </p>
+
+                            {/* ✔ PREZZO CORRETTO */}
+                            <p className="promo-price">{formatPrice(p.prezzo)}</p>
                         </div>
                     </div>
                 ))}

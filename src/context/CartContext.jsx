@@ -21,7 +21,6 @@ export function CartProvider({ children }) {
             weight = 0,
         } = options;
 
-        // Normalizzazione numerica sicura
         const qty = parseFloat(String(quantity).replace(",", ".").trim()) || 0;
         const wgt = parseFloat(String(weight).replace(",", ".").trim()) || 0;
 
@@ -47,8 +46,8 @@ export function CartProvider({ children }) {
                 ...prev,
                 {
                     ...product,
-                    a_peso: product.a_peso,   // S/N
-                    productType,              // "peso" o "pezzi"
+                    a_peso: product.a_peso,
+                    productType,
                     quantity: qty,
                     weight: wgt,
                 },
@@ -99,19 +98,20 @@ export function CartProvider({ children }) {
         localStorage.removeItem("cart");
     };
 
+    // ✔ TOTALE IN CENTESIMI (corretto)
     const total = items.reduce((sum, item) => {
-        const prezzoUnitario =
+        const prezzoUnitarioCentesimi =
             item.prezzo_scontato > 0 ? item.prezzo_scontato : item.prezzo;
 
         const qty = parseFloat(String(item.quantity).replace(",", ".").trim()) || 0;
         const wgt = parseFloat(String(item.weight).replace(",", ".").trim()) || 0;
 
         if (item.productType === "pezzi") {
-            return sum + prezzoUnitario * qty;
+            return sum + prezzoUnitarioCentesimi * qty;
         }
 
         if (item.productType === "peso") {
-            return sum + (wgt / 1000) * prezzoUnitario;
+            return sum + (wgt / 1000) * prezzoUnitarioCentesimi;
         }
 
         return sum;
@@ -125,7 +125,7 @@ export function CartProvider({ children }) {
                 decreaseQuantity,
                 removeFromCart,
                 clearCart,
-                total,
+                total, // sempre in centesimi
             }}
         >
             {children}
