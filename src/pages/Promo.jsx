@@ -12,19 +12,12 @@ export default function Promo() {
                 const res = await axios.get("/promo");
                 const data = res.data || [];
 
-                // 🔥 PARSING CORRETTO PER IL FORMATO DEL BACKEND
-                const parsed = data.map((row) => {
-                    const raw = Object.values(row)[0]; // prende la stringa intera
-                    const parts = raw.split(",");
-
-                    return {
-                        codice: parts[0]?.trim(),
-                        nome: parts[1]?.trim(),
-                        prezzo: parts[2]?.trim(),
-                        a_peso: parts[3]?.trim(),
-                        immagine: parts[4]?.trim(),
-                    };
-                });
+                const parsed = data.map((row) => ({
+                    codice: row.codice,
+                    nome: row.descrizione,
+                    prezzo: row.prezzo,
+                    immagine: row.immagine,
+                }));
 
                 setPromo(parsed);
             } catch (err) {
@@ -36,10 +29,12 @@ export default function Promo() {
         loadPromo();
     }, []);
 
-    // ✔ CORRETTO: PREZZO IN CENTESIMI → EURO
+    // ✔ PREZZO IN EURO (NESSUN /100)
     const formatPrice = (value) => {
-        if (!value || isNaN(value)) return "—";
-        return (Number(value) / 100).toFixed(2) + " €";
+        if (value === null || value === undefined || value === "" || isNaN(value)) {
+            return "—";
+        }
+        return Number(value).toFixed(2) + " €";
     };
 
     if (loading) return <h2 style={{ textAlign: "center" }}>Caricamento promo...</h2>;
@@ -59,8 +54,6 @@ export default function Promo() {
 
                         <div className="promo-info">
                             <h3 className="promo-name">{p.nome}</h3>
-
-                            {/* ✔ PREZZO CORRETTO */}
                             <p className="promo-price">{formatPrice(p.prezzo)}</p>
                         </div>
                     </div>
