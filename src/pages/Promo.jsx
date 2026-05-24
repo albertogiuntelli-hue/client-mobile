@@ -12,6 +12,7 @@ export default function Promo() {
                 const res = await axios.get("/promo");
                 const data = res.data || [];
 
+                // 🔥 Promo già in EURO dal backend
                 const parsed = data.map((row) => ({
                     codice: row.codice,
                     nome: row.descrizione,
@@ -29,13 +30,15 @@ export default function Promo() {
         loadPromo();
     }, []);
 
-    // 🔥 FORMATO EURO CORRETTO
+    // 🔥 FORMATO EURO CORRETTO (con virgola)
     const formatPrice = (value) => {
         if (value === null || value === undefined || value === "" || isNaN(value)) {
             return "—";
         }
 
-        return Number(value).toFixed(2).replace(".", ",") + " €";
+        return Number(value)
+            .toFixed(2)
+            .replace(".", ",") + " €";
     };
 
     if (loading) return <h2 style={{ textAlign: "center" }}>Caricamento promo...</h2>;
