@@ -10,7 +10,7 @@ export default function Home() {
             <img src={logo} alt="PlusMarket Giuntelli" className="home-logo" />
 
             <div className="home-buttons">
-                {/* 🔥 Bottone offerte → aggiunto ?promo=true */}
+                {/* 🔥 Bottone offerte → usa query promo=true */}
                 <button
                     className="home-btn"
                     onClick={() => navigate("/prodotti?promo=true")}

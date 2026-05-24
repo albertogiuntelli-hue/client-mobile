@@ -27,7 +27,7 @@ export default function ProductList() {
         fetch(endpoint)
             .then((res) => res.json())
             .then((data) => {
-                setProducts(data);
+                setProducts(data || []);
                 setLoading(false);
             })
             .catch((err) => {
@@ -40,28 +40,32 @@ export default function ProductList() {
         return <p style={{ padding: "20px" }}>Caricamento prodotti...</p>;
     }
 
+    /* ============================================================
+       IMMAGINI
+    ============================================================ */
     const getImage = (img) => {
         if (!isPromoPage) {
-            // I PRODOTTI NORMALI NON DEVONO AVERE IMMAGINI
-            return "/logo.png";
+            return "/logo.png"; // prodotti normali → nessuna immagine
         }
 
-        if (!img || img.trim() === "") {
-            return "/logo.png";
-        }
+        if (!img || img.trim() === "") return "/logo.png";
 
-        if (img.startsWith("http")) {
-            return img;
-        }
+        if (img.startsWith("http")) return img;
 
         return `https://backend-nuova-production.up.railway.app/api/images/${img}`;
     };
 
+    /* ============================================================
+       TIPO PRODOTTO (peso / pezzo)
+    ============================================================ */
     const isPeso = (product) => {
         if (isPromoPage) return false;
         return product.a_peso === "S";
     };
 
+    /* ============================================================
+       RICERCA FUZZY
+    ============================================================ */
     const normalize = (str) =>
         str
             .toLowerCase()
@@ -109,6 +113,26 @@ export default function ProductList() {
         return false;
     });
 
+    /* ============================================================
+       AGGIUNTA PRODOTTO A PESO
+    ============================================================ */
+    const handleAddWeight = (product, grams) => {
+        const peso = Number(grams);
+        if (!peso || peso <= 0) return;
+
+        addToCart(product, {
+            productType: "peso",
+            quantity: 0,
+            weight: peso,
+        });
+
+        setPopupProduct(null);
+        setToast("Aggiunto al carrello!");
+    };
+
+    /* ============================================================
+       RENDER
+    ============================================================ */
     return (
         <div className="products-container">
             <button className="back-btn" onClick={() => navigate("/")}>
