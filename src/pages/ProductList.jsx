@@ -71,7 +71,13 @@ export default function ProductList() {
     const getImage = (img) => {
         if (!isPromoPage) return null;
 
-        if (!img || img.trim() === "" || img === "null" || img === "undefined") {
+        if (
+            !img ||
+            img.trim() === "" ||
+            img === "null" ||
+            img === "undefined" ||
+            img.toLowerCase() === "immagine promo"
+        ) {
             return "/plusmarket-logo.png";
         }
 
@@ -157,7 +163,7 @@ export default function ProductList() {
 
                         {isPromoPage && (
                             <img
-                                src={getImage(product.immagine) || "/plusmarket-logo.png"}
+                                src={getImage(product.immagine)}
                                 alt={product.nome}
                                 className="product-img"
                             />
