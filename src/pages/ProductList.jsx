@@ -76,7 +76,8 @@ export default function ProductList() {
             img.trim() === "" ||
             img === "null" ||
             img === "undefined" ||
-            img.toLowerCase() === "immagine promo"
+            img.toLowerCase() === "immagine promo" ||
+            img.toLowerCase() === "/plusmarket-logo.png"
         ) {
             return "/plusmarket-logo.png";
         }
@@ -121,7 +122,7 @@ export default function ProductList() {
     const filtered = products.filter((p) => {
         if (!search) return true;
 
-        const name = normalize(p.nome || "");
+        const name = normalize(p.nome || p.descrizione || "");
         const term = normalize(search);
 
         if (name.includes(term)) return true;
@@ -164,12 +165,15 @@ export default function ProductList() {
                         {isPromoPage && (
                             <img
                                 src={getImage(product.immagine)}
-                                alt={product.nome}
+                                alt={product.nome || product.descrizione}
                                 className="product-img"
                             />
                         )}
 
-                        <div className="product-name">{product.nome}</div>
+                        <div className="product-name">
+                            {product.nome || product.descrizione}
+                        </div>
+
                         <div className="product-code">Cod: {product.codice}</div>
 
                         <div className="product-price">
