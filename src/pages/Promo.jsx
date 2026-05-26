@@ -12,11 +12,10 @@ export default function Promo() {
                 const res = await axios.get("/promo");
                 const data = res.data || [];
 
-                // 🔥 Promo già in EURO dal backend
                 const parsed = data.map((row) => ({
                     codice: row.codice,
                     nome: row.descrizione,
-                    prezzo: row.prezzo, // EURO
+                    prezzo: row.prezzo,
                     immagine: row.immagine,
                 }));
 
@@ -30,15 +29,14 @@ export default function Promo() {
         loadPromo();
     }, []);
 
-    // 🔥 FORMATO EURO CORRETTO (11.90 → 11,90)
     const formatPrice = (value) => {
         if (value === null || value === undefined || value === "" || isNaN(value)) {
             return "—";
         }
 
         return Number(value)
-            .toFixed(2)          // <-- aggiunge lo zero mancante
-            .replace(".", ",") + " €";
+            .toFixed(2)
+            .replace(".", ",");
     };
 
     if (loading) return <h2 style={{ textAlign: "center" }}>Caricamento promo...</h2>;
@@ -51,14 +49,20 @@ export default function Promo() {
                 {promo.map((p, index) => (
                     <div key={index} className="promo-card">
                         <img
-                            src={p.immagine && p.immagine !== "" ? p.immagine : "/plusmarket-logo.png"}
+                            src={
+                                p.immagine && p.immagine.trim() !== ""
+                                    ? p.immagine
+                                    : "/plusmarket-logo.png"
+                            }
                             alt={p.nome}
                             className="promo-image"
                         />
 
                         <div className="promo-info">
                             <h3 className="promo-name">{p.nome}</h3>
-                            <p className="promo-price">{formatPrice(p.prezzo)}</p>
+                            <p className="promo-price">
+                                € {String(formatPrice(p.prezzo))}
+                            </p>
                         </div>
                     </div>
                 ))}

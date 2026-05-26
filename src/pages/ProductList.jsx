@@ -41,14 +41,31 @@ export default function ProductList() {
     }
 
     /* ============================================================
+       FORMATO PREZZO (11.90 → 11,90)
+    ============================================================ */
+    const formatPrice = (value) => {
+        if (value === null || value === undefined || value === "" || isNaN(value)) {
+            return "—";
+        }
+
+        return Number(value)
+            .toFixed(2)
+            .replace(".", ",");
+    };
+
+    /* ============================================================
        IMMAGINI
     ============================================================ */
     const getImage = (img) => {
+        // LISTINO COMPLETO → NESSUNA IMMAGINE
         if (!isPromoPage) {
-            return "/logo.png"; // prodotti normali → nessuna immagine
+            return null;
         }
 
-        if (!img || img.trim() === "") return "/logo.png";
+        // PROMO → fallback logo
+        if (!img || img.trim() === "" || img === "null" || img === "undefined") {
+            return "/plusmarket-logo.png";
+        }
 
         if (img.startsWith("http")) return img;
 
@@ -155,11 +172,13 @@ export default function ProductList() {
                             <span className="badge-offerta">OFFERTA</span>
                         )}
 
-                        <img
-                            src={getImage(product.immagine)}
-                            alt={product.nome}
-                            className="product-img"
-                        />
+                        {isPromoPage && getImage(product.immagine) && (
+                            <img
+                                src={getImage(product.immagine)}
+                                alt={product.nome}
+                                className="product-img"
+                            />
+                        )}
 
                         <div className="product-name">{product.nome}</div>
                         <div className="product-code">Cod: {product.codice}</div>
@@ -171,7 +190,7 @@ export default function ProductList() {
                         )}
 
                         <div className="product-price">
-                            € {product.prezzo}
+                            € {String(formatPrice(product.prezzo))}
                             {isPeso(product) ? " / Kg" : ""}
                         </div>
 
