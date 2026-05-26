@@ -30,14 +30,14 @@ export default function Promo() {
         loadPromo();
     }, []);
 
-    // 🔥 FORMATO EURO CORRETTO (con virgola)
+    // 🔥 FORMATO EURO CORRETTO (11.90 → 11,90)
     const formatPrice = (value) => {
         if (value === null || value === undefined || value === "" || isNaN(value)) {
             return "—";
         }
 
         return Number(value)
-            .toFixed(2)
+            .toFixed(2)          // <-- aggiunge lo zero mancante
             .replace(".", ",") + " €";
     };
 
@@ -51,7 +51,7 @@ export default function Promo() {
                 {promo.map((p, index) => (
                     <div key={index} className="promo-card">
                         <img
-                            src={p.immagine || "/placeholder.png"}
+                            src={p.immagine && p.immagine !== "" ? p.immagine : "/plusmarket-logo.png"}
                             alt={p.nome}
                             className="promo-image"
                         />
