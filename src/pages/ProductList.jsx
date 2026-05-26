@@ -40,9 +40,6 @@ export default function ProductList() {
         return <p style={{ padding: "20px" }}>Caricamento prodotti...</p>;
     }
 
-    /* ============================================================
-       PAGINA IN ALLESTIMENTO (LISTINO COMPLETO VUOTO)
-    ============================================================ */
     if (!isPromoPage && products.length === 0) {
         return (
             <div className="products-container">
@@ -57,17 +54,11 @@ export default function ProductList() {
         );
     }
 
-    /* ============================================================
-       FORMATO PREZZO
-    ============================================================ */
     const formatPrice = (value) => {
         if (!value && value !== 0) return "—";
         return Number(value).toFixed(2).replace(".", ",");
     };
 
-    /* ============================================================
-       IMMAGINI (solo promo)
-    ============================================================ */
     const getImage = (img) => {
         if (!isPromoPage) return null;
 
@@ -87,9 +78,6 @@ export default function ProductList() {
         return `https://backend-nuova-production.up.railway.app/api/images/${img}`;
     };
 
-    /* ============================================================
-       RICERCA
-    ============================================================ */
     const normalize = (str) =>
         str
             .toLowerCase()
@@ -133,9 +121,6 @@ export default function ProductList() {
         return false;
     });
 
-    /* ============================================================
-       RENDER
-    ============================================================ */
     return (
         <div className="products-container">
             <button className="back-btn" onClick={() => navigate("/")}>
@@ -165,7 +150,7 @@ export default function ProductList() {
                         {isPromoPage && (
                             <img
                                 src={getImage(product.immagine)}
-                                alt={product.nome || product.descrizione}
+                                alt={product.nome || product.descrizione}   // 🔥 FIX DEFINITIVO
                                 className="product-img"
                             />
                         )}
