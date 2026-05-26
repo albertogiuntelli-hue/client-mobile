@@ -41,28 +41,19 @@ export default function ProductList() {
     }
 
     /* ============================================================
-       FORMATO PREZZO (11.90 → 11,90)
+       FORMATO PREZZO
     ============================================================ */
     const formatPrice = (value) => {
-        if (value === null || value === undefined || value === "" || isNaN(value)) {
-            return "—";
-        }
-
-        return Number(value)
-            .toFixed(2)
-            .replace(".", ",");
+        if (!value && value !== 0) return "—";
+        return Number(value).toFixed(2).replace(".", ",");
     };
 
     /* ============================================================
        IMMAGINI
     ============================================================ */
     const getImage = (img) => {
-        // LISTINO COMPLETO → NESSUNA IMMAGINE
-        if (!isPromoPage) {
-            return null;
-        }
+        if (!isPromoPage) return null;
 
-        // PROMO → fallback logo
         if (!img || img.trim() === "" || img === "null" || img === "undefined") {
             return "/plusmarket-logo.png";
         }
@@ -73,15 +64,7 @@ export default function ProductList() {
     };
 
     /* ============================================================
-       TIPO PRODOTTO (peso / pezzo)
-    ============================================================ */
-    const isPeso = (product) => {
-        if (isPromoPage) return false;
-        return product.a_peso === "S";
-    };
-
-    /* ============================================================
-       RICERCA FUZZY
+       RICERCA
     ============================================================ */
     const normalize = (str) =>
         str
@@ -123,29 +106,8 @@ export default function ProductList() {
         const distance = levenshtein(name, term);
         if (distance <= 3) return true;
 
-        if (term.length > 4 && name.startsWith(term.slice(0, 4))) return true;
-
-        if (name.length > 4 && term.startsWith(name.slice(0, 4))) return true;
-
         return false;
     });
-
-    /* ============================================================
-       AGGIUNTA PRODOTTO A PESO
-    ============================================================ */
-    const handleAddWeight = (product, grams) => {
-        const peso = Number(grams);
-        if (!peso || peso <= 0) return;
-
-        addToCart(product, {
-            productType: "peso",
-            quantity: 0,
-            weight: peso,
-        });
-
-        setPopupProduct(null);
-        setToast("Aggiunto al carrello!");
-    };
 
     /* ============================================================
        RENDER
@@ -155,6 +117,10 @@ export default function ProductList() {
             <button className="back-btn" onClick={() => navigate("/")}>
                 ⬅ Torna indietro
             </button>
+
+            <h2 style={{ textAlign: "center", marginBottom: "10px" }}>
+                {isPromoPage ? "Offerte Speciali" : "Listino completo Plusmarket"}
+            </h2>
 
             <input
                 type="text"
@@ -172,9 +138,9 @@ export default function ProductList() {
                             <span className="badge-offerta">OFFERTA</span>
                         )}
 
-                        {isPromoPage && getImage(product.immagine) && (
+                        {isPromoPage && (
                             <img
-                                src={getImage(product.immagine)}
+                                src={getImage(product.immagine) || "/plusmarket-logo.png"}
                                 alt={product.nome}
                                 className="product-img"
                             />
@@ -183,25 +149,27 @@ export default function ProductList() {
                         <div className="product-name">{product.nome}</div>
                         <div className="product-code">Cod: {product.codice}</div>
 
-                        {!isPromoPage && (
-                            <div className="product-type">
-                                Tipo: {isPeso(product) ? "Peso" : "Pezzo"}
-                            </div>
-                        )}
-
                         <div className="product-price">
                             € {String(formatPrice(product.prezzo))}
-                            {isPeso(product) ? " / Kg" : ""}
                         </div>
 
-                        {isPeso(product) ? (
+                        {!isPromoPage && (
                             <button
                                 className="btn-primary"
-                                onClick={() => setPopupProduct(product)}
+                                onClick={() => {
+                                    addToCart(product, {
+                                        productType: "pezzi",
+                                        quantity: 1,
+                                        weight: 0,
+                                    });
+                                    setToast("Aggiunto al carrello!");
+                                }}
                             >
-                                Scegli quantità
+                                Aggiungi
                             </button>
-                        ) : (
+                        )}
+
+                        {isPromoPage && (
                             <button
                                 className="btn-primary"
                                 onClick={() => {

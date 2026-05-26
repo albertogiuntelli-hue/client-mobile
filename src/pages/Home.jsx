@@ -7,7 +7,7 @@ export default function Home() {
 
     return (
         <div className="home-container">
-            <img src={logo} alt="PlusMarket Giuntelli" className="home-logo" />
+            <img src={logo} alt="Plusmarket" className="home-logo" />
 
             <div className="home-buttons">
                 {/* 🔥 Bottone offerte → usa query promo=true */}
@@ -22,7 +22,7 @@ export default function Home() {
                     className="home-btn"
                     onClick={() => navigate("/prodotti")}
                 >
-                    ORDINA ONLINE I PRODOTTI
+                    LISTINO COMPLETO PLUSMARKET
                 </button>
 
                 <button
