@@ -41,6 +41,23 @@ export default function ProductList() {
     }
 
     /* ============================================================
+       PAGINA IN ALLESTIMENTO (LISTINO COMPLETO VUOTO)
+    ============================================================ */
+    if (!isPromoPage && products.length === 0) {
+        return (
+            <div className="products-container">
+                <button className="back-btn" onClick={() => navigate("/")}>
+                    ⬅ Torna indietro
+                </button>
+
+                <h2 style={{ textAlign: "center", marginTop: "40px" }}>
+                    Pagina in allestimento
+                </h2>
+            </div>
+        );
+    }
+
+    /* ============================================================
        FORMATO PREZZO
     ============================================================ */
     const formatPrice = (value) => {
@@ -49,7 +66,7 @@ export default function ProductList() {
     };
 
     /* ============================================================
-       IMMAGINI
+       IMMAGINI (solo promo)
     ============================================================ */
     const getImage = (img) => {
         if (!isPromoPage) return null;
