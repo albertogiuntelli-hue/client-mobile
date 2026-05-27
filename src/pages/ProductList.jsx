@@ -59,6 +59,7 @@ export default function ProductList() {
         return Number(value).toFixed(2).replace(".", ",");
     };
 
+    // 🔥 LOGICA IMMAGINE PROMO: SE MANCANTE O SPORCA → LOGO
     const getImage = (img) => {
         if (!isPromoPage) return null;
 
@@ -67,10 +68,9 @@ export default function ProductList() {
             img.trim() === "" ||
             img === "null" ||
             img === "undefined" ||
-            img.toLowerCase() === "immagine promo" ||
-            img.toLowerCase() === "/plusmarket-logo.png"
+            img.toLowerCase() === "immagine promo"
         ) {
-            return "/plusmarket-logo.png";
+            return "/plusmarket-logo.png"; // fallback logo
         }
 
         if (img.startsWith("http")) return img;
@@ -142,7 +142,6 @@ export default function ProductList() {
             <div className="product-grid">
                 {filtered.map((product) => (
                     <div key={product.codice} className="product-card">
-
                         {isPromoPage && (
                             <span className="badge-offerta">OFFERTA</span>
                         )}
@@ -150,8 +149,13 @@ export default function ProductList() {
                         {isPromoPage && (
                             <img
                                 src={getImage(product.immagine)}
-                                alt={product.nome || product.descrizione}   // 🔥 FIX DEFINITIVO
+                                alt={product.nome || product.descrizione}
                                 className="product-img"
+                                // 🔥 SE L’IMMAGINE FALLISCE → FORZA IL LOGO
+                                onError={(e) => {
+                                    e.target.onerror = null;
+                                    e.target.src = "/plusmarket-logo.png";
+                                }}
                             />
                         )}
 
@@ -164,22 +168,6 @@ export default function ProductList() {
                         <div className="product-price">
                             € {String(formatPrice(product.prezzo))}
                         </div>
-
-                        {!isPromoPage && (
-                            <button
-                                className="btn-primary"
-                                onClick={() => {
-                                    addToCart(product, {
-                                        productType: "pezzi",
-                                        quantity: 1,
-                                        weight: 0,
-                                    });
-                                    setToast("Aggiunto al carrello!");
-                                }}
-                            >
-                                Aggiungi
-                            </button>
-                        )}
 
                         {isPromoPage && (
                             <button
@@ -194,6 +182,22 @@ export default function ProductList() {
                                 }}
                             >
                                 Aggiungi al carrello
+                            </button>
+                        )}
+
+                        {!isPromoPage && (
+                            <button
+                                className="btn-primary"
+                                onClick={() => {
+                                    addToCart(product, {
+                                        productType: "pezzi",
+                                        quantity: 1,
+                                        weight: 0,
+                                    });
+                                    setToast("Aggiunto al carrello!");
+                                }}
+                            >
+                                Aggiungi
                             </button>
                         )}
                     </div>
