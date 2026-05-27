@@ -14,6 +14,25 @@ const ProductPage = () => {
 
     const { addToCart } = useCart();
 
+    // 🔥 Fallback logo sicuro (ESISTE sul backend)
+    const FALLBACK =
+        "https://backend-nuova-production.up.railway.app/plusmarket-logo.png";
+
+    const getImage = (img) => {
+        if (
+            !img ||
+            img.trim() === "" ||
+            img === "null" ||
+            img === "undefined"
+        ) {
+            return FALLBACK;
+        }
+
+        if (img.startsWith("http")) return img;
+
+        return `https://backend-nuova-production.up.railway.app/api/images/${img}`;
+    };
+
     useEffect(() => {
         const fetchProduct = async () => {
             try {
@@ -62,7 +81,7 @@ const ProductPage = () => {
         <div className="product-page">
 
             <img
-                src={product.immagine || "/logo.png"}
+                src={getImage(product.immagine)}
                 alt={product.nome}
                 className="product-page-image"
             />
