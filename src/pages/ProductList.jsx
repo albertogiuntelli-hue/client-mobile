@@ -59,7 +59,11 @@ export default function ProductList() {
         return Number(value).toFixed(2).replace(".", ",");
     };
 
-    // 🔥 LOGICA IMMAGINE PROMO: SE MANCANTE O SPORCA → LOGO
+    // 🔥 FALLBACK IMMAGINE SICURO (ESISTE DAVVERO)
+    const FALLBACK =
+        "https://backend-nuova-production.up.railway.app/plusmarket-logo.png";
+
+    // 🔥 LOGICA IMMAGINE PROMO STABILE
     const getImage = (img) => {
         if (!isPromoPage) return null;
 
@@ -70,7 +74,7 @@ export default function ProductList() {
             img === "undefined" ||
             img.toLowerCase() === "immagine promo"
         ) {
-            return "/plusmarket-logo.png"; // fallback logo
+            return FALLBACK;
         }
 
         if (img.startsWith("http")) return img;
@@ -151,11 +155,6 @@ export default function ProductList() {
                                 src={getImage(product.immagine)}
                                 alt={product.nome || product.descrizione}
                                 className="product-img"
-                                // 🔥 SE L’IMMAGINE FALLISCE → FORZA IL LOGO
-                                onError={(e) => {
-                                    e.target.onerror = null;
-                                    e.target.src = "/plusmarket-logo.png";
-                                }}
                             />
                         )}
 
