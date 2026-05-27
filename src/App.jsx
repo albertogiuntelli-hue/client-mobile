@@ -11,6 +11,7 @@ import Navbar from "./components/Navbar";
 import ChiSiamo from "./pages/ChiSiamo";
 import Grazie from "./pages/Grazie";
 import Conditions from "./pages/Conditions";
+import Promo from "./pages/Promo";   // ⭐ AGGIUNTO
 
 import { listenForInstallPrompt } from "./installPrompt";
 
@@ -35,6 +36,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/prodotti" element={<ProductList />} />
+        <Route path="/promo" element={<Promo />} />   {/* ⭐ ROTTA PROMO */}
         <Route path="/product/:codice" element={<ProductPage />} />
         <Route path="/cart" element={<Carrello />} />
         <Route path="/checkout" element={<Checkout />} />
