@@ -16,8 +16,9 @@ export default function ProductList() {
     const { addToCart } = useCart();
     const navigate = useNavigate();
 
-    const isPromoPage =
-        new URLSearchParams(window.location.search).get("promo") === "true";
+    // 🔥 FIX: rilevamento promo robusto (funziona in PWA)
+    const params = new URLSearchParams(window.location.search);
+    const isPromoPage = params.get("promo")?.toLowerCase() === "true";
 
     useEffect(() => {
         const endpoint = isPromoPage
@@ -59,11 +60,11 @@ export default function ProductList() {
         return Number(value).toFixed(2).replace(".", ",");
     };
 
-    // 🔥 FALLBACK IMMAGINE SICURO (ESISTE DAVVERO)
+    // 🔥 Fallback logo sicuro (esiste sul backend)
     const FALLBACK =
         "https://backend-nuova-production.up.railway.app/plusmarket-logo.png";
 
-    // 🔥 LOGICA IMMAGINE PROMO STABILE
+    // 🔥 Logica immagine promo stabile
     const getImage = (img) => {
         if (!isPromoPage) return null;
 
