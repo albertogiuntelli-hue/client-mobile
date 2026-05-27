@@ -1,12 +1,10 @@
 import { useEffect, useState } from "react";
 import axios from "../api/axios";
-import "./Promo.css";
 
 export default function Promo() {
     const [promo, setPromo] = useState([]);
     const [loading, setLoading] = useState(true);
 
-    // 🔥 Fallback logo sicuro (ESISTE sul backend)
     const FALLBACK =
         "https://backend-nuova-production.up.railway.app/plusmarket-logo.png";
 
@@ -21,10 +19,8 @@ export default function Promo() {
             return FALLBACK;
         }
 
-        // Se è già un URL completo
         if (img.startsWith("http")) return img;
 
-        // Altrimenti è un nome file → lo prendo dal backend
         return `https://backend-nuova-production.up.railway.app/api/images/${img}`;
     };
 
