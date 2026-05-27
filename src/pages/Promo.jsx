@@ -6,6 +6,28 @@ export default function Promo() {
     const [promo, setPromo] = useState([]);
     const [loading, setLoading] = useState(true);
 
+    // 🔥 Fallback logo sicuro (ESISTE sul backend)
+    const FALLBACK =
+        "https://backend-nuova-production.up.railway.app/plusmarket-logo.png";
+
+    const getImage = (img) => {
+        if (
+            !img ||
+            img.trim() === "" ||
+            img === "null" ||
+            img === "undefined" ||
+            img.toLowerCase() === "immagine promo"
+        ) {
+            return FALLBACK;
+        }
+
+        // Se è già un URL completo
+        if (img.startsWith("http")) return img;
+
+        // Altrimenti è un nome file → lo prendo dal backend
+        return `https://backend-nuova-production.up.railway.app/api/images/${img}`;
+    };
+
     useEffect(() => {
         const loadPromo = async () => {
             try {
@@ -49,11 +71,7 @@ export default function Promo() {
                 {promo.map((p, index) => (
                     <div key={index} className="promo-card">
                         <img
-                            src={
-                                p.immagine && p.immagine.trim() !== ""
-                                    ? p.immagine
-                                    : "/plusmarket-logo.png"
-                            }
+                            src={getImage(p.immagine)}
                             alt={p.nome}
                             className="promo-image"
                         />
