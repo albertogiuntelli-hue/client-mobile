@@ -1,194 +1,136 @@
-import { useEffect, useState } from "react";
-import api from "../api/axios";
-import { useCart } from "../context/CartContext";
-import PopupPeso from "../components/PopupPeso";
-import Toast from "../components/Toast";
-import { useNavigate } from "react-router-dom";
-import "../styles/theme.css";
-import "../styles/productlist.css";
+import fs from "fs";
+import path from "path";
 
-export default function ProductList() {
-    const [products, setProducts] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [popupProduct, setPopupProduct] = useState(null);
-    const [search, setSearch] = useState("");
-    const [toast, setToast] = useState("");
+// Cartella corretta e persistente su Railway
+const dataDir = "/tmp/uploads/products";
+const productsFile = path.join(dataDir, "prodotti.csv");
 
-    const { addToCart } = useCart();
-    const navigate = useNavigate();
+// Normalizza prezzo
+function normalizePrice(value) {
+    if (!value) return 0;
 
-    // 🔥 Modalità offerte attiva se arrivo da /prodotti?promo=true
-    const isPromoPage =
-        new URLSearchParams(window.location.search).get("promo") === "true";
+    const cleaned = String(value)
+        .replace(/"/g, "")
+        .replace(/\s+/g, "")
+        .trim();
 
-    useEffect(() => {
-        const endpoint = isPromoPage ? "/promo" : "/products";
+    const num = Number(cleaned.replace(",", "."));
+    return isNaN(num) ? 0 : num;
+}
 
-        api.get(endpoint)
-            .then((res) => {
-                setProducts(res.data);
-                setLoading(false);
+// Normalizza immagine
+function normalizeImage(img) {
+    if (!img) return "/images/plusmarket-logo.png";
+
+    const cleaned = img.trim().toLowerCase();
+
+    if (
+        cleaned === "" ||
+        cleaned === "null" ||
+        cleaned === "undefined" ||
+        cleaned === "-" ||
+        cleaned === "n/d"
+    ) {
+        return "/images/plusmarket-logo.png";
+    }
+
+    return img.trim();
+}
+
+// Split intelligente (TAB, ; oppure ,)
+function smartSplit(row) {
+    if (row.includes("\t")) return row.split("\t");
+    if (row.includes(";")) return row.split(";");
+    return row.split(",");
+}
+
+// Assicura che la cartella esista
+function ensureProductsFile() {
+    if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
+    if (!fs.existsSync(productsFile)) fs.writeFileSync(productsFile, "");
+}
+
+/* ============================================================
+   GET /api/products
+   ============================================================ */
+export function getProducts(req, res) {
+    try {
+        ensureProductsFile();
+
+        const csv = fs.readFileSync(productsFile, "utf8");
+        if (!csv.trim()) return res.json([]);
+
+        const rows = csv
+            .split("\n")
+            .map(r => r.trim())
+            .filter(r => r !== "");
+
+        const dataRows = rows.slice(1); // salta intestazione
+
+        const products = dataRows
+            .map(row => {
+                const parts = smartSplit(row);
+
+                const codice = parts[0]?.trim();
+                const nome = (parts[1] || "").trim();
+                const prezzo = normalizePrice(parts[2]);
+                const a_peso = (parts[3] || "N").trim();
+                const immagine = normalizeImage(parts[4]);
+
+                if (!codice) return null;
+
+                return {
+                    codice,
+                    nome,
+                    prezzo,
+                    a_peso,
+                    immagine
+                };
             })
-            .catch((err) => {
-                console.error("Errore caricamento prodotti:", err);
-                setLoading(false);
-            });
-    }, [isPromoPage]);
+            .filter(Boolean);
 
-    if (loading) {
-        return <p style={{ padding: "20px" }}>Caricamento prodotti...</p>;
+        return res.json(products);
+
+    } catch (err) {
+        console.error("Errore GET /products:", err);
+        return res.status(500).json({ error: "Errore lettura prodotti" });
     }
+}
 
-    // 🔥 LOGICA PESO (ripristinata)
-    const handleAddWeight = (product, grams) => {
-        const peso = Number(grams);
-        if (!peso || peso <= 0) return;
+/* ============================================================
+   POST /api/products/upload
+   ============================================================ */
+export function uploadProducts(req, res) {
+    try {
+        ensureProductsFile();
 
-        addToCart(product, {
-            productType: "peso",
-            quantity: 0,
-            weight: peso,
-        });
-
-        setPopupProduct(null);
-        setToast("Aggiunto al carrello!");
-    };
-
-    // 🔥 FALLBACK IMMAGINE (logo PlusMarket)
-    const FALLBACK = "/images/plusmarket-logo.png";
-
-    const getImage = (img) => {
-        if (!img || img.trim() === "" || img === "null" || img === "undefined") {
-            return FALLBACK;
+        if (!req.file) {
+            return res.status(400).json({ error: "Nessun file caricato" });
         }
-        return img;
-    };
 
-    // 🔥 RICERCA FUZZY
-    const normalize = (str) =>
-        str
-            .toLowerCase()
-            .replace(/\./g, "")
-            .replace(/\s+/g, "")
-            .normalize("NFD")
-            .replace(/[\u0300-\u036f]/g, "");
+        const csv = fs.readFileSync(req.file.path, "utf8");
+        fs.writeFileSync(productsFile, csv);
 
-    function levenshtein(a, b) {
-        const matrix = [];
-        for (let i = 0; i <= b.length; i++) matrix[i] = [i];
-        for (let j = 0; j <= a.length; j++) matrix[0][j] = j;
+        fs.unlinkSync(req.file.path);
 
-        for (let i = 1; i <= b.length; i++) {
-            for (let j = 1; j <= a.length; j++) {
-                matrix[i][j] =
-                    b.charAt(i - 1) === a.charAt(j - 1)
-                        ? matrix[i - 1][j - 1]
-                        : Math.min(
-                            matrix[i - 1][j - 1] + 1,
-                            matrix[i][j - 1] + 1,
-                            matrix[i - 1][j] + 1
-                        );
-            }
-        }
-        return matrix[b.length][a.length];
+        return res.json({ message: "Prodotti caricati correttamente" });
+
+    } catch (err) {
+        console.error("Errore UPLOAD /products:", err);
+        return res.status(500).json({ error: "Errore caricamento prodotti" });
     }
+}
 
-    const filtered = products.filter((p) => {
-        if (!search) return true;
-
-        const name = normalize(p.nome || "");
-        const term = normalize(search);
-
-        if (name.includes(term)) return true;
-
-        const distance = levenshtein(name, term);
-        if (distance <= 3) return true;
-
-        if (term.length > 4 && name.startsWith(term.slice(0, 4))) return true;
-        if (name.length > 4 && term.startsWith(name.slice(0, 4))) return true;
-
-        return false;
-    });
-
-    return (
-        <div className="products-container">
-            <button className="back-btn" onClick={() => navigate("/")}>
-                ⬅ Torna indietro
-            </button>
-
-            <input
-                type="text"
-                className="search-box"
-                placeholder="Cerca prodotto..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-            />
-
-            <div className="product-grid">
-                {filtered.map((product) => (
-                    <div key={product.codice} className="product-card">
-
-                        {/* 🔥 BADGE OFFERTA DIAGONALE */}
-                        {isPromoPage && (
-                            <span className="badge-offerta">OFFERTA</span>
-                        )}
-
-                        {/* 🔥 IMMAGINE CON FALLBACK LOGO */}
-                        <img
-                            src={getImage(product.immagine)}
-                            alt={product.nome}
-                            className="product-img"
-                        />
-
-                        <div className="product-name">{product.nome}</div>
-                        <div className="product-code">Cod: {product.codice}</div>
-
-                        <div className="product-type">
-                            Tipo: {product.a_peso === "S" ? "S (peso)" : "N (pezzo)"}
-                        </div>
-
-                        <div className="product-price">
-                            € {product.prezzo}
-                            {product.a_peso === "S" ? " / Kg" : ""}
-                        </div>
-
-                        {/* 🔥 LOGICA PESO RIPRISTINATA */}
-                        {product.a_peso === "S" ? (
-                            <button
-                                className="btn-primary"
-                                onClick={() => setPopupProduct(product)}
-                            >
-                                Scegli quantità
-                            </button>
-                        ) : (
-                            <button
-                                className="btn-primary"
-                                onClick={() => {
-                                    addToCart(product, {
-                                        productType: "pezzi",
-                                        quantity: 1,
-                                        weight: 0,
-                                    });
-                                    setToast("Aggiunto al carrello!");
-                                }}
-                            >
-                                Aggiungi al carrello
-                            </button>
-                        )}
-                    </div>
-                ))}
-            </div>
-
-            {/* 🔥 POPUP PESO FUNZIONANTE */}
-            {popupProduct && (
-                <PopupPeso
-                    product={popupProduct}
-                    onConfirm={(grams) => handleAddWeight(popupProduct, grams)}
-                    onClose={() => setPopupProduct(null)}
-                />
-            )}
-
-            {toast && <Toast message={toast} onClose={() => setToast("")} />}
-        </div>
-    );
+/* ============================================================
+   DELETE /api/products/delete
+   ============================================================ */
+export function deleteProducts(req, res) {
+    try {
+        ensureProductsFile();
+        fs.writeFileSync(productsFile, "");
+        return res.json({ message: "Prodotti eliminati" });
+    } catch (err) {
+        console.error("Errore DELETE /products:", err);
+        return res.status(500).json({ error: "Errore eliminazione prodotti" });
+    }
 }
