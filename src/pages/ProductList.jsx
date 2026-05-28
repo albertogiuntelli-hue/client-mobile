@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import api from "../api/axios";
 import { useCart } from "../context/CartContext";
 import PopupPeso from "../components/PopupPeso";
 import Toast from "../components/Toast";
@@ -16,19 +17,16 @@ export default function ProductList() {
     const { addToCart } = useCart();
     const navigate = useNavigate();
 
-    // 🔥 Rilevamento promo
-    const params = new URLSearchParams(window.location.search);
-    const isPromoPage = params.get("promo")?.toLowerCase() === "true";
+    // 🔥 Modalità offerte attiva se arrivo da /prodotti?promo=true
+    const isPromoPage =
+        new URLSearchParams(window.location.search).get("promo") === "true";
 
     useEffect(() => {
-        const endpoint = isPromoPage
-            ? "https://backend-nuova-production.up.railway.app/api/promo"
-            : "https://backend-nuova-production.up.railway.app/api/products";
+        const endpoint = isPromoPage ? "/promo" : "/products";
 
-        fetch(endpoint)
-            .then((res) => res.json())
-            .then((data) => {
-                setProducts(data || []);
+        api.get(endpoint)
+            .then((res) => {
+                setProducts(res.data);
                 setLoading(false);
             })
             .catch((err) => {
@@ -41,46 +39,32 @@ export default function ProductList() {
         return <p style={{ padding: "20px" }}>Caricamento prodotti...</p>;
     }
 
-    if (!isPromoPage && products.length === 0) {
-        return (
-            <div className="products-container">
-                <button className="back-btn" onClick={() => navigate("/")}>
-                    ⬅ Torna indietro
-                </button>
+    // 🔥 LOGICA PESO (ripristinata)
+    const handleAddWeight = (product, grams) => {
+        const peso = Number(grams);
+        if (!peso || peso <= 0) return;
 
-                <h2 style={{ textAlign: "center", marginTop: "40px" }}>
-                    Pagina in allestimento
-                </h2>
-            </div>
-        );
-    }
+        addToCart(product, {
+            productType: "peso",
+            quantity: 0,
+            weight: peso,
+        });
 
-    const formatPrice = (value) => {
-        if (!value && value !== 0) return "—";
-        return Number(value).toFixed(2).replace(".", ",");
+        setPopupProduct(null);
+        setToast("Aggiunto al carrello!");
     };
 
-    // 🔥 Fallback logo sicuro
-    const FALLBACK =
-        "https://backend-nuova-production.up.railway.app/plusmarket-logo.png";
+    // 🔥 FALLBACK IMMAGINE (logo PlusMarket)
+    const FALLBACK = "/images/plusmarket-logo.png";
 
-    // 🔥 Logica immagine corretta (funziona SEMPRE)
     const getImage = (img) => {
-        if (
-            !img ||
-            img.trim() === "" ||
-            img === "null" ||
-            img === "undefined" ||
-            img.toLowerCase() === "immagine promo"
-        ) {
+        if (!img || img.trim() === "" || img === "null" || img === "undefined") {
             return FALLBACK;
         }
-
-        if (img.startsWith("http")) return img;
-
-        return `https://backend-nuova-production.up.railway.app/api/images/${img}`;
+        return img;
     };
 
+    // 🔥 RICERCA FUZZY
     const normalize = (str) =>
         str
             .toLowerCase()
@@ -106,20 +90,22 @@ export default function ProductList() {
                         );
             }
         }
-
         return matrix[b.length][a.length];
     }
 
     const filtered = products.filter((p) => {
         if (!search) return true;
 
-        const name = normalize(p.nome || p.descrizione || "");
+        const name = normalize(p.nome || "");
         const term = normalize(search);
 
         if (name.includes(term)) return true;
 
         const distance = levenshtein(name, term);
         if (distance <= 3) return true;
+
+        if (term.length > 4 && name.startsWith(term.slice(0, 4))) return true;
+        if (name.length > 4 && term.startsWith(name.slice(0, 4))) return true;
 
         return false;
     });
@@ -129,10 +115,6 @@ export default function ProductList() {
             <button className="back-btn" onClick={() => navigate("/")}>
                 ⬅ Torna indietro
             </button>
-
-            <h2 style={{ textAlign: "center", marginBottom: "10px" }}>
-                {isPromoPage ? "Offerte Speciali" : "Listino completo Plusmarket"}
-            </h2>
 
             <input
                 type="text"
@@ -145,30 +127,40 @@ export default function ProductList() {
             <div className="product-grid">
                 {filtered.map((product) => (
                     <div key={product.codice} className="product-card">
+
+                        {/* 🔥 BADGE OFFERTA DIAGONALE */}
                         {isPromoPage && (
                             <span className="badge-offerta">OFFERTA</span>
                         )}
 
-                        {/* 🔥 IMMAGINE SEMPRE MOSTRATA IN PROMO */}
-                        {isPromoPage && (
-                            <img
-                                src={getImage(product.immagine)}
-                                alt={product.nome || product.descrizione}
-                                className="product-img"
-                            />
-                        )}
+                        {/* 🔥 IMMAGINE CON FALLBACK LOGO */}
+                        <img
+                            src={getImage(product.immagine)}
+                            alt={product.nome}
+                            className="product-img"
+                        />
 
-                        <div className="product-name">
-                            {product.nome || product.descrizione}
-                        </div>
-
+                        <div className="product-name">{product.nome}</div>
                         <div className="product-code">Cod: {product.codice}</div>
 
-                        <div className="product-price">
-                            € {String(formatPrice(product.prezzo))}
+                        <div className="product-type">
+                            Tipo: {product.a_peso === "S" ? "S (peso)" : "N (pezzo)"}
                         </div>
 
-                        {isPromoPage && (
+                        <div className="product-price">
+                            € {product.prezzo}
+                            {product.a_peso === "S" ? " / Kg" : ""}
+                        </div>
+
+                        {/* 🔥 LOGICA PESO RIPRISTINATA */}
+                        {product.a_peso === "S" ? (
+                            <button
+                                className="btn-primary"
+                                onClick={() => setPopupProduct(product)}
+                            >
+                                Scegli quantità
+                            </button>
+                        ) : (
                             <button
                                 className="btn-primary"
                                 onClick={() => {
@@ -183,26 +175,11 @@ export default function ProductList() {
                                 Aggiungi al carrello
                             </button>
                         )}
-
-                        {!isPromoPage && (
-                            <button
-                                className="btn-primary"
-                                onClick={() => {
-                                    addToCart(product, {
-                                        productType: "pezzi",
-                                        quantity: 1,
-                                        weight: 0,
-                                    });
-                                    setToast("Aggiunto al carrello!");
-                                }}
-                            >
-                                Aggiungi
-                            </button>
-                        )}
                     </div>
                 ))}
             </div>
 
+            {/* 🔥 POPUP PESO FUNZIONANTE */}
             {popupProduct && (
                 <PopupPeso
                     product={popupProduct}
