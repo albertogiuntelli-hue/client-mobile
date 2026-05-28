@@ -1,136 +1,179 @@
-import fs from "fs";
-import path from "path";
+import { useEffect, useState } from "react";
+import api from "../api/axios";
+import { useCart } from "../context/CartContext";
+import PopupPeso from "../components/PopupPeso";
+import Toast from "../components/Toast";
+import { useNavigate } from "react-router-dom";
+import "../styles/theme.css";
+import "../styles/productlist.css";
 
-// Cartella corretta e persistente su Railway
-const dataDir = "/tmp/uploads/products";
-const productsFile = path.join(dataDir, "prodotti.csv");
+export default function ProductList() {
+    const [products, setProducts] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [popupProduct, setPopupProduct] = useState(null);
+    const [search, setSearch] = useState("");
+    const [toast, setToast] = useState("");
 
-// Normalizza prezzo
-function normalizePrice(value) {
-    if (!value) return 0;
+    const { addToCart } = useCart();
+    const navigate = useNavigate();
 
-    const cleaned = String(value)
-        .replace(/"/g, "")
-        .replace(/\s+/g, "")
-        .trim();
+    const isPromoPage =
+        new URLSearchParams(window.location.search).get("promo") === "true";
 
-    const num = Number(cleaned.replace(",", "."));
-    return isNaN(num) ? 0 : num;
-}
+    useEffect(() => {
+        const endpoint = isPromoPage ? "/promo" : "/products";
 
-// Normalizza immagine
-function normalizeImage(img) {
-    if (!img) return "/images/plusmarket-logo.png";
-
-    const cleaned = img.trim().toLowerCase();
-
-    if (
-        cleaned === "" ||
-        cleaned === "null" ||
-        cleaned === "undefined" ||
-        cleaned === "-" ||
-        cleaned === "n/d"
-    ) {
-        return "/images/plusmarket-logo.png";
-    }
-
-    return img.trim();
-}
-
-// Split intelligente (TAB, ; oppure ,)
-function smartSplit(row) {
-    if (row.includes("\t")) return row.split("\t");
-    if (row.includes(";")) return row.split(";");
-    return row.split(",");
-}
-
-// Assicura che la cartella esista
-function ensureProductsFile() {
-    if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
-    if (!fs.existsSync(productsFile)) fs.writeFileSync(productsFile, "");
-}
-
-/* ============================================================
-   GET /api/products
-   ============================================================ */
-export function getProducts(req, res) {
-    try {
-        ensureProductsFile();
-
-        const csv = fs.readFileSync(productsFile, "utf8");
-        if (!csv.trim()) return res.json([]);
-
-        const rows = csv
-            .split("\n")
-            .map(r => r.trim())
-            .filter(r => r !== "");
-
-        const dataRows = rows.slice(1); // salta intestazione
-
-        const products = dataRows
-            .map(row => {
-                const parts = smartSplit(row);
-
-                const codice = parts[0]?.trim();
-                const nome = (parts[1] || "").trim();
-                const prezzo = normalizePrice(parts[2]);
-                const a_peso = (parts[3] || "N").trim();
-                const immagine = normalizeImage(parts[4]);
-
-                if (!codice) return null;
-
-                return {
-                    codice,
-                    nome,
-                    prezzo,
-                    a_peso,
-                    immagine
-                };
+        api.get(endpoint)
+            .then((res) => {
+                setProducts(res.data);
+                setLoading(false);
             })
-            .filter(Boolean);
+            .catch((err) => {
+                console.error("Errore caricamento prodotti:", err);
+                setLoading(false);
+            });
+    }, [isPromoPage]);
 
-        return res.json(products);
-
-    } catch (err) {
-        console.error("Errore GET /products:", err);
-        return res.status(500).json({ error: "Errore lettura prodotti" });
+    if (loading) {
+        return <p style={{ padding: "20px" }}>Caricamento prodotti...</p>;
     }
-}
 
-/* ============================================================
-   POST /api/products/upload
-   ============================================================ */
-export function uploadProducts(req, res) {
-    try {
-        ensureProductsFile();
+    const handleAddWeight = (product, grams) => {
+        const peso = Number(grams);
+        if (!peso || peso <= 0) return;
 
-        if (!req.file) {
-            return res.status(400).json({ error: "Nessun file caricato" });
+        addToCart(product, {
+            productType: "peso",
+            quantity: 0,
+            weight: peso,
+        });
+
+        setPopupProduct(null);
+        setToast("Aggiunto al carrello!");
+    };
+
+    const normalize = (str) =>
+        str
+            .toLowerCase()
+            .replace(/\./g, "")
+            .replace(/\s+/g, "")
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "");
+
+    function levenshtein(a, b) {
+        const matrix = [];
+
+        for (let i = 0; i <= b.length; i++) matrix[i] = [i];
+        for (let j = 0; j <= a.length; j++) matrix[0][j] = j;
+
+        for (let i = 1; i <= b.length; i++) {
+            for (let j = 1; j <= a.length; j++) {
+                matrix[i][j] =
+                    b.charAt(i - 1) === a.charAt(j - 1)
+                        ? matrix[i - 1][j - 1]
+                        : Math.min(
+                            matrix[i - 1][j - 1] + 1,
+                            matrix[i][j - 1] + 1,
+                            matrix[i - 1][j] + 1
+                        );
+            }
         }
 
-        const csv = fs.readFileSync(req.file.path, "utf8");
-        fs.writeFileSync(productsFile, csv);
-
-        fs.unlinkSync(req.file.path);
-
-        return res.json({ message: "Prodotti caricati correttamente" });
-
-    } catch (err) {
-        console.error("Errore UPLOAD /products:", err);
-        return res.status(500).json({ error: "Errore caricamento prodotti" });
+        return matrix[b.length][a.length];
     }
-}
 
-/* ============================================================
-   DELETE /api/products/delete
-   ============================================================ */
-export function deleteProducts(req, res) {
-    try {
-        ensureProductsFile();
-        fs.writeFileSync(productsFile, "");
-        return res.json({ message: "Prodotti eliminati" });
-    } catch (err) {
-        console.error("Errore DELETE /products:", err);
-        return res.status(500).json({ error: "Errore eliminazione prodotti" });
-    }
+    const filtered = products.filter((p) => {
+        if (!search) return true;
+
+        const name = normalize(p.nome);
+        const term = normalize(search);
+
+        if (name.includes(term)) return true;
+
+        const distance = levenshtein(name, term);
+        if (distance <= 3) return true;
+
+        if (term.length > 4 && name.startsWith(term.slice(0, 4))) return true;
+
+        if (name.length > 4 && term.startsWith(name.slice(0, 4))) return true;
+
+        return false;
+    });
+
+    return (
+        <div className="products-container">
+            <button className="back-btn" onClick={() => navigate("/")}>
+                ⬅ Torna indietro
+            </button>
+
+            <input
+                type="text"
+                className="search-box"
+                placeholder="Cerca prodotto..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+            />
+
+            <div className="product-grid">
+                {filtered.map((product) => (
+                    <div key={product.codice} className="product-card">
+                        {isPromoPage && (
+                            <span className="badge-offerta">OFFERTA</span>
+                        )}
+
+                        <img
+                            src={product.immagine || "/placeholder.png"}
+                            alt={product.nome}
+                            className="product-img"
+                        />
+
+                        <div className="product-name">{product.nome}</div>
+                        <div className="product-code">Cod: {product.codice}</div>
+
+                        <div className="product-type">
+                            Tipo: {product.a_peso === "S" ? "S (peso)" : "N (pezzo)"}
+                        </div>
+
+                        <div className="product-price">
+                            € {product.prezzo}
+                            {product.a_peso === "S" ? " / Kg" : ""}
+                        </div>
+
+                        {product.a_peso === "S" ? (
+                            <button
+                                className="btn-primary"
+                                onClick={() => setPopupProduct(product)}
+                            >
+                                Scegli quantità
+                            </button>
+                        ) : (
+                            <button
+                                className="btn-primary"
+                                onClick={() => {
+                                    addToCart(product, {
+                                        productType: "pezzi",
+                                        quantity: 1,
+                                        weight: 0,
+                                    });
+                                    setToast("Aggiunto al carrello!");
+                                }}
+                            >
+                                Aggiungi al carrello
+                            </button>
+                        )}
+                    </div>
+                ))}
+            </div>
+
+            {popupProduct && (
+                <PopupPeso
+                    product={popupProduct}
+                    onConfirm={(grams) => handleAddWeight(popupProduct, grams)}
+                    onClose={() => setPopupProduct(null)}
+                />
+            )}
+
+            {toast && <Toast message={toast} onClose={() => setToast("")} />}
+        </div>
+    );
 }
