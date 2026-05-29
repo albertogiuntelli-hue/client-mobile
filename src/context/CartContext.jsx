@@ -3,13 +3,11 @@ import { createContext, useContext, useState, useEffect } from "react";
 const CartContext = createContext();
 
 export function CartProvider({ children }) {
-    // Carica il carrello dal localStorage
     const [items, setItems] = useState(() => {
         const saved = localStorage.getItem("cart");
         return saved ? JSON.parse(saved) : [];
     });
 
-    // Salva ogni modifica
     useEffect(() => {
         localStorage.setItem("cart", JSON.stringify(items));
     }, [items]);
@@ -28,15 +26,12 @@ export function CartProvider({ children }) {
             const existing = prev.find((p) => p.codice === product.codice);
 
             if (existing) {
-                const prevQty = parseFloat(String(existing.quantity).replace(",", ".").trim()) || 0;
-                const prevWgt = parseFloat(String(existing.weight).replace(",", ".").trim()) || 0;
-
                 return prev.map((p) =>
                     p.codice === product.codice
                         ? {
                             ...p,
-                            quantity: prevQty + qty,
-                            weight: prevWgt + wgt,
+                            quantity: p.quantity + qty,
+                            weight: p.weight + wgt,
                         }
                         : p
                 );
@@ -46,7 +41,6 @@ export function CartProvider({ children }) {
                 ...prev,
                 {
                     ...product,
-                    a_peso: product.a_peso,
                     productType,
                     quantity: qty,
                     weight: wgt,
@@ -60,27 +54,24 @@ export function CartProvider({ children }) {
             const existing = prev.find((p) => p.codice === product.codice);
             if (!existing) return prev;
 
-            const prevQty = parseFloat(String(existing.quantity).replace(",", ".").trim()) || 0;
-            const prevWgt = parseFloat(String(existing.weight).replace(",", ".").trim()) || 0;
-
             if (existing.productType === "pezzi") {
-                if (prevQty <= 1) {
+                if (existing.quantity <= 1) {
                     return prev.filter((p) => p.codice !== product.codice);
                 }
                 return prev.map((p) =>
                     p.codice === product.codice
-                        ? { ...p, quantity: prevQty - 1 }
+                        ? { ...p, quantity: p.quantity - 1 }
                         : p
                 );
             }
 
             if (existing.productType === "peso") {
-                if (prevWgt <= 50) {
+                if (existing.weight <= 50) {
                     return prev.filter((p) => p.codice !== product.codice);
                 }
                 return prev.map((p) =>
                     p.codice === product.codice
-                        ? { ...p, weight: prevWgt - 50 }
+                        ? { ...p, weight: existing.weight - 50 }
                         : p
                 );
             }
@@ -98,20 +89,16 @@ export function CartProvider({ children }) {
         localStorage.removeItem("cart");
     };
 
-    // ✔ TOTALE IN CENTESIMI (corretto)
+    // TOTALE IN EURO
     const total = items.reduce((sum, item) => {
-        const prezzoUnitarioCentesimi =
-            item.prezzo_scontato > 0 ? item.prezzo_scontato : item.prezzo;
-
-        const qty = parseFloat(String(item.quantity).replace(",", ".").trim()) || 0;
-        const wgt = parseFloat(String(item.weight).replace(",", ".").trim()) || 0;
+        const prezzoUnitarioEuro = item.prezzo / 100;
 
         if (item.productType === "pezzi") {
-            return sum + prezzoUnitarioCentesimi * qty;
+            return sum + prezzoUnitarioEuro * item.quantity;
         }
 
         if (item.productType === "peso") {
-            return sum + (wgt / 1000) * prezzoUnitarioCentesimi;
+            return sum + (item.weight / 1000) * prezzoUnitarioEuro;
         }
 
         return sum;
@@ -125,7 +112,7 @@ export function CartProvider({ children }) {
                 decreaseQuantity,
                 removeFromCart,
                 clearCart,
-                total, // sempre in centesimi
+                total,
             }}
         >
             {children}

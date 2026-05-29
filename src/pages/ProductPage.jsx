@@ -14,23 +14,13 @@ const ProductPage = () => {
 
     const { addToCart } = useCart();
 
-    // 🔥 Fallback logo sicuro (ESISTE sul backend)
-    const FALLBACK =
-        "https://backend-nuova-production.up.railway.app/plusmarket-logo.png";
+    const FALLBACK = "/logo.png";
 
     const getImage = (img) => {
-        if (
-            !img ||
-            img.trim() === "" ||
-            img === "null" ||
-            img === "undefined"
-        ) {
+        if (!img || img.trim() === "" || img === "null" || img === "undefined") {
             return FALLBACK;
         }
-
-        if (img.startsWith("http")) return img;
-
-        return `https://backend-nuova-production.up.railway.app/api/images/${img}`;
+        return img.startsWith("http") ? img : img;
     };
 
     useEffect(() => {
@@ -95,31 +85,11 @@ const ProductPage = () => {
             )}
 
             <p className="product-page-price">
-                {product.prezzo_scontato > 0 ? (
-                    <>
-                        <span className="old-price">{product.prezzo} €</span>
-                        <span className="new-price">{product.prezzo_scontato} €</span>
-                    </>
-                ) : (
-                    <span className="normal-price">
-                        {product.prezzo_al_kg
-                            ? `${product.prezzo} €/Kg`
-                            : `${product.prezzo} €`}
-                    </span>
-                )}
+                <span className="normal-price">
+                    € {(product.prezzo / 100).toFixed(2)}
+                    {product.a_peso === "S" ? " / Kg" : ""}
+                </span>
             </p>
-
-            {product.categoria && (
-                <p className="product-page-cat">
-                    Categoria: {product.categoria}
-                </p>
-            )}
-
-            {"disponibile" in product && (
-                <p className="product-page-stock">
-                    Disponibile: {product.disponibile ? "Sì" : "No"}
-                </p>
-            )}
 
             {product.a_peso === "S" ? (
                 <button

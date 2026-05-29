@@ -20,6 +20,15 @@ export default function ProductList() {
     const isPromoPage =
         new URLSearchParams(window.location.search).get("promo") === "true";
 
+    const FALLBACK = "/logo.png";
+
+    const getImage = (img) => {
+        if (!img || img.trim() === "" || img === "null" || img === "undefined") {
+            return FALLBACK;
+        }
+        return img.startsWith("http") ? img : img;
+    };
+
     useEffect(() => {
         const endpoint = isPromoPage ? "/promo" : "/products";
 
@@ -62,7 +71,6 @@ export default function ProductList() {
 
     function levenshtein(a, b) {
         const matrix = [];
-
         for (let i = 0; i <= b.length; i++) matrix[i] = [i];
         for (let j = 0; j <= a.length; j++) matrix[0][j] = j;
 
@@ -78,7 +86,6 @@ export default function ProductList() {
                         );
             }
         }
-
         return matrix[b.length][a.length];
     }
 
@@ -122,7 +129,7 @@ export default function ProductList() {
                         )}
 
                         <img
-                            src={product.immagine || "/placeholder.png"}
+                            src={getImage(product.immagine)}
                             alt={product.nome}
                             className="product-img"
                         />
@@ -135,7 +142,7 @@ export default function ProductList() {
                         </div>
 
                         <div className="product-price">
-                            € {product.prezzo}
+                            € {(product.prezzo / 100).toFixed(2)}
                             {product.a_peso === "S" ? " / Kg" : ""}
                         </div>
 

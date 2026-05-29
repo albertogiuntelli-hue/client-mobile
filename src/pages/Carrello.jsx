@@ -14,16 +14,13 @@ export default function Carrello() {
 
     const navigate = useNavigate();
 
+    const FALLBACK = "/logo.png";
+
     const getImage = (img) => {
-        if (!img || img.trim() === "") {
-            return "/logo.png";
+        if (!img || img.trim() === "" || img === "null" || img === "undefined") {
+            return FALLBACK;
         }
-
-        if (img.startsWith("http")) {
-            return img;
-        }
-
-        return `https://backend-nuova-production.up.railway.app/api/images/${img}`;
+        return img.startsWith("http") ? img : img;
     };
 
     if (items.length === 0) {
@@ -37,20 +34,16 @@ export default function Carrello() {
         );
     }
 
-    // ✔ PREZZO IN CENTESIMI → EURO
     const getItemPrice = (item) => {
-        const prezzoUnitarioCentesimi =
-            item.prezzo_scontato > 0 ? item.prezzo_scontato : item.prezzo;
-
-        const prezzoUnitario = prezzoUnitarioCentesimi / 100;
+        const prezzoUnitarioEuro = item.prezzo / 100;
 
         if (item.productType === "pezzi") {
-            return (prezzoUnitario * item.quantity).toFixed(2);
+            return (prezzoUnitarioEuro * item.quantity).toFixed(2);
         }
 
         if (item.productType === "peso") {
             const pesoKg = item.weight / 1000;
-            return (prezzoUnitario * pesoKg).toFixed(2);
+            return (prezzoUnitarioEuro * pesoKg).toFixed(2);
         }
 
         return "0.00";
@@ -123,9 +116,8 @@ export default function Carrello() {
                 </div>
             ))}
 
-            {/* ✔ TOTALE CORRETTO (centesimi → euro) */}
             <div className="cart-total">
-                Totale: € {(total / 100).toFixed(2)}
+                Totale: € {total.toFixed(2)}
             </div>
 
             <button

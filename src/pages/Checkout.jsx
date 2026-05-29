@@ -42,11 +42,11 @@ export default function Checkout() {
                     quantita: isPeso ? 0 : Number(p.quantity),
                     peso: isPeso ? Number(p.weight) : 0,
                     tipo: p.a_peso,
-                    prezzo: Number(p.prezzo),
+                    prezzo: Number(p.prezzo), // EURO ×100
                     prezzo_scontato: 0,
                 };
             }),
-            totale: total,
+            totale: Number((total * 100).toFixed(0)), // EURO → CENTESIMI
             createdAt: new Date().toISOString(),
         };
 
@@ -65,7 +65,7 @@ export default function Checkout() {
             return;
         }
 
-        if (total < 2000) {
+        if (total < 20) {
             alert("L'importo minimo per inviare l'ordine è di 20€.");
             return;
         }
@@ -101,7 +101,7 @@ export default function Checkout() {
             "Ordine PlusMarket\n\n" +
             message +
             "\n------------------------------\n" +
-            `Totale: ${(total / 100).toFixed(2).replace(".", ",")} €\n` +
+            `Totale: ${total.toFixed(2).replace(".", ",")} €\n` +
             `Nome: ${nome}\n` +
             `Cognome: ${cognome}\n` +
             `Telefono: ${telefonoCliente}\n` +
@@ -152,7 +152,7 @@ export default function Checkout() {
                         })}
 
                         <div className="checkout-total">
-                            Totale: {(total / 100).toFixed(2).replace(".", ",")} €
+                            Totale: {total.toFixed(2).replace(".", ",")} €
                         </div>
                     </div>
 
