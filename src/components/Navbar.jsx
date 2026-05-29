@@ -5,8 +5,13 @@ import "../styles/navbar.css";
 export default function Navbar() {
     const { items, total } = useCart();
 
-    // Numero articoli (peso o pezzi)
-    const cartCount = items.length;
+    // 🔥 Conteggio reale articoli
+    const cartCount = items.reduce((sum, item) => {
+        if (item.productType === "pezzi") {
+            return sum + item.quantity; // somma i pezzi reali
+        }
+        return sum + 1; // ogni prodotto a peso vale 1
+    }, 0);
 
     return (
         <nav className="mobile-navbar">

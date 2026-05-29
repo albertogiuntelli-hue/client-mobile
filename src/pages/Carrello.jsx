@@ -35,15 +35,15 @@ export default function Carrello() {
     }
 
     const getItemPrice = (item) => {
-        const prezzoUnitarioEuro = item.prezzo / 100;
+        const prezzoUnitario = Number(item.prezzo); // 🔥 già in EURO
 
         if (item.productType === "pezzi") {
-            return (prezzoUnitarioEuro * item.quantity).toFixed(2);
+            return (prezzoUnitario * item.quantity).toFixed(2);
         }
 
         if (item.productType === "peso") {
             const pesoKg = item.weight / 1000;
-            return (prezzoUnitarioEuro * pesoKg).toFixed(2);
+            return (prezzoUnitario * pesoKg).toFixed(2);
         }
 
         return "0.00";

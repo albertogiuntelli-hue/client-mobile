@@ -1,86 +1,132 @@
 import { useEffect, useState } from "react";
-import axios from "../api/axios";
+import api from "../api/axios";
+import { useCart } from "../context/CartContext";
+import PopupPeso from "../components/PopupPeso";
+import Toast from "../components/Toast";
+import { useNavigate } from "react-router-dom";
+import "../styles/theme.css";
+import "../styles/productlist.css";
 
 export default function Promo() {
     const [promo, setPromo] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [popupProduct, setPopupProduct] = useState(null);
+    const [toast, setToast] = useState("");
 
-    const FALLBACK =
-        "https://backend-nuova-production.up.railway.app/plusmarket-logo.png";
+    const { addToCart } = useCart();
+    const navigate = useNavigate();
+
+    const FALLBACK = "/logo.png";
 
     const getImage = (img) => {
-        if (
-            !img ||
-            img.trim() === "" ||
-            img === "null" ||
-            img === "undefined" ||
-            img.toLowerCase() === "immagine promo"
-        ) {
+        if (!img || img.trim() === "" || img === "null" || img === "undefined") {
             return FALLBACK;
         }
-
-        if (img.startsWith("http")) return img;
-
-        return `https://backend-nuova-production.up.railway.app/api/images/${img}`;
+        return img.startsWith("http") ? img : img;
     };
 
     useEffect(() => {
-        const loadPromo = async () => {
-            try {
-                const res = await axios.get("/promo");
-                const data = res.data || [];
-
-                const parsed = data.map((row) => ({
-                    codice: row.codice,
-                    nome: row.descrizione,
-                    prezzo: row.prezzo,
-                    immagine: row.immagine,
+        api.get("/promo")
+            .then((res) => {
+                const fixed = res.data.map((p) => ({
+                    ...p,
+                    nome: p.nome || p.descrizione,
+                    a_peso: (p.a_peso || "").toUpperCase() === "S" ? "S" : "N",
+                    prezzo: Number(p.prezzo),
                 }));
-
-                setPromo(parsed);
-            } catch (err) {
+                setPromo(fixed);
+                setLoading(false);
+            })
+            .catch((err) => {
                 console.error("Errore caricamento promo:", err);
-            }
-            setLoading(false);
-        };
-
-        loadPromo();
+                setLoading(false);
+            });
     }, []);
 
-    const formatPrice = (value) => {
-        if (value === null || value === undefined || value === "" || isNaN(value)) {
-            return "—";
-        }
+    if (loading) {
+        return <p style={{ padding: "20px" }}>Caricamento promo...</p>;
+    }
 
-        return Number(value)
-            .toFixed(2)
-            .replace(".", ",");
+    const handleAddWeight = (product, grams) => {
+        const peso = Number(grams);
+        if (!peso || peso <= 0) return;
+
+        addToCart(product, {
+            productType: "peso",
+            quantity: 0,
+            weight: peso,
+        });
+
+        setPopupProduct(null);
+        setToast("Aggiunto al carrello!");
     };
 
-    if (loading) return <h2 style={{ textAlign: "center" }}>Caricamento promo...</h2>;
-
     return (
-        <div className="promo-container">
+        <div className="products-container">
+            <button className="back-btn" onClick={() => navigate("/")}>
+                ⬅ Torna indietro
+            </button>
+
             <h2 className="promo-title">Offerte Speciali</h2>
 
-            <div className="promo-grid">
-                {promo.map((p, index) => (
-                    <div key={index} className="promo-card">
+            <div className="product-grid">
+                {promo.map((product) => (
+                    <div key={product.codice} className="product-card">
+                        <span className="badge-offerta">OFFERTA</span>
+
                         <img
-                            src={getImage(p.immagine)}
-                            alt={p.nome}
-                            className="promo-image"
+                            src={getImage(product.immagine)}
+                            alt={product.nome}
+                            className="product-img"
                         />
 
-                        <div className="promo-info">
-                            <h3 className="promo-name">{p.nome}</h3>
-                            <p className="promo-price">
-                                € {String(formatPrice(p.prezzo))}
-                            </p>
+                        <div className="product-name">{product.nome}</div>
+                        <div className="product-code">Cod: {product.codice}</div>
+
+                        <div className="product-type">
+                            Tipo: {product.a_peso === "S" ? "S (peso)" : "N (pezzo)"}
                         </div>
+
+                        <div className="product-price">
+                            € {product.prezzo.toFixed(2)}
+                            {product.a_peso === "S" ? " / Kg" : ""}
+                        </div>
+
+                        {product.a_peso === "S" ? (
+                            <button
+                                className="btn-primary"
+                                onClick={() => setPopupProduct(product)}
+                            >
+                                Scegli quantità
+                            </button>
+                        ) : (
+                            <button
+                                className="btn-primary"
+                                onClick={() => {
+                                    addToCart(product, {
+                                        productType: "pezzi",
+                                        quantity: 1,
+                                        weight: 0,
+                                    });
+                                    setToast("Aggiunto al carrello!");
+                                }}
+                            >
+                                Aggiungi al carrello
+                            </button>
+                        )}
                     </div>
                 ))}
             </div>
+
+            {popupProduct && (
+                <PopupPeso
+                    product={popupProduct}
+                    onConfirm={(grams) => handleAddWeight(popupProduct, grams)}
+                    onClose={() => setPopupProduct(null)}
+                />
+            )}
+
+            {toast && <Toast message={toast} onClose={() => setToast("")} />}
         </div>
     );
 }
