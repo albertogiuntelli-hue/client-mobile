@@ -1,5 +1,4 @@
 import { useNavigate } from "react-router-dom";
-import logo from "../../public/icon-192.png";
 import "../styles/theme.css";
 
 export default function Home() {
@@ -7,51 +6,50 @@ export default function Home() {
 
     return (
         <div className="home-container">
-            <img src={logo} alt="Plusmarket" className="home-logo" />
+            <img
+                src="/icon-192.png"
+                alt="PlusMarket Logo"
+                className="home-logo"
+            />
+
+            <h1 className="home-title">PlusMarket Giuntelli</h1>
 
             <div className="home-buttons">
-                {/* 🔥 Bottone offerte → usa query promo=true */}
-                <button
-                    className="home-btn"
-                    onClick={() => navigate("/prodotti?promo=true")}
-                >
-                    ORDINA ONLINE LE OFFERTE
-                </button>
-
                 <button
                     className="home-btn"
                     onClick={() => navigate("/prodotti")}
                 >
-                    LISTINO COMPLETO PLUSMARKET
+                    Ordina online i prodotti
+                </button>
+
+                <button
+                    className="home-btn"
+                    onClick={() => navigate("/prodotti?promo=true")}
+                >
+                    Ordina online le offerte
+                </button>
+
+                <button
+                    className="home-btn"
+                    onClick={() => navigate("/listino")}
+                >
+                    Listino completo PlusMarket
                 </button>
 
                 <button
                     className="home-btn"
                     onClick={() => navigate("/condizioni")}
                 >
-                    CONDIZIONI DI VENDITA
+                    Condizioni di vendita
+                </button>
+
+                <button
+                    className="home-btn"
+                    onClick={() => navigate("/chi-siamo")}
+                >
+                    Chi siamo
                 </button>
             </div>
-
-            <p className="home-description">
-                Il tuo negozio di fiducia, vicino a te ogni giorno.
-            </p>
-
-            <a
-                href="https://www.plusmarket.it"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="home-link"
-            >
-                www.plusmarket.it
-            </a>
-
-            <button
-                className="home-btn-secondary"
-                onClick={() => navigate("/chi-siamo")}
-            >
-                CHI SIAMO
-            </button>
         </div>
     );
 }
