@@ -89,9 +89,9 @@ export function CartProvider({ children }) {
         localStorage.removeItem("cart");
     };
 
-    // TOTALE IN EURO
+    // 🔥 TOTALE IN EURO — NIENTE /100
     const total = items.reduce((sum, item) => {
-        const prezzoUnitarioEuro = item.prezzo / 100;
+        const prezzoUnitarioEuro = item.prezzo; // CORRETTO
 
         if (item.productType === "pezzi") {
             return sum + prezzoUnitarioEuro * item.quantity;
