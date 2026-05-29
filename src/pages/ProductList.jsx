@@ -143,6 +143,7 @@ export default function ProductList() {
 
                         <img
                             src={getImage(product.immagine)}
+                            onError={(e) => (e.target.src = FALLBACK)}
                             alt={product.nome}
                             className="product-img"
                         />
