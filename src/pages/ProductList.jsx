@@ -26,7 +26,7 @@ export default function ProductList() {
         if (!img || img.trim() === "" || img === "null" || img === "undefined") {
             return FALLBACK;
         }
-        return img.startsWith("http") ? img : img;
+        return img;
     };
 
     useEffect(() => {
@@ -34,7 +34,20 @@ export default function ProductList() {
 
         api.get(endpoint)
             .then((res) => {
-                setProducts(res.data);
+                const fixed = res.data.map((p) => ({
+                    ...p,
+                    nome: (p.nome || p.descrizione || "").trim(),
+                    a_peso: String(p.a_peso || "")
+                        .trim()
+                        .toUpperCase() === "S"
+                        ? "S"
+                        : "N",
+                    prezzo: parseFloat(
+                        String(p.prezzo).replace(",", ".").trim()
+                    ),
+                }));
+
+                setProducts(fixed);
                 setLoading(false);
             })
             .catch((err) => {
@@ -142,7 +155,7 @@ export default function ProductList() {
                         </div>
 
                         <div className="product-price">
-                            € {(product.prezzo / 100).toFixed(2)}
+                            € {product.prezzo.toFixed(2)}
                             {product.a_peso === "S" ? " / Kg" : ""}
                         </div>
 
@@ -184,3 +197,4 @@ export default function ProductList() {
         </div>
     );
 }
+

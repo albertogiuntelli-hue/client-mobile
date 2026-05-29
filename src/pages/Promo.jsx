@@ -22,7 +22,7 @@ export default function Promo() {
         if (!img || img.trim() === "" || img === "null" || img === "undefined") {
             return FALLBACK;
         }
-        return img.startsWith("http") ? img : img;
+        return img;
     };
 
     useEffect(() => {
@@ -30,10 +30,17 @@ export default function Promo() {
             .then((res) => {
                 const fixed = res.data.map((p) => ({
                     ...p,
-                    nome: p.nome || p.descrizione,
-                    a_peso: (p.a_peso || "").toUpperCase() === "S" ? "S" : "N",
-                    prezzo: Number(p.prezzo),
+                    nome: (p.nome || p.descrizione || "").trim(),
+                    a_peso: String(p.a_peso || "")
+                        .trim()
+                        .toUpperCase() === "S"
+                        ? "S"
+                        : "N",
+                    prezzo: parseFloat(
+                        String(p.prezzo).replace(",", ".").trim()
+                    ),
                 }));
+
                 setPromo(fixed);
                 setLoading(false);
             })
