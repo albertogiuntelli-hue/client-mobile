@@ -20,7 +20,7 @@ export default function ProductList() {
     const isPromoPage =
         new URLSearchParams(window.location.search).get("promo") === "true";
 
-    const FALLBACK = "/logo.png";
+    const FALLBACK = "/icon-192.png";
 
     const getImage = (img) => {
         if (!img || img.trim() === "" || img === "null" || img === "undefined") {
@@ -197,4 +197,3 @@ export default function ProductList() {
         </div>
     );
 }
-
