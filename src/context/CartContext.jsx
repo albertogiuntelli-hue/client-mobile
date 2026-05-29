@@ -1,139 +1,124 @@
-import { useEffect, useState } from "react";
-import api from "../api/axios";
-import { useCart } from "../context/CartContext";
-import PopupPeso from "../components/PopupPeso";
-import Toast from "../components/Toast";
-import { useNavigate } from "react-router-dom";
-import "../styles/theme.css";
-import "../styles/productlist.css";
+import { createContext, useContext, useState, useEffect } from "react";
 
-export default function Promo() {
-    const [promo, setPromo] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [popupProduct, setPopupProduct] = useState(null);
-    const [toast, setToast] = useState("");
+const CartContext = createContext();
 
-    const { addToCart } = useCart();
-    const navigate = useNavigate();
-
-    const FALLBACK = "/logo.png";
-
-    const getImage = (img) => {
-        if (!img || img.trim() === "" || img === "null" || img === "undefined") {
-            return FALLBACK;
-        }
-        return img;
-    };
+export function CartProvider({ children }) {
+    const [items, setItems] = useState(() => {
+        const saved = localStorage.getItem("cart");
+        return saved ? JSON.parse(saved) : [];
+    });
 
     useEffect(() => {
-        api.get("/promo")
-            .then((res) => {
-                const fixed = res.data.map((p) => ({
-                    ...p,
-                    nome: (p.nome || p.descrizione || "").trim(),
-                    a_peso: String(p.a_peso || "")
-                        .trim()
-                        .toUpperCase() === "S"
-                        ? "S"
-                        : "N",
-                    prezzo: parseFloat(
-                        String(p.prezzo).replace(",", ".").trim()
-                    ),
-                }));
+        localStorage.setItem("cart", JSON.stringify(items));
+    }, [items]);
 
-                setPromo(fixed);
-                setLoading(false);
-            })
-            .catch((err) => {
-                console.error("Errore caricamento promo:", err);
-                setLoading(false);
-            });
-    }, []);
+    const addToCart = (product, options = {}) => {
+        const {
+            productType = product.a_peso === "S" ? "peso" : "pezzi",
+            quantity = 1,
+            weight = 0,
+        } = options;
 
-    if (loading) {
-        return <p style={{ padding: "20px" }}>Caricamento promo...</p>;
-    }
+        const qty = parseFloat(String(quantity).replace(",", ".").trim()) || 0;
+        const wgt = parseFloat(String(weight).replace(",", ".").trim()) || 0;
 
-    const handleAddWeight = (product, grams) => {
-        const peso = Number(grams);
-        if (!peso || peso <= 0) return;
+        setItems((prev) => {
+            const existing = prev.find((p) => p.codice === product.codice);
 
-        addToCart(product, {
-            productType: "peso",
-            quantity: 0,
-            weight: peso,
+            if (existing) {
+                return prev.map((p) =>
+                    p.codice === product.codice
+                        ? {
+                            ...p,
+                            quantity: p.quantity + qty,
+                            weight: p.weight + wgt,
+                        }
+                        : p
+                );
+            }
+
+            return [
+                ...prev,
+                {
+                    ...product,
+                    productType,
+                    quantity: qty,
+                    weight: wgt,
+                },
+            ];
         });
-
-        setPopupProduct(null);
-        setToast("Aggiunto al carrello!");
     };
 
+    const decreaseQuantity = (product) => {
+        setItems((prev) => {
+            const existing = prev.find((p) => p.codice === product.codice);
+            if (!existing) return prev;
+
+            if (existing.productType === "pezzi") {
+                if (existing.quantity <= 1) {
+                    return prev.filter((p) => p.codice !== product.codice);
+                }
+                return prev.map((p) =>
+                    p.codice === product.codice
+                        ? { ...p, quantity: p.quantity - 1 }
+                        : p
+                );
+            }
+
+            if (existing.productType === "peso") {
+                if (existing.weight <= 50) {
+                    return prev.filter((p) => p.codice !== product.codice);
+                }
+                return prev.map((p) =>
+                    p.codice === product.codice
+                        ? { ...p, weight: existing.weight - 50 }
+                        : p
+                );
+            }
+
+            return prev;
+        });
+    };
+
+    const removeFromCart = (product) => {
+        setItems((prev) => prev.filter((p) => p.codice !== product.codice));
+    };
+
+    const clearCart = () => {
+        setItems([]);
+        localStorage.removeItem("cart");
+    };
+
+    const total = items.reduce((sum, item) => {
+        const prezzoUnitarioEuro = item.prezzo;
+
+        if (item.productType === "pezzi") {
+            return sum + prezzoUnitarioEuro * item.quantity;
+        }
+
+        if (item.productType === "peso") {
+            return sum + (item.weight / 1000) * prezzoUnitarioEuro;
+        }
+
+        return sum;
+    }, 0);
+
     return (
-        <div className="products-container">
-            <button className="back-btn" onClick={() => navigate("/")}>
-                ⬅ Torna indietro
-            </button>
-
-            <h2 className="promo-title">Offerte Speciali</h2>
-
-            <div className="product-grid">
-                {promo.map((product) => (
-                    <div key={product.codice} className="product-card">
-                        <span className="badge-offerta">OFFERTA</span>
-
-                        <img
-                            src={getImage(product.immagine)}
-                            alt={product.nome}
-                            className="product-img"
-                        />
-
-                        <div className="product-name">{product.nome}</div>
-                        <div className="product-code">Cod: {product.codice}</div>
-
-                        <div className="product-type">
-                            Tipo: {product.a_peso === "S" ? "S (peso)" : "N (pezzo)"}
-                        </div>
-
-                        <div className="product-price">
-                            € {product.prezzo.toFixed(2)}
-                            {product.a_peso === "S" ? " / Kg" : ""}
-                        </div>
-
-                        {product.a_peso === "S" ? (
-                            <button
-                                className="btn-primary"
-                                onClick={() => setPopupProduct(product)}
-                            >
-                                Scegli quantità
-                            </button>
-                        ) : (
-                            <button
-                                className="btn-primary"
-                                onClick={() => {
-                                    addToCart(product, {
-                                        productType: "pezzi",
-                                        quantity: 1,
-                                        weight: 0,
-                                    });
-                                    setToast("Aggiunto al carrello!");
-                                }}
-                            >
-                                Aggiungi al carrello
-                            </button>
-                        )}
-                    </div>
-                ))}
-            </div>
-
-            {popupProduct && (
-                <PopupPeso
-                    product={popupProduct}
-                    onConfirm={(grams) => handleAddWeight(popupProduct, grams)}
-                    onClose={() => setPopupProduct(null)}
-                />
-            )}
-
-            {toast && <Toast message={toast} onClose={() => setToast("")} />}
-        </div>
+        <CartContext.Provider
+            value={{
+                items,
+                addToCart,
+                decreaseQuantity,
+                removeFromCart,
+                clearCart,
+                total,
+            }}
+        >
+            {children}
+        </CartContext.Provider>
     );
+}
+
+export function useCart() {
+    return useContext(CartContext);
 }
