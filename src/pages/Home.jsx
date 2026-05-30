@@ -15,12 +15,6 @@ export default function Home() {
             <h1 className="home-title">PlusMarket Giuntelli</h1>
 
             <div className="home-buttons">
-                <button
-                    className="home-btn"
-                    onClick={() => navigate("/prodotti")}
-                >
-                    Ordina online i prodotti
-                </button>
 
                 <button
                     className="home-btn"
@@ -49,6 +43,7 @@ export default function Home() {
                 >
                     Chi siamo
                 </button>
+
             </div>
         </div>
     );
