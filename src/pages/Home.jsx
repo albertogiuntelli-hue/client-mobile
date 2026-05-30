@@ -14,11 +14,20 @@ export default function Home() {
 
             <h1 className="home-title">PlusMarket Giuntelli</h1>
 
-            {/* ⭐ TESTO MANCANTE INSERITO QUI */}
+            {/* Testo descrittivo */}
             <p style={{ fontSize: "18px", marginTop: "10px", marginBottom: "5px" }}>
                 Il tuo negozio di fiducia vicino a te ogni giorno
             </p>
-            <p style={{ fontSize: "16px", marginBottom: "20px", color: "#444" }}>
+
+            {/* www.plusmarket.it in blu */}
+            <p
+                style={{
+                    fontSize: "16px",
+                    marginBottom: "20px",
+                    color: "#0066cc",
+                    fontWeight: "bold"
+                }}
+            >
                 www.plusmarket.it
             </p>
 
@@ -45,8 +54,13 @@ export default function Home() {
                     Condizioni di vendita
                 </button>
 
+                {/* Pulsante Chi siamo in marrone bello */}
                 <button
                     className="home-btn"
+                    style={{
+                        backgroundColor: "#8B4513",
+                        color: "white"
+                    }}
                     onClick={() => navigate("/chi-siamo")}
                 >
                     Chi siamo
