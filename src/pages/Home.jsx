@@ -14,6 +14,14 @@ export default function Home() {
 
             <h1 className="home-title">PlusMarket Giuntelli</h1>
 
+            {/* ⭐ TESTO MANCANTE INSERITO QUI */}
+            <p style={{ fontSize: "18px", marginTop: "10px", marginBottom: "5px" }}>
+                Il tuo negozio di fiducia vicino a te ogni giorno
+            </p>
+            <p style={{ fontSize: "16px", marginBottom: "20px", color: "#444" }}>
+                www.plusmarket.it
+            </p>
+
             <div className="home-buttons">
 
                 <button
