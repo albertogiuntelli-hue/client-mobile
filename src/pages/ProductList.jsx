@@ -29,14 +29,14 @@ export default function ProductList() {
         return img;
     };
 
-    // 🔥 FORMATO DATE CORTO (senza anno)
+    // formato date corto
     const formatDateShort = (str) => {
         if (!str) return "";
         const [day, month] = str.split("/");
         return `${day}/${month}`;
     };
 
-    // 🔥 Verifica se l’offerta è attiva oggi
+    // verifica se l’offerta è attiva
     const isActiveOffer = (p) => {
         if (!p.startDate || !p.endDate) return false;
 
@@ -156,14 +156,17 @@ export default function ProductList() {
                 {filtered.map((product) => (
                     <div key={product.codice} className="product-card">
 
-                        {/* 🔥 Striscia OFFERTA con date */}
-                        {isActiveOffer(product) && (
+                        {/* 🔥 OFFERTA SEMPRE IN PAGINA PROMO + DATE SE ESISTONO */}
+                        {(isPromoPage || isActiveOffer(product)) && (
                             <div className="badge-offerta">
                                 OFFERTA
-                                <div className="badge-date">
-                                    DAL {formatDateShort(product.startDate)}
-                                    {" "}AL {formatDateShort(product.endDate)}
-                                </div>
+
+                                {product.startDate && product.endDate && (
+                                    <div className="badge-date">
+                                        DAL {formatDateShort(product.startDate)}
+                                        {" "}AL {formatDateShort(product.endDate)}
+                                    </div>
+                                )}
                             </div>
                         )}
 
@@ -224,3 +227,4 @@ export default function ProductList() {
         </div>
     );
 }
+
