@@ -23,7 +23,6 @@
 =========================== */
 .product-card {
     position: relative;
-    /* necessario per il badge */
     background: white;
     padding: 12px;
     border-radius: 14px;
@@ -39,7 +38,7 @@
 }
 
 /* ===========================
-   BADGE OFFERTA DIAGONALE (ELEGANTE)
+   BADGE OFFERTA DIAGONALE + DATE
 =========================== */
 .badge-offerta {
     position: absolute;
@@ -58,6 +57,15 @@
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.18);
     opacity: 0.92;
     z-index: 20;
+}
+
+/* 🔥 Date sotto la scritta OFFERTA */
+.badge-date {
+    font-size: 9px;
+    font-weight: 400;
+    margin-top: 2px;
+    display: block;
+    transform: rotate(45deg);
 }
 
 /* ===========================
