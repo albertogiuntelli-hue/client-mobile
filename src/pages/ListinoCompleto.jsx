@@ -5,7 +5,7 @@ import PopupPeso from "../components/PopupPeso";
 import Toast from "../components/Toast";
 import { useNavigate } from "react-router-dom";
 import "../styles/theme.css";
-import "../styles/listino.css";   // 🔥 nuovo CSS dedicato
+import "../styles/listino.css";
 
 export default function ListinoCompleto() {
     const [products, setProducts] = useState([]);
@@ -22,13 +22,9 @@ export default function ListinoCompleto() {
             .then((res) => {
                 const fixed = res.data.map((p) => ({
                     ...p,
-                    nome: (p.nome || "").trim(),
-                    a_peso: String(p.a_peso || "")
-                        .trim()
-                        .toUpperCase() === "S"
-                        ? "S"
-                        : "N",
-                    prezzo: Number(String(p.prezzo).replace(",", ".").trim()),
+                    nome: (p.nome || p.descrizione || "").trim(),
+                    a_peso: String(p.a_peso || "").trim().toUpperCase() === "S" ? "S" : "N",
+                    prezzo: Number(String(p.prezzo).replace(",", ".").trim()) / 100,
                 }));
 
                 setProducts(fixed);
@@ -77,9 +73,7 @@ export default function ListinoCompleto() {
                     <div key={product.codice} className="listino-row">
                         <div className="listino-code">{product.codice}</div>
                         <div className="listino-name">{product.nome}</div>
-                        <div className="listino-price">
-                            € {product.prezzo.toFixed(2)}
-                        </div>
+                        <div className="listino-price">€ {product.prezzo.toFixed(2)}</div>
 
                         {product.a_peso === "S" ? (
                             <button
