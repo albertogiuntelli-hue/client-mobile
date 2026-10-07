@@ -5,7 +5,7 @@ import PopupPeso from "../components/PopupPeso";
 import Toast from "../components/Toast";
 import { useNavigate } from "react-router-dom";
 import "../styles/theme.css";
-import "../styles/Productlist.css"; // ✔ IMPORT PULITO, SENZA SPAZI
+import "../styles/productlist.css"; // ✔ IMPORT PULITO, SENZA SPAZI
 
 export default function ListinoCompleto() {
     const [products, setProducts] = useState([]);
