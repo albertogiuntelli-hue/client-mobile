@@ -5,7 +5,7 @@ import PopupPeso from "../components/PopupPeso";
 import Toast from "../components/Toast";
 import { useNavigate } from "react-router-dom";
 import "../styles/theme.css";
-import "../styles/Productlist.css";
+import "../styles/productlist.css";
 
 export default function Promo() {
     const [promo, setPromo] = useState([]);
