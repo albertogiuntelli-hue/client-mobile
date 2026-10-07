@@ -5,7 +5,7 @@ import PopupPeso from "../components/PopupPeso";
 import Toast from "../components/Toast";
 import { useNavigate } from "react-router-dom";
 import "../styles/theme.css";
-import "../styles/productlist.css"; // ✔ IMPORT PULITO, SENZA SPAZI
+import "../styles/listino.css";   // 🔥 nuovo CSS dedicato
 
 export default function ListinoCompleto() {
     const [products, setProducts] = useState([]);
@@ -16,15 +16,6 @@ export default function ListinoCompleto() {
 
     const { addToCart } = useCart();
     const navigate = useNavigate();
-
-    const FALLBACK = "/placeholder.png";
-
-    const getImage = (img) => {
-        if (!img || img.trim() === "" || img === "null" || img === "undefined") {
-            return FALLBACK;
-        }
-        return img;
-    };
 
     useEffect(() => {
         api.get("/products")
@@ -37,37 +28,18 @@ export default function ListinoCompleto() {
                         .toUpperCase() === "S"
                         ? "S"
                         : "N",
-                    prezzo: Number(
-                        String(p.prezzo).replace(",", ".").trim()
-                    ),
+                    prezzo: Number(String(p.prezzo).replace(",", ".").trim()),
                 }));
 
                 setProducts(fixed);
                 setLoading(false);
             })
-            .catch((err) => {
-                console.error("Errore caricamento prodotti:", err);
-                setLoading(false);
-            });
+            .catch(() => setLoading(false));
     }, []);
 
     if (loading) {
         return <p style={{ padding: "20px" }}>Caricamento prodotti...</p>;
     }
-
-    const handleAddWeight = (product, grams) => {
-        const peso = Number(grams);
-        if (!peso || peso <= 0) return;
-
-        addToCart(product, {
-            productType: "peso",
-            quantity: 0,
-            weight: peso,
-        });
-
-        setPopupProduct(null);
-        setToast("Aggiunto al carrello!");
-    };
 
     const normalize = (str) =>
         str
@@ -77,95 +49,48 @@ export default function ListinoCompleto() {
             .normalize("NFD")
             .replace(/[\u0300-\u036f]/g, "");
 
-    function levenshtein(a, b) {
-        const matrix = [];
-        for (let i = 0; i <= b.length; i++) matrix[i] = [i];
-        for (let j = 0; j <= a.length; j++) matrix[0][j] = j;
-
-        for (let i = 1; i <= b.length; i++) {
-            for (let j = 1; j <= a.length; j++) {
-                matrix[i][j] =
-                    b.charAt(i - 1) === a.charAt(j - 1)
-                        ? matrix[i - 1][j - 1]
-                        : Math.min(
-                            matrix[i - 1][j - 1] + 1,
-                            matrix[i][j - 1] + 1,
-                            matrix[i - 1][j] + 1
-                        );
-            }
-        }
-        return matrix[b.length][a.length];
-    }
-
     const filtered = products.filter((p) => {
         if (!search) return true;
-
         const name = normalize(p.nome);
         const term = normalize(search);
-
-        if (name.includes(term)) return true;
-
-        const distance = levenshtein(name, term);
-        if (distance <= 3) return true;
-
-        if (term.length > 4 && name.startsWith(term.slice(0, 4))) return true;
-
-        if (name.length > 4 && term.startsWith(name.slice(0, 4))) return true;
-
-        return false;
+        return name.includes(term);
     });
 
     return (
-        <div className="products-container">
+        <div className="listino-container">
             <button className="back-btn" onClick={() => navigate("/")}>
                 ⬅ Torna indietro
             </button>
 
-            <h2 style={{ textAlign: "center", marginTop: "10px" }}>
-                Listino completo PlusMarket
-            </h2>
+            <h2 className="listino-title">Listino completo PlusMarket</h2>
 
             <input
                 type="text"
-                className="search-box"
+                className="listino-search"
                 placeholder="Cerca prodotto..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
             />
 
-            <div className="product-grid">
+            <div className="listino-table">
                 {filtered.map((product) => (
-                    <div key={product.codice} className="product-card">
-
-                        <img
-                            src={getImage(product.immagine)}
-                            onError={(e) => (e.target.src = FALLBACK)}
-                            alt={product.nome}
-                            className="product-img"
-                        />
-
-                        <div className="product-name">{product.nome}</div>
-                        <div className="product-code">Cod: {product.codice}</div>
-
-                        <div className="product-type">
-                            Tipo: {product.a_peso === "S" ? "S (peso)" : "N (pezzo)"}
-                        </div>
-
-                        <div className="product-price">
+                    <div key={product.codice} className="listino-row">
+                        <div className="listino-code">{product.codice}</div>
+                        <div className="listino-name">{product.nome}</div>
+                        <div className="listino-price">
                             € {product.prezzo.toFixed(2)}
-                            {product.a_peso === "S" ? " / Kg" : ""}
                         </div>
 
                         {product.a_peso === "S" ? (
                             <button
-                                className="btn-primary"
+                                className="listino-btn"
                                 onClick={() => setPopupProduct(product)}
                             >
-                                Scegli quantità
+                                Peso
                             </button>
                         ) : (
                             <button
-                                className="btn-primary"
+                                className="listino-btn"
                                 onClick={() => {
                                     addToCart(product, {
                                         productType: "pezzi",
@@ -175,7 +100,7 @@ export default function ListinoCompleto() {
                                     setToast("Aggiunto al carrello!");
                                 }}
                             >
-                                Aggiungi al carrello
+                                +1
                             </button>
                         )}
                     </div>
@@ -185,7 +110,15 @@ export default function ListinoCompleto() {
             {popupProduct && (
                 <PopupPeso
                     product={popupProduct}
-                    onConfirm={(grams) => handleAddWeight(popupProduct, grams)}
+                    onConfirm={(grams) => {
+                        addToCart(popupProduct, {
+                            productType: "peso",
+                            quantity: 0,
+                            weight: Number(grams),
+                        });
+                        setPopupProduct(null);
+                        setToast("Aggiunto al carrello!");
+                    }}
                     onClose={() => setPopupProduct(null)}
                 />
             )}

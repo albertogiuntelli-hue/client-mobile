@@ -1,0 +1,52 @@
+.listino-container {
+    padding: 15px;
+}
+
+.listino-title {
+    text-align: center;
+    margin: 10px 0;
+    font-size: 20px;
+}
+
+.listino-search {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0 20px;
+    font-size: 16px;
+}
+
+.listino-table {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.listino-row {
+    display: grid;
+    grid-template-columns: 70px 1fr 80px 60px;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+    background: #fafafa;
+}
+
+.listino-code {
+    font-weight: bold;
+}
+
+.listino-name {
+    font-size: 15px;
+}
+
+.listino-price {
+    font-weight: bold;
+    text-align: right;
+}
+
+.listino-btn {
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 6px 10px;
+    border-radius: 5px;
+}

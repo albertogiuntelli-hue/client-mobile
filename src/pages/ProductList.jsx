@@ -29,14 +29,12 @@ export default function ProductList() {
         return img;
     };
 
-    // formato date corto
     const formatDateShort = (str) => {
         if (!str) return "";
         const [day, month] = str.split("/");
         return `${day}/${month}`;
     };
 
-    // verifica se l’offerta è attiva
     const isActiveOffer = (p) => {
         if (!p.startDate || !p.endDate) return false;
 
@@ -68,29 +66,12 @@ export default function ProductList() {
                 setProducts(fixed);
                 setLoading(false);
             })
-            .catch((err) => {
-                console.error("Errore caricamento prodotti:", err);
-                setLoading(false);
-            });
+            .catch(() => setLoading(false));
     }, [isPromoPage]);
 
     if (loading) {
         return <p style={{ padding: "20px" }}>Caricamento prodotti...</p>;
     }
-
-    const handleAddWeight = (product, grams) => {
-        const peso = Number(grams);
-        if (!peso || peso <= 0) return;
-
-        addToCart(product, {
-            productType: "peso",
-            quantity: 0,
-            weight: peso,
-        });
-
-        setPopupProduct(null);
-        setToast("Aggiunto al carrello!");
-    };
 
     const normalize = (str) =>
         str
@@ -99,26 +80,6 @@ export default function ProductList() {
             .replace(/\s+/g, "")
             .normalize("NFD")
             .replace(/[\u0300-\u036f]/g, "");
-
-    function levenshtein(a, b) {
-        const matrix = [];
-        for (let i = 0; i <= b.length; i++) matrix[i] = [i];
-        for (let j = 0; j <= a.length; j++) matrix[0][j] = j;
-
-        for (let i = 1; i <= b.length; i++) {
-            for (let j = 1; j <= a.length; j++) {
-                matrix[i][j] =
-                    b.charAt(i - 1) === a.charAt(j - 1)
-                        ? matrix[i - 1][j - 1]
-                        : Math.min(
-                            matrix[i - 1][j - 1] + 1,
-                            matrix[i][j - 1] + 1,
-                            matrix[i - 1][j] + 1
-                        );
-            }
-        }
-        return matrix[b.length][a.length];
-    }
 
     const filtered = products.filter((p) => {
         if (!search) return true;
@@ -156,11 +117,9 @@ export default function ProductList() {
                 {filtered.map((product) => (
                     <div key={product.codice} className="product-card">
 
-                        {/* 🔥 OFFERTA SEMPRE IN PAGINA PROMO + DATE SE ESISTONO */}
                         {(isPromoPage || isActiveOffer(product)) && (
                             <div className="badge-offerta">
                                 OFFERTA
-
                                 {product.startDate && product.endDate && (
                                     <div className="badge-date">
                                         DAL {formatDateShort(product.startDate)}
@@ -218,7 +177,15 @@ export default function ProductList() {
             {popupProduct && (
                 <PopupPeso
                     product={popupProduct}
-                    onConfirm={(grams) => handleAddWeight(popupProduct, grams)}
+                    onConfirm={(grams) => {
+                        addToCart(popupProduct, {
+                            productType: "peso",
+                            quantity: 0,
+                            weight: Number(grams),
+                        });
+                        setPopupProduct(null);
+                        setToast("Aggiunto al carrello!");
+                    }}
                     onClose={() => setPopupProduct(null)}
                 />
             )}
@@ -228,3 +195,22 @@ export default function ProductList() {
     );
 }
 
+function levenshtein(a, b) {
+    const matrix = [];
+    for (let i = 0; i <= b.length; i++) matrix[i] = [i];
+    for (let j = 0; j <= a.length; j++) matrix[0][j] = j;
+
+    for (let i = 1; i <= b.length; i++) {
+        for (let j = 1; j <= a.length; j++) {
+            matrix[i][j] =
+                b.charAt(i - 1) === a.charAt(j - 1)
+                    ? matrix[i - 1][j - 1]
+                    : Math.min(
+                        matrix[i - 1][j - 1] + 1,
+                        matrix[i][j - 1] + 1,
+                        matrix[i - 1][j] + 1
+                    );
+        }
+    }
+    return matrix[b.length][a.length];
+}
