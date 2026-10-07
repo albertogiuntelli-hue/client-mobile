@@ -5,7 +5,7 @@ import PopupPeso from "../components/PopupPeso";
 import Toast from "../components/Toast";
 import { useNavigate } from "react-router-dom";
 import "../styles/theme.css";
-import "../styles/productlist.css";
+import "../styles/Productlist.css";
 
 export default function Promo() {
     const [promo, setPromo] = useState([]);
@@ -16,7 +16,7 @@ export default function Promo() {
     const { addToCart } = useCart();
     const navigate = useNavigate();
 
-    const FALLBACK = "/icon-192.png";
+    const FALLBACK = "/placeholder.png";
 
     const getImage = (img) => {
         if (!img || img.trim() === "" || img === "null" || img === "undefined") {
@@ -30,15 +30,16 @@ export default function Promo() {
             .then((res) => {
                 const fixed = res.data.map((p) => ({
                     ...p,
-                    nome: (p.nome || p.descrizione || "").trim(),
+                    nome: (p.nome || "").trim(),
                     a_peso: String(p.a_peso || "")
                         .trim()
                         .toUpperCase() === "S"
                         ? "S"
                         : "N",
-                    prezzo: parseFloat(
+                    prezzo: Number(
                         String(p.prezzo).replace(",", ".").trim()
                     ),
+                    immagine: getImage(p.immagine)
                 }));
 
                 setPromo(fixed);
@@ -82,7 +83,7 @@ export default function Promo() {
                         <span className="badge-offerta">OFFERTA</span>
 
                         <img
-                            src={getImage(product.immagine)}
+                            src={product.immagine}
                             onError={(e) => (e.target.src = FALLBACK)}
                             alt={product.nome}
                             className="product-img"

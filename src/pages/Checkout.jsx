@@ -87,7 +87,7 @@ export default function Checkout() {
                 const isPeso = p.a_peso === "S";
                 const qty = Number(p.quantity) || 0;
                 const weight = Number(p.weight) || 0;
-                const prezzoUnit = Number(p.prezzo); // 🔥 EURO
+                const prezzoUnit = Number(p.prezzo); // EURO
 
                 const subtotal = isPeso
                     ? ((weight / 1000) * prezzoUnit).toFixed(2)
@@ -132,7 +132,7 @@ export default function Checkout() {
                     <div className="checkout-summary">
                         {items.map((item) => {
                             const isPeso = item.a_peso === "S";
-                            const prezzoUnit = Number(item.prezzo); // 🔥 EURO
+                            const prezzoUnit = Number(item.prezzo); // EURO
 
                             const subtotal = isPeso
                                 ? (item.weight / 1000) * prezzoUnit

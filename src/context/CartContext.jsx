@@ -19,8 +19,8 @@ export function CartProvider({ children }) {
             weight = 0,
         } = options;
 
-        const qty = parseFloat(String(quantity).replace(",", ".").trim()) || 0;
-        const wgt = parseFloat(String(weight).replace(",", ".").trim()) || 0;
+        const qty = Number(String(quantity).replace(",", ".").trim()) || 0;
+        const wgt = Number(String(weight).replace(",", ".").trim()) || 0;
 
         setItems((prev) => {
             const existing = prev.find((p) => p.codice === product.codice);
@@ -89,8 +89,9 @@ export function CartProvider({ children }) {
         localStorage.removeItem("cart");
     };
 
+    // TOTALE IN EURO
     const total = items.reduce((sum, item) => {
-        const prezzoUnitarioEuro = item.prezzo;
+        const prezzoUnitarioEuro = Number(item.prezzo) || 0;
 
         if (item.productType === "pezzi") {
             return sum + prezzoUnitarioEuro * item.quantity;

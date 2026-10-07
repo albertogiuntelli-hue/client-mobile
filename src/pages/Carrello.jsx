@@ -14,13 +14,13 @@ export default function Carrello() {
 
     const navigate = useNavigate();
 
-    const FALLBACK = "/logo.png";
+    const FALLBACK = "/placeholder.png";
 
     const getImage = (img) => {
         if (!img || img.trim() === "" || img === "null" || img === "undefined") {
             return FALLBACK;
         }
-        return img.startsWith("http") ? img : img;
+        return img;
     };
 
     if (items.length === 0) {
@@ -35,7 +35,7 @@ export default function Carrello() {
     }
 
     const getItemPrice = (item) => {
-        const prezzoUnitario = Number(item.prezzo); // 🔥 già in EURO
+        const prezzoUnitario = Number(item.prezzo) || 0;
 
         if (item.productType === "pezzi") {
             return (prezzoUnitario * item.quantity).toFixed(2);
@@ -48,6 +48,8 @@ export default function Carrello() {
 
         return "0.00";
     };
+
+    const safeTotal = Number(total || 0).toFixed(2);
 
     return (
         <div className="cart-container">
@@ -65,6 +67,7 @@ export default function Carrello() {
                         src={getImage(item.immagine)}
                         alt={item.nome}
                         className="cart-img"
+                        onError={(e) => (e.target.src = FALLBACK)}
                     />
 
                     <div className="cart-info">
@@ -117,7 +120,7 @@ export default function Carrello() {
             ))}
 
             <div className="cart-total">
-                Totale: € {total.toFixed(2)}
+                Totale: € {safeTotal}
             </div>
 
             <button
